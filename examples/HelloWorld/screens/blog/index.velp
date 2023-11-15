@@ -1,0 +1,28 @@
+import { AsyncQueue, String } from "ellipsis"
+import { getAboutContent } from "$app/internal/api"
+import { Paragraph } from "$components/paragraph"
+
+export Blog(): Screen() {
+    let aboutContent: String
+    let error: Error
+
+    AsyncQueue {
+        (&aboutContent, error) = await getAboutContent()
+    }
+
+    Column {
+        if error {
+            Row(class = "error-row") {
+                Text(error.AsString())
+            }
+        } else {
+            Row {
+                Text(aboutContent.title, class = "title")
+                Paragraph(aboutContent.body)
+            }
+        }
+    }
+}
+
+// vim: ft=swift
+

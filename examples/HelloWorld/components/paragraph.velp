@@ -1,0 +1,7 @@
+import { Text, Component } from "ellipsis"
+
+export Paragraph(const text: string): Component {
+	Text(text)
+}
+
+// vim: ft=swift

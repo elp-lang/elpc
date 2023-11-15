@@ -1,0 +1,8 @@
+App {
+	.ignoreSafeAreas = true
+}
+
+Text {
+    .fontFamily = "Patua One"
+}
+// vim: ft=swift

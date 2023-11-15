@@ -1,0 +1,12 @@
+import { Package, Version } from "ellipsis"
+
+export Package {
+	.name = "elp",
+	.version = Version(1, 0, 0, 0),
+	.entry = "main.elp",
+	.targets = [
+		.iOS,
+		.Android,
+		.Web,
+	],
+}

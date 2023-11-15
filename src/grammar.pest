@@ -1,16 +1,11 @@
 alpha = { 'a'..'z' | 'A'..'Z' }
 digit = { '0'..'9' }
 
-program = _{ SOI ~ expression ~ EOF }
+program = _{ SOI ~ (expression)+ ~ EOI }
 
-expression = { import }
+expression = _{ importExpr }
 
 ident = { (alpha | digit)+ }
 
-import = { import ~ lcurly ~ (ident comma?)+ ~ rcurly ~ from ~ ident }
+importExpr = { "import" ~ "{" ~ (ident ~ ("," ~ ident)?)+ ~ "}" ~ "from" ~ (ident) }
 
-import = "import"
-from = "from"
-lcurly = "{"
-rcurly = "}"
-comma = ","

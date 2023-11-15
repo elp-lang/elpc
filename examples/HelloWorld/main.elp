@@ -1,0 +1,20 @@
+import { App, Router } from "ellipsis"
+import { Home } from "$screens/home"
+import Styles from "$app/styles"
+
+export App(globalStyles = Styles()) {
+    Router {
+        Home()
+        About()
+    }
+}
+
+Stylesheet {
+    App {
+        .ignoreSafeAreas = true
+    }
+
+    Text {
+        .fontFamily = "Patua One"
+    }
+}

@@ -1,0 +1,19 @@
+import { Error } from "ellipsis"
+import { Fetch } from "ellipsis/net"
+
+export struct Content {
+    userId string
+    id     string
+    title  string
+    body   string
+}
+
+export getAboutContent() -> async (Content, Error) {
+    return Fetch<Content>("https://jsonplaceholder.typicode.com/posts/1")
+}
+
+export getBlogPost(id string) -> async (Content, Error) {
+    return Fetch<Content>("https://jsonplaceholder.typicode.com/posts/1")
+}
+
+// vim: ft=swift
