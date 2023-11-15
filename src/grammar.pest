@@ -1,0 +1,16 @@
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+
+program = _{ SOI ~ expression ~ EOF }
+
+expression = { import }
+
+ident = { (alpha | digit)+ }
+
+import = { import ~ lcurly ~ (ident comma?)+ ~ rcurly ~ from ~ ident }
+
+import = "import"
+from = "from"
+lcurly = "{"
+rcurly = "}"
+comma = ","
