@@ -1,4 +1,4 @@
-import { Package, Version } from "ellipsis"
+import { Package, Version } from ellipsis
 
 export Package {
 	.name = "elp",

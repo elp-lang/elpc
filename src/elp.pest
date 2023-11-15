@@ -3,9 +3,10 @@ digit = { '0'..'9' }
 
 program = _{ SOI ~ (expression)+ ~ EOI }
 
-expression = _{ importExpr }
+expression = _{ importExpr | funcExpr | exportExpr }
 
 ident = { (alpha | digit)+ }
 
 importExpr = { "import" ~ "{" ~ (ident ~ ("," ~ ident)?)+ ~ "}" ~ "from" ~ (ident) }
-
+funcExpr = { (ident) ~ "{" ~ (exporyExpr)* ~ "}" }
+exportExpr = { "export" ~ funcExpr }

@@ -2,7 +2,7 @@ use pest::Parser;
 use pest_derive::Parser;
 
 #[derive(Parser)]
-#[grammar = "./grammar.pest"] // relative to src
+#[grammar = "./elp.pest"] // relative to src
 struct ElpParser;
 
 pub fn parse(file: String) {
