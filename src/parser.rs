@@ -6,7 +6,7 @@ use pest_derive::Parser;
 struct ElpParser;
 
 pub fn parse(file: String) {
-    let unit = ElpParser::parse(Rule::program, &file)
+    let unit = ElpParser::parse(Rule::Program, &file)
         .expect("Failed to parse file")
         .next()
         .unwrap();
