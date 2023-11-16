@@ -8,13 +8,21 @@ Expression = _{
 	Import
 	| Function
 	| Export
+	| Array
+	| IdentType
+	| MemberAssignment
 }
 
-Ident = { !digit ~ (alphaNumerical) }
+
+Ident = { ( !digit ~ (alphaNumerical)+ ) }
 
 Import = { "import" ~ "{" ~ (Ident ~ ("," ~ Ident)?)+ ~ "}" ~ "from" ~ (Ident) }
 IdentType = { ( LifeCycleModifier? ~ Ident ~ Ident ) }
-Function = { (Ident) ~ ( "(" ~ IdentType ~ ")" )? ~ "{" ~ (Export)* ~ "}" }
+Function = { (Ident) ~ ( "(" ~ IdentType ~ ")" )? ~ "{" ~ (Expression)* ~ "}" }
 Export = { "export" ~ Function }
 Array = { "[" ~ Expression ~ "]" }
+MemberAssignment = { "." ~ (Ident) ~ "=" ~ (Expression) }
 LifeCycleModifier = { ( "const" | "async" ) }
+
+StringLiteral = { "\"" ~ StringLiteralInterior ~ "\"" }
+StringLiteralInterior = { ( !("\"" ~ PEEK) ~ ANY )* }
