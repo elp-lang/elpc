@@ -40,18 +40,28 @@ fn print_syntax_error_and_exit(error: Error<Rule>, source: String) -> ! {
     let source_lines: Vec<&str>;
     let mut offset_line = false;
     if source.lines().count() > 30 {
-        source_lines = source
-            .lines()
-            .skip(line_num - 15)
-            .take(line_num + 15)
-            .collect();
-        offset_line = true;
+        if line_num > 15 {
+            source_lines = source
+                .lines()
+                .skip(line_num - 15)
+                .take(line_num + 15)
+                .collect();
+            offset_line = true;
+        } else {
+            source_lines = source.lines().skip(line_num).take(line_num + 15).collect();
+        }
     } else {
         source_lines = source.lines().collect();
     }
 
     for (line_number, line) in source_lines.iter().enumerate() {
-        println!("{}: {}", line_number + 1, line);
+        let mut actual_line_number = line_number;
+
+        if offset_line {
+            actual_line_number = line_number + 15;
+        }
+
+        println!("{}: {}", actual_line_number + 1, line);
         if line_number == line_num - 1 {
             let repeated_string: String = std::iter::repeat("-").take(col_num + 3).collect();
             println!("{}^", repeated_string);
