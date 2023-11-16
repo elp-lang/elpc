@@ -1,25 +1,43 @@
-alpha = { 'a'..'z' | 'A'..'Z' }
-digit = { '0'..'9' }
-alphaNumerical = { (alpha | digit)+ }
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+Program    = _{ SOI ~ Expression* ~ EOI }
 
-Program = _{ SOI ~ (Expression)+ ~ EOI }
-
-Expression = _{
-	Import
-	| Function
-	| Export
-	| Array
-	| IdentType
-	| MemberAssignment
+Expression = {
+    Import
+  | Function
+  | Export
+  | Array
+  | IdentType
+  | MemberAssignment
+  | StringLiteral
+  | NumberLiteral
 }
 
-Ident = { ( !digit ~ (alphaNumerical)+ ) }
-Import = { "import" ~ "{" ~ (Ident ~ ("," ~ Ident)?)+ ~ "}" ~ "from" ~ (Ident) }
-IdentType = { ( LifeCycleModifier? ~ Ident ~ Ident ) }
-Function = { (Ident) ~ ( "(" ~ IdentType ~ ")" )? ~ "{" ~ (Expression)* ~ "}" }
-Export = { "export" ~ Function }
-Array = { "[" ~ Expression ~ "]" }
-MemberAssignment = { "." ~ (Ident) ~ "=" ~ (Expression) }
-LifeCycleModifier = { ( "const" | "async" ) }
-StringLiteral = { "\"" ~ StringLiteralInterior ~ "\"" }
-StringLiteralInterior = { ( !("\"" ~ PEEK) ~ ANY )* }
+ValueArg          = _{ Ident ~ ","? }
+Ident             = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+Import            =  { "import" ~ "{" ~ ValueArg+ ~ "}" ~ "from" ~ StringLiteral }
+IdentType         =  { LifeCycleModifier? ~ Ident ~ Ident }
+Function          =  { Ident ~ ("(" ~ IdentType ~ ")")? ~ "{" ~ Expression* ~ "}" }
+Export            =  { "export" ~ Function }
+Array             =  { "[" ~ Expression ~ "]" }
+MemberAssignment  =  { "." ~ (Ident) ~ "=" ~ (Expression) }
+LifeCycleModifier =  { ("const" | "async") }
+
+StringLiteral         =  { "\"" ~ (StringLiteralInterior | escape)* ~ "\"" }
+StringLiteralInterior =  { (!("\\" | "\"") ~ ANY)+ }
+predefined            =  { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" }
+byte                  =  { "x" ~ hex{2} }
+unicode               =  { "u" ~ "{" ~ unicode_hex ~ "}" }
+escape                =  { "\\" ~ (predefined | byte | unicode) }
+hex                   = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
+unicode_hex           =  { hex{1, 6} }
+
+digit         = _{ '0'..'9' }
+Int           =  { digit ~ (digit | "_")* }
+Float         =  {
+    Int ~ "." ~ Int? ~ exp?
+  | Int ~ exp
+}
+plus          =  { "+" }
+minus         =  { "-" }
+exp           =  { ^"e" ~ (plus | minus)? ~ Int }
+NumberLiteral =  { Int | Float }

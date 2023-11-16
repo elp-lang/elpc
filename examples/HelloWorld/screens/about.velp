@@ -1,13 +1,13 @@
-import { AsyncQueue, String } from "ellipsis"
+import { AsyncQueue, String } from "elp"
 import { getAboutContent } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-export About(): Screen(path = "about") {
+export About(): Screen {
     let aboutContent: String
     let error: Error
 
     AsyncQueue {
-        (&aboutContent, error) = await getAboutContent()
+        (&aboutContent, &error) = await getAboutContent()
     }
 
     Column {
