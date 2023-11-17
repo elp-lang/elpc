@@ -3,24 +3,39 @@ Program    = _{ SOI ~ Expression* ~ EOI }
 
 Expression = {
     Import
+  | Call
   | Function
   | Export
   | Array
   | IdentType
+  | MemberValue
   | MemberAssignment
-  | StringLiteral
-  | NumberLiteral
+  | Literal
 }
 
-ValueArg          = _{ Ident ~ ","? }
+Literal = {
+    StringLiteral
+  | NumberLiteral
+  | BoolLiteral
+}
+
+ValueArg          = _{ (Ident | Literal) ~ ","? }
 Ident             = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
 Import            =  { "import" ~ "{" ~ ValueArg+ ~ "}" ~ "from" ~ StringLiteral }
 IdentType         =  { LifeCycleModifier? ~ Ident ~ Ident }
+Call              =  { Ident ~ "(" ~ ValueArg* ~ ")" }
 Function          =  { Ident ~ ("(" ~ IdentType ~ ")")? ~ "{" ~ Expression* ~ "}" }
 Export            =  { "export" ~ Function }
 Array             =  { "[" ~ Expression ~ "]" }
-MemberAssignment  =  { "." ~ (Ident) ~ "=" ~ (Expression) }
-LifeCycleModifier =  { ("const" | "async") }
+MemberValue       =  { "." ~ Ident }
+MemberAssignment  =  { MemberValue ~ "=" ~ Expression }
+LifeCycleModifier =  { ASYNC | CONST }
+CONST             =  { "const" }
+ASYNC             =  { "async" }
+
+BoolLiteral = { TRUE | FALSE }
+TRUE        = { "true" }
+FALSE       = { "false" }
 
 StringLiteral         =  { "\"" ~ (StringLiteralInterior | escape)* ~ "\"" }
 StringLiteralInterior =  { (!("\\" | "\"") ~ ANY)+ }

@@ -2,7 +2,7 @@ use crate::ast;
 use pest::{
     error::{Error, LineColLocation},
     iterators::Pairs,
-    Lines, Parser,
+    Parser,
 };
 use pest_derive::Parser;
 
@@ -19,6 +19,8 @@ pub fn parse(source: String) -> StdResult<Vec<ast::nodes::Expression>, Error<Rul
         Ok(parser) => parse_result = parser,
         Err(e) => print_syntax_error_and_exit(e, source.clone()),
     }
+
+    print!("{:?}", parse_result);
 
     parse_result
         .into_iter()
@@ -63,7 +65,7 @@ fn print_syntax_error_and_exit(error: Error<Rule>, source: String) -> ! {
 
         println!("{}: {}", actual_line_number + 1, line);
         if line_number == line_num - 1 {
-            let repeated_string: String = std::iter::repeat("-").take(col_num + 3).collect();
+            let repeated_string: String = std::iter::repeat("-").take(col_num + 6).collect();
             println!("{}^", repeated_string);
         }
     }
