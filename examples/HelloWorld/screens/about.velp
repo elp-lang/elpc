@@ -7,7 +7,7 @@ export About(): Screen {
     let error: Error
 
     AsyncQueue {
-        (&aboutContent, &error) = await getAboutContent()
+        aboutContent, error = await getAboutContent()
     }
 
     Column {
