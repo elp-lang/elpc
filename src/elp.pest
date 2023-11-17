@@ -9,7 +9,6 @@ Expression = {
   | Array
   | IdentType
   | MemberValue
-  | MemberAssignment
   | Literal
 }
 
@@ -27,8 +26,7 @@ Call              =  { Ident ~ "(" ~ ValueArg* ~ ")" }
 Function          =  { Ident ~ ("(" ~ IdentType ~ ")")? ~ "{" ~ Expression* ~ "}" }
 Export            =  { "export" ~ Function }
 Array             =  { "[" ~ Expression ~ "]" }
-MemberValue       =  { "." ~ Ident }
-MemberAssignment  =  { MemberValue ~ "=" ~ Expression }
+MemberValue       =  { "." ~ Ident ~ ("=" ~ Expression)* }
 LifeCycleModifier =  { ASYNC | CONST }
 CONST             =  { "const" }
 ASYNC             =  { "async" }
