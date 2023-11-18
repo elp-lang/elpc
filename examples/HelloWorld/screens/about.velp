@@ -2,7 +2,7 @@ import { AsyncQueue, String } from "elp"
 import { getAboutContent } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-export About(): Screen {
+export fn About(): Screen {
     let aboutContent: String
     let error: Error
 

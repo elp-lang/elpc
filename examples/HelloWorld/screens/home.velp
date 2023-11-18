@@ -2,7 +2,7 @@ import { Column, Row, Text, Date, String } from "ellipsis"
 import { Stylesheet } from "ellipsis/styling"
 import Paragraph from "$components/paragraph"
 
-export Home(): Screen(path = "home") {
+export fn Home: Screen {
     const name = "Dave"
 
     Column {
