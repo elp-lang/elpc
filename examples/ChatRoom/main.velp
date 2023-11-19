@@ -1,2 +1,9 @@
-import { View } from "elp"
-import { User, UserMessage }
+import { App } from "elp"
+
+export fn Chat: App {
+	.name: string?
+
+	if name not Empty {
+
+	}
+}
