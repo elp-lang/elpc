@@ -1,44 +1,19 @@
-WHITESPACE = _{ " " | "\t" | NEWLINE }
-Program    = _{ SOI ~ Expression* ~ EOI }
+Program = { SOI ~ (Declaration | Expression | Statement)* ~ EOI }
 
-Expression = {
-    Import
-  | Declaration
-  | Call
-  | Function
-  | Export
-  | Array
-  | MemberValue
-  | Literal
-  | IfElseChain
+// PARENT TYPES
+Declaration = { Interface | Enum | VariableDeclaration }
+Statement   = { Import | VariableBinding }
+Expression  = {
+    Literal
 }
+// \PARENT TYPES
 
+// LITERALS
 Literal = {
     StringLiteral
   | NumberLiteral
   | BoolLiteral
 }
-
-Binding           =  { "=" ~ Expression }
-ValueArg          = _{ (Ident | Literal | Call) ~ Binding? ~ ","? }
-IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-Ident             =  { IdentConstituents ~ ("." ~ IdentConstituents)* }
-Import            =  { "import" ~ "{" ~ ValueArg+ ~ "}" ~ "from" ~ StringLiteral }
-Call              =  { LifeCycleModifier? ~ Ident ~ ("(" ~ ValueArg* ~ ")")? ~ TypeDeclaration? ~ Body? }
-Body              =  { "{" ~ Expression* ~ "}" }
-Function          =  { FN ~ Ident ~ TypeDeclaration? ~ ("(" ~ Declaration* ~ ")")? ~ Body }
-Export            =  { "export" ~ (Declaration | Function) }
-Array             =  { "[" ~ (Expression ~ ",")* ~ "]" }
-MemberValue       =  { "." ~ Ident ~ Binding? }
-LifeCycleModifier =  { ASYNC | AWAIT }
-ASYNC             =  { "async" }
-AWAIT             =  { "await" }
-TypeDeclaration   =  { ":" ~ Ident }
-Declaration       =  { Mutability? ~ Ident ~ ("," ~ Ident)* ~ TypeDeclaration? ~ Binding? }
-Mutability        =  { LET | CONST }
-LET               =  { "let" }
-CONST             =  { "const" }
-FN                =  { "fn" }
 
 BoolLiteral = { TRUE | FALSE }
 TRUE        = { "true" }
@@ -63,12 +38,45 @@ plus          =  { "+" }
 minus         =  { "-" }
 exp           =  { ^"e" ~ (plus | minus)? ~ Int }
 NumberLiteral =  { Int | Float }
+// \LITERALS
 
+// BRANCHING
 IF           = @{ "if" }
 ELSE         = @{ "else" }
 ELSEIF       = @{ "elseif" }
 MATCH        =  { "match" }
-LogicControl =  { IF | ELSE | ELSEIF | MATCH }
+LogicControl =  { IF | ELSE | ELSEIF }
 IfElseChain  =  { LogicControl ~ Expression? ~ "{" ~ Expression* ~ "}" }
+// \BRANCHING
 
-Keywords = { ASYNC | LET | CONST | IF | ELSE | ELSEIF | MATCH | FN }
+// INTRINSICS
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+IMPORT     =  { "import" }
+FROM       =  { "from" }
+INTERFACE  =  { "interface" }
+ENUM       =  { "enum" }
+CONST      =  { "const" }
+Keywords   =  { IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST }
+
+IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+Ident             =  { IdentConstituents ~ ("." ~ IdentConstituents)* }
+// \INTRINSICS
+
+// DECLARATIONS
+ValueBinding        = { "=" ~ Expression }
+TypeBinding         = { ":" ~ Ident }
+Member              = { "." ~ Ident ~ TypeBinding? ~ ValueBinding? }
+EnumMember          = { "." ~ Ident ~ ("(" ~ (Ident ~ TypeBinding ~ ","?)+ ~ ")")? }
+Interface           = { INTERFACE ~ Ident ~ "{" ~ Member* ~ "}" }
+Enum                = { ENUM ~ Ident ~ "{" ~ EnumMember+ ~ "}" }
+VariableDeclaration = { CONST? ~ Ident ~ TypeBinding? }
+// \DECLARATIONS
+
+// STATEMENTS
+Import          = { IMPORT ~ "{" ~ (Ident ~ ","?)+ ~ "}" ~ FROM ~ StringLiteral }
+VariableBinding = { VariableDeclaration ~ "=" ~ ValueBinding }
+// \STATEMENTS
+
+// EXPRESSIONS
+
+// \EXPRESSIONS
