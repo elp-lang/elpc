@@ -2,12 +2,12 @@ import { AsyncQueue, String } from "ellipsis"
 import { getAboutContent } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-export Blog(): Screen() {
+export fn Blog(): Screen() {
     let aboutContent: String
     let error: Error
 
     AsyncQueue {
-        (&aboutContent, error) = await getAboutContent()
+        aboutContent, error = await getAboutContent()
     }
 
     Column {

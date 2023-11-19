@@ -1,0 +1,7 @@
+import { View } from "elp"
+import { User, UserMessage } from "$types/chat"
+
+export fn Message(body:string) {
+
+}
+

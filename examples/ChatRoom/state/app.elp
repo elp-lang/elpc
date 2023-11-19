@@ -1,0 +1,23 @@
+import { Stateful } from "elp/state"
+import { User, Message, Actions } from "$types/chat"
+
+export interface State: Stateful {
+	.usersInRoom: [User]
+	.messages: [Message]
+}
+
+fn ChatState(user: User): State {
+	.usersInRoom = [user]
+	.messages = []
+}
+
+
+export fn Reducer(startingState: State) -> fn(Actions) -> State {
+	.state = startingState
+
+	return fn Dispatcher(action: Actions) -> State {
+		return match action {
+			.LOGIN() -> .state = 
+		}
+	}
+}

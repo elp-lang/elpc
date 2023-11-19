@@ -1,0 +1,17 @@
+import { UUID } from "elp/types"
+
+export interface User {
+	displayName: string
+}
+
+export interface Message {
+	body: string
+	user: User
+}
+
+export enum Actions {
+	.LOGIN(user: User)
+	.SEND_MESSAGE(body: string)
+	.DELETE_MESSAGE(id: UUID)
+	.LOGOUT
+}

@@ -1,17 +1,17 @@
-import { AsyncQueue, String } from "ellipsis"
+import { AsyncQueue, String } from "elp"
 import { getBlogPost } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-struct Params {
-    id string
+interface Params {
+    id: string
 }
 
-export BlogPost(): Screen<Params>() {
+export fn BlogPost(): Screen<Params> {
     let post: Content
     let error: Error
 
     AsyncQueue {
-        &post, &error = await getBlogPost()
+        post, error = await getBlogPost()
     }
 
     Column {
