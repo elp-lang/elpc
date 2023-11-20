@@ -1,10 +1,15 @@
-Program = { SOI ~ (Declaration | Expression | Statement)* ~ EOI }
+Program = { SOI ~ Expression* ~ EOI }
 
 // PARENT TYPES
-Declaration = { Interface | Enum | VariableDeclaration }
-Statement   = { Import | VariableBinding }
-Expression  = {
+Expression = {
     Literal
+  | Interface
+  | Enum
+  | Import
+  | VariableBinding
+  | VariableDeclaration
+  | Function
+  | FunctionCall
 }
 // \PARENT TYPES
 
@@ -55,8 +60,9 @@ IMPORT     =  { "import" }
 FROM       =  { "from" }
 INTERFACE  =  { "interface" }
 ENUM       =  { "enum" }
+FN         =  { "fn" }
 CONST      =  { "const" }
-Keywords   =  { IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST }
+Keywords   =  { IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST | FN }
 
 IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
 Ident             =  { IdentConstituents ~ ("." ~ IdentConstituents)* }
@@ -66,17 +72,23 @@ Ident             =  { IdentConstituents ~ ("." ~ IdentConstituents)* }
 ValueBinding        = { "=" ~ Expression }
 TypeBinding         = { ":" ~ Ident }
 Member              = { "." ~ Ident ~ TypeBinding? ~ ValueBinding? }
-EnumMember          = { "." ~ Ident ~ ("(" ~ (Ident ~ TypeBinding ~ ","?)+ ~ ")")? }
+EnumMember          = { "." ~ Ident ~ ParenArgDeclarations? }
 Interface           = { INTERFACE ~ Ident ~ "{" ~ Member* ~ "}" }
 Enum                = { ENUM ~ Ident ~ "{" ~ EnumMember+ ~ "}" }
 VariableDeclaration = { CONST? ~ Ident ~ TypeBinding? }
+Function            = { FN ~ Ident ~ ParenArgDeclarations? ~ FunctionInherits? ~ ReturnType? ~ Block }
 // \DECLARATIONS
 
 // STATEMENTS
 Import          = { IMPORT ~ "{" ~ (Ident ~ ","?)+ ~ "}" ~ FROM ~ StringLiteral }
-VariableBinding = { VariableDeclaration ~ "=" ~ ValueBinding }
+VariableBinding = { (VariableDeclaration ~ ","?)+ ~ ValueBinding }
 // \STATEMENTS
 
 // EXPRESSIONS
-
+Block                = { "{" ~ Expression* ~ "}" }
+ParenArgDeclarations = { ("(" ~ (Ident ~ TypeBinding ~ ","?)* ~ ")") }
+CallArgDeclarations  = { (Ident ~ "=")? ~ Expression }
+ReturnType           = { "->" ~ Ident }
+FunctionInherits     = { ":" ~ FunctionCall }
+FunctionCall         = { Ident ~ (("(" ~ CallArgDeclarations* ~ ")") | Block) }
 // \EXPRESSIONS
