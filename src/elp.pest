@@ -87,8 +87,8 @@ VariableBinding = { (VariableDeclaration ~ ","?)+ ~ ValueBinding }
 // EXPRESSIONS
 Block                = { "{" ~ Expression* ~ "}" }
 ParenArgDeclarations = { ("(" ~ (Ident ~ TypeBinding ~ ","?)* ~ ")") }
-CallArgDeclarations  = { (Ident ~ "=")? ~ Expression }
+CallArgDeclarations  = { "(" ~ ((Ident ~ "=")? ~ Expression ~ ","?)* ~ ")" }
 ReturnType           = { "->" ~ Ident }
-FunctionInherits     = { ":" ~ FunctionCall }
-FunctionCall         = { Ident ~ (("(" ~ CallArgDeclarations* ~ ")") | Block) }
+FunctionInherits     = { ":" ~ Ident ~ CallArgDeclarations? }
+FunctionCall         = { Ident ~ CallArgDeclarations? ~ Block? }
 // \EXPRESSIONS
