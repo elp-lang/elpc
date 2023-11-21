@@ -1,7 +1,7 @@
 Program = { SOI ~ Expression* ~ EOI }
 
 // PARENT TYPES
-Expression = {
+Expression = _{
     Literal
   | Interface
   | Enum
@@ -14,58 +14,56 @@ Expression = {
 // \PARENT TYPES
 
 // LITERALS
-Literal = {
+Literal = @{
     StringLiteral
   | NumberLiteral
   | BoolLiteral
 }
 
-BoolLiteral = { TRUE | FALSE }
-TRUE        = { "true" }
-FALSE       = { "false" }
+BoolLiteral = _{ TRUE | FALSE }
+TRUE        = _{ "true" }
+FALSE       = _{ "false" }
 
 StringLiteral         =  { "\"" ~ (StringLiteralInterior | escape)* ~ "\"" }
 StringLiteralInterior =  { (!("\\" | "\"") ~ ANY)+ }
-predefined            =  { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" }
-byte                  =  { "x" ~ hex{2} }
-unicode               =  { "u" ~ "{" ~ unicode_hex ~ "}" }
-escape                =  { "\\" ~ (predefined | byte | unicode) }
-hex                   = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
-unicode_hex           =  { hex{1, 6} }
+predefined            = _{ "n" | "r" | "t" | "\\" | "0" | "\"" | "'" }
+byte                  = _{ "x" ~ ASCII_HEX_DIGIT{2} }
+unicode               = _{ "u" ~ "{" ~ ASCII_HEX_DIGIT+ ~ "}" }
+escape                = _{ "\\" ~ (predefined | byte | unicode) }
 
 digit         = _{ '0'..'9' }
-Int           =  { digit ~ (digit | "_")* }
-Float         =  {
+Int           = _{ digit ~ (digit | "_")* }
+Float         = _{
     Int ~ "." ~ Int? ~ exp?
   | Int ~ exp
 }
-plus          =  { "+" }
-minus         =  { "-" }
-exp           =  { ^"e" ~ (plus | minus)? ~ Int }
-NumberLiteral =  { Int | Float }
+plus          = _{ "+" }
+minus         = _{ "-" }
+exp           = _{ ^"e" ~ (plus | minus)? ~ Int }
+NumberLiteral = _{ Int | Float }
 // \LITERALS
 
 // BRANCHING
-IF           = @{ "if" }
-ELSE         = @{ "else" }
-ELSEIF       = @{ "elseif" }
-MATCH        =  { "match" }
-LogicControl =  { IF | ELSE | ELSEIF }
-IfElseChain  =  { LogicControl ~ Expression? ~ "{" ~ Expression* ~ "}" }
+IF           = _{ "if" }
+ELSE         = _{ "else" }
+ELSEIF       = _{ "elseif" }
+MATCH        = _{ "match" }
+LogicControl = _{ IF | ELSE | ELSEIF }
+IfElseChain  = _{ LogicControl ~ Expression? ~ "{" ~ Expression* ~ "}" }
 // \BRANCHING
 
 // INTRINSICS
 WHITESPACE = _{ " " | "\t" | NEWLINE }
-IMPORT     =  { "import" }
-FROM       =  { "from" }
-INTERFACE  =  { "interface" }
-ENUM       =  { "enum" }
-FN         =  { "fn" }
-CONST      =  { "const" }
-Keywords   =  { IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST | FN }
+IMPORT     = _{ "import" }
+FROM       = _{ "from" }
+INTERFACE  = _{ "interface" }
+ENUM       = _{ "enum" }
+FN         = _{ "fn" }
+CONST      = _{ "const" }
+Keywords   = _{ IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST | FN }
 
 IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-Ident             =  { IdentConstituents ~ ("." ~ IdentConstituents)* }
+Ident             = @{ IdentConstituents ~ ("." ~ IdentConstituents)* }
 // \INTRINSICS
 
 // DECLARATIONS
@@ -90,5 +88,5 @@ ParenArgDeclarations = { ("(" ~ (Ident ~ TypeBinding ~ ","?)* ~ ")") }
 CallArgDeclarations  = { "(" ~ ((Ident ~ "=")? ~ Expression ~ ","?)* ~ ")" }
 ReturnType           = { "->" ~ Ident }
 FunctionInherits     = { ":" ~ Ident ~ CallArgDeclarations? }
-FunctionCall         = { Ident ~ CallArgDeclarations? ~ Block? }
+FunctionCall         = { Ident ~ (CallArgDeclarations | Block)+ }
 // \EXPRESSIONS
