@@ -3,6 +3,7 @@ Program = { SOI ~ Expression* ~ EOI }
 // PARENT TYPES
 Expression = _{
     Match
+  | IfElseChain
   | FunctionCall
   | Function
   | Literal
@@ -11,7 +12,6 @@ Expression = _{
   | Import
   | VariableBinding
   | VariableDeclaration
-  | IfElseChain
 }
 // \PARENT TYPES
 
@@ -51,9 +51,10 @@ ELSE         = _{ "else" }
 ELSEIF       = _{ "elseif" }
 MATCH        = _{ "match" }
 LogicControl = @{ IF | ELSEIF | ELSE }
-IfElse       = _{ LogicControl ~ Expression ~ Block }
+IfElse       = { LogicControl ~ Expression ~ Block }
 IfElseChain  =  { IfElse+ }
-MatchClause  =  { "."? ~ (Ident | Literal) ~ ParenArgDeclarations? ~ "->" ~ Expression ~ "," }
+MatchClause  =  { "."? ~ (Ident | Literal) ~ ParenArgDeclarations? ~ "->" ~ MatchReturn ~ "," }
+MatchReturn = { Expression | Block }
 Match        =  { MATCH ~ (Expression | Literal) ~ "{" ~ MatchClause* ~ "}" }
 // \BRANCHING
 
@@ -67,7 +68,7 @@ FN         = _{ "fn" }
 CONST      = _{ "const" }
 Keywords   = _{ FN | IF | ELSEIF | ELSE | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST }
 
-IdentConstituents = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
 Ident             = @{ IdentConstituents ~ ("." ~ IdentConstituents)* }
 // \INTRINSICS
 
