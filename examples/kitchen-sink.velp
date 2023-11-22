@@ -43,15 +43,16 @@ MyFunction("world") {}
 MyFunction(hello = "world", name = "dave") {}
 
 if a {}
-elseif b {}
+elseif b { }
 else {}
 
 match result {
-	.MEMBER -> expression
-	.ACTION(arg: string) -> arg
+	.MEMBER -> expression,
+	.ACTION(arg: string) -> arg,
 }
 
 match booleanCheck {
-	true -> expression
-	false -> expression
+	true -> expression,
+	false -> expression,
 }
+

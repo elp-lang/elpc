@@ -2,15 +2,16 @@ Program = { SOI ~ Expression* ~ EOI }
 
 // PARENT TYPES
 Expression = _{
-    FunctionCall
+    Match
+  | FunctionCall
   | Function
-  | IfElseChain
   | Literal
   | Interface
   | Enum
   | Import
   | VariableBinding
   | VariableDeclaration
+  | IfElseChain
 }
 // \PARENT TYPES
 
@@ -49,9 +50,11 @@ IF           = _{ "if" }
 ELSE         = _{ "else" }
 ELSEIF       = _{ "elseif" }
 MATCH        = _{ "match" }
-LogicControl =  { IF | ELSE | ELSEIF }
-IfElse       =  { LogicControl ~ Expression ~ Block }
+LogicControl = @{ IF | ELSEIF | ELSE }
+IfElse       = _{ LogicControl ~ Expression ~ Block }
 IfElseChain  =  { IfElse+ }
+MatchClause  =  { "."? ~ (Ident | Literal) ~ ParenArgDeclarations? ~ "->" ~ Expression ~ "," }
+Match        =  { MATCH ~ (Expression | Literal) ~ "{" ~ MatchClause* ~ "}" }
 // \BRANCHING
 
 // INTRINSICS
@@ -62,9 +65,9 @@ INTERFACE  = _{ "interface" }
 ENUM       = _{ "enum" }
 FN         = _{ "fn" }
 CONST      = _{ "const" }
-Keywords   = _{ FN | IF | ELSE | ELSEIF | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST }
+Keywords   = _{ FN | IF | ELSEIF | ELSE | MATCH | INTERFACE | ENUM | IMPORT | FROM | CONST }
 
-IdentConstituents = @{ !Keywords ~ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+IdentConstituents = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
 Ident             = @{ IdentConstituents ~ ("." ~ IdentConstituents)* }
 // \INTRINSICS
 
@@ -77,7 +80,7 @@ Interface           = { INTERFACE ~ Ident ~ "{" ~ Member* ~ "}" }
 Enum                = { ENUM ~ Ident ~ "{" ~ EnumMember+ ~ "}" }
 VariableDeclaration = { CONST? ~ Ident ~ TypeBinding? }
 Function            = { FN ~ Ident ~ ParenArgDeclarations? ~ FunctionInherits? ~ ReturnType? ~ Block }
-ReturnType           = { "->" ~ Ident }
+ReturnType          = { "->" ~ Ident }
 // \DECLARATIONS
 
 // STATEMENTS
