@@ -70,13 +70,11 @@ impl Lexer {
     fn consume_ident_into_token(&mut self) -> Token {
         let mut value: String = "".to_string();
 
-        loop {
-            if let Some(ch) = self.input.chars().nth(self.reader_position) {
-                if self.could_be_ident(ch) {
-                    value.push(ch);
-                } else {
-                    break;
-                }
+        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+            if self.could_be_ident(ch) {
+                value.push(ch);
+            } else {
+                break;
             }
 
             self.reader_position += 1;
@@ -96,13 +94,11 @@ impl Lexer {
     fn consume_whitespace_into_token(&mut self) -> Token {
         let mut value: String = "".to_string();
 
-        loop {
-            if let Some(ch) = self.input.chars().nth(self.reader_position) {
-                if ch.is_whitespace() {
-                    value.push(ch);
-                } else {
-                    break;
-                }
+        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+            if ch.is_whitespace() {
+                value.push(ch);
+            } else {
+                break;
             }
 
             self.reader_position += 1;
@@ -118,13 +114,9 @@ impl Lexer {
     fn consume_symbol_into_token(&mut self) -> Token {
         let mut value: String = "".to_string();
 
-        loop {
-            if let Some(ch) = self.input.chars().nth(self.reader_position) {
-                if !ch.is_whitespace() && !self.could_be_ident(ch) {
-                    value.push(ch);
-                } else {
-                    break;
-                }
+        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+            if !ch.is_whitespace() && !self.could_be_ident(ch) {
+                value.push(ch);
             } else {
                 break;
             }
@@ -147,12 +139,11 @@ impl Lexer {
     fn consume_next_token(&mut self) -> Result<Token, Error> {
         let next_token: Result<Token, Error>;
 
-        print!("{} {}", self.reader_position + 1, self.input.len());
         if self.reader_position + 1 >= self.input.len() - 1 {
             self.current_position = self.input.len() - 1;
             return Ok(Token {
                 token_type: TokenType::EOF,
-                span: (self.current_position, self.reader_position),
+                span: (self.reader_position, self.reader_position),
                 value: "".to_string(),
             });
         }
@@ -175,21 +166,50 @@ impl Lexer {
         next_token
     }
 
-    pub fn consume_all_tokens(&mut self) -> Result<&Vec<Token>, Error> {
+    pub fn consume_all_tokens(&mut self) -> &Vec<Token> {
         while let Ok(next_token) = self.consume_next_token() {
-            print!("\n{}, {}\n", self.current_position, self.reader_position);
             if self.current_position == self.reader_position {
                 panic!("Cursor was not advanced!")
             }
             self.current_position = self.reader_position;
 
             self.tokens.push(next_token.clone());
-            // print!("\n'{}'\n{}\n", next_token.value, next_token.token_type);
             if next_token.token_type == TokenType::EOF {
                 break;
             }
         }
 
-        Ok(&self.tokens)
+        &self.tokens
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lexer() {
+        let mut lexer = Lexer::new("import".to_string());
+
+        assert_eq!(
+            *lexer.consume_all_tokens(),
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    span: (0, 0),
+                    value: "".to_string(),
+                },
+                Token {
+                    token_type: TokenType::Ident("import".to_string()),
+                    span: (0, 6),
+                    value: "import".to_string(),
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    span: (6, 6),
+                    value: "".to_string(),
+                }
+            ]
+        );
     }
 }

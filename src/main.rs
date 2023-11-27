@@ -8,8 +8,6 @@ fn main() {
         .expect("Couldn't open kitchen-sink.velp");
     let mut lexer = Lexer::new(source);
 
-    match lexer.consume_all_tokens() {
-        Ok(tokens) => print!("TOKENS: \n{:#?}\n", tokens),
-        Err(err) => panic!("{:#?}", err),
-    }
+    let tokens = lexer.consume_all_tokens();
+    print!("TOKENS: \n{:#?}\n", tokens);
 }
