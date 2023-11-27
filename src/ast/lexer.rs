@@ -55,7 +55,11 @@ impl Lexer {
             input,
             current_position: 0,
             reader_position: 0,
-            tokens: vec![],
+            tokens: vec![Token {
+                token_type: TokenType::SOI,
+                value: "".to_string(),
+                span: (0, 0),
+            }],
         }
     }
 
@@ -141,13 +145,11 @@ impl Lexer {
     }
 
     fn consume_next_token(&mut self) -> Result<Token, Error> {
-        let mut next_token: Result<Token, Error> = Ok(Token {
-            token_type: TokenType::SOI,
-            value: "".to_string(),
-            span: (0, 0),
-        });
+        let next_token: Result<Token, Error>;
 
-        if &self.reader_position + 1 > self.input.len() {
+        print!("{} {}", self.reader_position + 1, self.input.len());
+        if self.reader_position + 1 >= self.input.len() - 1 {
+            self.current_position = self.input.len() - 1;
             return Ok(Token {
                 token_type: TokenType::EOF,
                 span: (self.current_position, self.reader_position),
@@ -174,26 +176,17 @@ impl Lexer {
     }
 
     pub fn consume_all_tokens(&mut self) -> Result<&Vec<Token>, Error> {
-        loop {
-            let next_token = self.consume_next_token();
+        while let Ok(next_token) = self.consume_next_token() {
             print!("\n{}, {}\n", self.current_position, self.reader_position);
             if self.current_position == self.reader_position {
                 panic!("Cursor was not advanced!")
             }
             self.current_position = self.reader_position;
 
-            if let Err(err) = next_token {
-                return Err(err);
-            }
-
-            if let Ok(token) = next_token {
-                self.tokens.push(token.clone());
-                print!("\n'{}'\n{}\n", token.value, token.token_type);
-                if token.token_type == TokenType::EOF {
-                    break;
-                }
-            } else {
-                self.tokens.push(next_token.unwrap());
+            self.tokens.push(next_token.clone());
+            // print!("\n'{}'\n{}\n", next_token.value, next_token.token_type);
+            if next_token.token_type == TokenType::EOF {
+                break;
             }
         }
 
