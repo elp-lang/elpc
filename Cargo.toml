@@ -10,5 +10,3 @@ edition = "2021"
 [dev-dependencies]
 pretty_assertions = "1.4.0"
 # inkwell = { version = "0.2.0", features = ["llvm16-0"] }
-# pest = "2.7.5"
-# pest_derive = "2.7.5"
