@@ -187,29 +187,52 @@ impl Lexer {
 mod tests {
     use super::*;
 
+    macro_rules! results {
+    ($($middle:expr),*) => {
+        {
+        let soi = Token {
+            token_type: TokenType::SOI,
+            span: (0, 0),
+            value: "".to_string(),
+        };
+        let eof = Token {
+            token_type: TokenType::EOF,
+            span: (6, 6),
+            value: "".to_string(),
+        };
+            let mut v = Vec::new();
+            v.push(soi);
+            $(v.push($middle);)*
+            v.push(eof);
+            v
+        }
+    };
+}
+
+    macro_rules! whitespace {
+        ($x:expr, $y:expr, $value:expr) => {
+            Token {
+                token_type: TokenType::Whitespace,
+                span: ($x, $y),
+                value: $value.to_string(),
+            }
+        };
+    }
+
     #[test]
-    fn test_lexer() {
-        let mut lexer = Lexer::new("import".to_string());
+    fn test_lexer_sanity() {
+        let mut lexer = Lexer::new("import { Thing } from \"elp\"".to_string());
 
         assert_eq!(
             *lexer.consume_all_tokens(),
-            vec![
-                Token {
-                    token_type: TokenType::SOI,
-                    span: (0, 0),
-                    value: "".to_string(),
-                },
+            results!(
                 Token {
                     token_type: TokenType::Ident("import".to_string()),
                     span: (0, 6),
                     value: "import".to_string(),
                 },
-                Token {
-                    token_type: TokenType::EOF,
-                    span: (6, 6),
-                    value: "".to_string(),
-                }
-            ]
+                whitespace!(7, 7, " ")
+            )
         );
     }
 }
