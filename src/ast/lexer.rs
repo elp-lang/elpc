@@ -189,6 +189,7 @@ impl Lexer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     macro_rules! results {
     ($str:expr, $($middle:expr),*,) => {
@@ -233,10 +234,34 @@ mod tests {
                 input.clone(),
                 Token {
                     token_type: TokenType::Ident("import".to_string()),
-                    span: (0, 6),
+                    span: (0, 5),
                     value: "import".to_string(),
                 },
-                whitespace!(7, 7, " "),
+                whitespace!(6, 7, " "),
+                Token {
+                    token_type: TokenType::OpenBlock,
+                    span: (8, 9),
+                    value: "{".to_string(),
+                },
+                whitespace!(9, 10, " "),
+                Token {
+                    token_type: TokenType::Ident("Thing".to_string()),
+                    span: (11, 16),
+                    value: "Thing".to_string(),
+                },
+                whitespace!(17, 18, " "),
+                Token {
+                    token_type: TokenType::CloseBlock,
+                    span: (19, 20),
+                    value: "}".to_string(),
+                },
+                whitespace!(21, 22, " "),
+                Token {
+                    token_type: TokenType::Ident("from".to_string()),
+                    span: (22, 26),
+                    value: "from".to_string(),
+                },
+                whitespace!(26, 27, " "),
             )
         );
     }
