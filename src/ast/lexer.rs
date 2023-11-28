@@ -168,7 +168,10 @@ impl Lexer {
 
     pub fn consume_all_tokens(&mut self) -> &Vec<Token> {
         while let Ok(next_token) = self.consume_next_token() {
-            if self.current_position == self.reader_position {
+            if self.current_position == self.reader_position
+                && next_token.token_type != TokenType::EOF
+            {
+                print!("Parsed token {:#?}\n", next_token);
                 panic!("Cursor was not advanced!")
             }
             self.current_position = self.reader_position;
@@ -188,18 +191,18 @@ mod tests {
     use super::*;
 
     macro_rules! results {
-    ($($middle:expr),*) => {
+    ($str:expr, $($middle:expr),*,) => {
         {
-        let soi = Token {
-            token_type: TokenType::SOI,
-            span: (0, 0),
-            value: "".to_string(),
-        };
-        let eof = Token {
-            token_type: TokenType::EOF,
-            span: (6, 6),
-            value: "".to_string(),
-        };
+            let soi = Token {
+                token_type: TokenType::SOI,
+                span: (0, 0),
+                value: "".to_string(),
+            };
+            let eof = Token {
+                token_type: TokenType::EOF,
+                span: ($str.len()-1, $str.len()-1),
+                value: "".to_string(),
+            };
             let mut v = Vec::new();
             v.push(soi);
             $(v.push($middle);)*
@@ -212,7 +215,7 @@ mod tests {
     macro_rules! whitespace {
         ($x:expr, $y:expr, $value:expr) => {
             Token {
-                token_type: TokenType::Whitespace,
+                token_type: TokenType::Whitespace($value.to_string()),
                 span: ($x, $y),
                 value: $value.to_string(),
             }
@@ -221,17 +224,19 @@ mod tests {
 
     #[test]
     fn test_lexer_sanity() {
-        let mut lexer = Lexer::new("import { Thing } from \"elp\"".to_string());
+        let input = "import { Thing } from \"elp\"".to_string();
+        let mut lexer = Lexer::new(input.clone());
 
         assert_eq!(
             *lexer.consume_all_tokens(),
             results!(
+                input.clone(),
                 Token {
                     token_type: TokenType::Ident("import".to_string()),
                     span: (0, 6),
                     value: "import".to_string(),
                 },
-                whitespace!(7, 7, " ")
+                whitespace!(7, 7, " "),
             )
         );
     }
