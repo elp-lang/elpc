@@ -1,3 +1,5 @@
+use std::str::Chars;
+
 #[derive(Debug)]
 pub enum Error {
     UnknownToken(String), // Add more error variants as needed
@@ -39,6 +41,41 @@ impl std::fmt::Display for TokenType {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
+pub struct Cursor {
+    input: String,
+    position: usize,
+    pub prev_char: Option<char>,
+    pub current_char: Option<char>,
+    pub next_char: Option<char>,
+}
+
+impl Cursor {
+    pub fn new(input: String) -> Self {
+        Self {
+            input,
+            position: 0,
+            prev_char: None,
+            current_char: None,
+            next_char: None,
+        }
+    }
+
+    pub fn advance_one(&mut self) {
+        self.prev_char = self.current_char;
+        self.current_char = self.next_char;
+        self.position += 1;
+        self.next_char = self.input.chars().nth(self.position);
+    }
+
+    pub fn advance_back_one(&mut self) {
+        self.next_char = self.current_char;
+        self.current_char = self.prev_char;
+        self.prev_char = self.input.chars().nth(self.position - 1);
+        self.position -= 1;
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Token {
     pub token_type: TokenType,
     pub span: (usize, usize),
@@ -48,7 +85,7 @@ pub struct Token {
 #[derive(Debug)]
 pub struct Lexer {
     input: String,
-    cursor: usize,
+    cursor: Cursor,
     tokens: Vec<Token>,
 }
 
@@ -56,7 +93,10 @@ impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
             input,
-            cursor: 0,
+            cursor: Cursor {
+                input: input,
+                position: 0,
+            },
             tokens: vec![Token {
                 token_type: TokenType::SOI,
                 value: "".to_string(),
