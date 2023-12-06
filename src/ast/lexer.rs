@@ -9,6 +9,8 @@ pub enum TokenType {
     EOF,
     LiteralBoolean(bool),
     Keyword(String),
+    DoubleSpeechMark,
+    SingleSpeechMark,
     OpenBlock,
     CloseBlock,
     ReturnType,
@@ -30,6 +32,8 @@ impl std::fmt::Display for TokenType {
             TokenType::Ident(value) => write!(f, "Ident: {}", value),
             TokenType::Whitespace(value) => write!(f, "Whitespace: '{:#?}'", value),
             TokenType::Symbol(value) => write!(f, "Symbol: {}", value),
+            TokenType::DoubleSpeechMark => write!(f, "\""),
+            TokenType::SingleSpeechMark => write!(f, "'"),
         }
     }
 }
@@ -44,8 +48,7 @@ pub struct Token {
 #[derive(Debug)]
 pub struct Lexer {
     input: String,
-    current_position: usize,
-    reader_position: usize,
+    cursor: usize,
     tokens: Vec<Token>,
 }
 
@@ -53,8 +56,7 @@ impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
             input,
-            current_position: 0,
-            reader_position: 0,
+            cursor: 0,
             tokens: vec![Token {
                 token_type: TokenType::SOI,
                 value: "".to_string(),
@@ -63,26 +65,34 @@ impl Lexer {
         }
     }
 
+    fn get_next_char(&mut self) -> Option<char> {
+        self.cursor += 1;
+
+        let ch = self.input.chars().nth(self.cursor);
+
+        ch
+    }
+
     fn could_be_ident(&mut self, ch: char) -> bool {
         ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_'
     }
 
     fn consume_ident_into_token(&mut self) -> Token {
+        let starting_cursor = self.cursor;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+        while let Some(ch) = self.get_next_char() {
             if self.could_be_ident(ch) {
                 value.push(ch);
             } else {
+                self.cursor -= 1;
                 break;
             }
-
-            self.reader_position += 1;
         }
 
         Token {
             value: value.clone(),
-            span: (self.current_position, self.reader_position - 1),
+            span: (starting_cursor, self.cursor),
             token_type: match value.clone() {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
@@ -92,45 +102,47 @@ impl Lexer {
     }
 
     fn consume_whitespace_into_token(&mut self) -> Token {
+        let starting_cursor = self.cursor;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+        while let Some(ch) = self.get_next_char() {
             if ch.is_whitespace() {
                 value.push(ch);
             } else {
+                self.cursor -= 1;
                 break;
             }
-
-            self.reader_position += 1;
         }
 
         Token {
             value: value.clone(),
-            span: (self.current_position, self.reader_position - 1),
+            span: (starting_cursor, self.cursor),
             token_type: TokenType::Whitespace(value.clone()),
         }
     }
 
     fn consume_symbol_into_token(&mut self) -> Token {
+        let starting_cursor = self.cursor;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.input.chars().nth(self.reader_position) {
+        while let Some(ch) = self.get_next_char() {
             if !ch.is_whitespace() && !self.could_be_ident(ch) {
                 value.push(ch);
             } else {
+                self.cursor -= 1;
                 break;
             }
-
-            self.reader_position += 1;
         }
 
         Token {
             value: value.clone(),
-            span: (self.current_position, self.reader_position - 1),
+            span: (starting_cursor, self.cursor),
             token_type: match value.clone() {
                 s if s == "{" => TokenType::OpenBlock,
                 s if s == "}" => TokenType::CloseBlock,
                 s if s == "->" => TokenType::ReturnType,
+                s if s == "\"" => TokenType::DoubleSpeechMark,
+                s if s == "'" => TokenType::SingleSpeechMark,
                 _ => TokenType::Symbol(value),
             },
         }
@@ -139,17 +151,16 @@ impl Lexer {
     fn consume_next_token(&mut self) -> Result<Token, Error> {
         let next_token: Result<Token, Error>;
 
-        if self.reader_position + 1 >= self.input.len() - 1 {
-            self.current_position = self.input.len() - 1;
+        if self.cursor + 1 >= self.input.len() - 1 {
             return Ok(Token {
                 token_type: TokenType::EOF,
-                span: (self.reader_position, self.reader_position),
+                span: (self.cursor, self.cursor),
                 value: "".to_string(),
             });
         }
 
         // Peek at the next char to get what function to call then we can advance the cursor.
-        if let Some(ch) = self.input.chars().nth(self.reader_position) {
+        if let Some(ch) = self.input.chars().nth(self.cursor + 1) {
             next_token = if self.could_be_ident(ch) {
                 Ok(self.consume_ident_into_token())
             } else if ch.is_whitespace() {
@@ -168,13 +179,9 @@ impl Lexer {
 
     pub fn consume_all_tokens(&mut self) -> &Vec<Token> {
         while let Ok(next_token) = self.consume_next_token() {
-            if self.current_position == self.reader_position
-                && next_token.token_type != TokenType::EOF
-            {
-                print!("Parsed token {:#?}\n", next_token);
-                panic!("Cursor was not advanced!")
+            if self.cursor == self.cursor && next_token.token_type != TokenType::EOF {
+                print!("Parsed token but cursor didn't move {:#?}\n", next_token);
             }
-            self.current_position = self.reader_position;
 
             self.tokens.push(next_token.clone());
             if next_token.token_type == TokenType::EOF {
@@ -232,7 +239,6 @@ mod tests {
         let mut lexer = Lexer::new(input.clone());
 
         assert_eq!(
-            *lexer.consume_all_tokens(),
             results!(
                 input.clone(),
                 Token {
@@ -243,29 +249,45 @@ mod tests {
                 whitespace!(6, " "),
                 Token {
                     token_type: TokenType::OpenBlock,
-                    span: (8, 9),
+                    span: (7, 7),
                     value: "{".to_string(),
                 },
-                whitespace!(9, " "),
+                whitespace!(8, " "),
                 Token {
                     token_type: TokenType::Ident("Thing".to_string()),
-                    span: (11, 16),
+                    span: (9, 13),
                     value: "Thing".to_string(),
                 },
-                whitespace!(17, " "),
+                whitespace!(14, " "),
                 Token {
                     token_type: TokenType::CloseBlock,
-                    span: (19, 20),
+                    span: (15, 15),
                     value: "}".to_string(),
+                },
+                whitespace!(16, " "),
+                Token {
+                    token_type: TokenType::Ident("from".to_string()),
+                    span: (17, 20),
+                    value: "from".to_string(),
                 },
                 whitespace!(21, " "),
                 Token {
-                    token_type: TokenType::Ident("from".to_string()),
-                    span: (22, 26),
-                    value: "from".to_string(),
+                    token_type: TokenType::DoubleSpeechMark,
+                    span: (22, 22),
+                    value: "\"".to_string(),
                 },
-                whitespace!(26, " "),
-            )
+                Token {
+                    token_type: TokenType::Ident("elp".to_string()),
+                    span: (23, 25),
+                    value: "elp".to_string(),
+                },
+                Token {
+                    token_type: TokenType::DoubleSpeechMark,
+                    span: (26, 26),
+                    value: "\"".to_string(),
+                },
+            ),
+            *lexer.consume_all_tokens(),
         );
     }
 }
