@@ -43,7 +43,7 @@ impl std::fmt::Display for TokenType {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cursor {
     input: String,
-    position: usize,
+    pub position: usize,
     pub prev_char: Option<char>,
     pub current_char: Option<char>,
     pub next_char: Option<char>,
@@ -60,18 +60,20 @@ impl Cursor {
         }
     }
 
-    pub fn advance_one(&mut self) {
+    pub fn next(&mut self) -> Option<char> {
         self.prev_char = self.current_char;
         self.current_char = self.next_char;
         self.position += 1;
         self.next_char = self.input.chars().nth(self.position);
+        self.current_char
     }
 
-    pub fn advance_back_one(&mut self) {
+    pub fn prev(&mut self) -> Option<char> {
         self.next_char = self.current_char;
         self.current_char = self.prev_char;
         self.prev_char = self.input.chars().nth(self.position - 1);
         self.position -= 1;
+        self.current_char
     }
 }
 
@@ -93,10 +95,7 @@ impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
             input,
-            cursor: Cursor {
-                input: input,
-                position: 0,
-            },
+            cursor: Cursor::new(input),
             tokens: vec![Token {
                 token_type: TokenType::SOI,
                 value: "".to_string(),
@@ -105,34 +104,25 @@ impl Lexer {
         }
     }
 
-    fn get_next_char(&mut self) -> Option<char> {
-        self.cursor += 1;
-
-        let ch = self.input.chars().nth(self.cursor);
-
-        ch
-    }
-
-    fn could_be_ident(&mut self, ch: char) -> bool {
-        ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_'
+    fn could_be_ident(&mut self, ch: char) -> Option<char> {
+        if ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_' {
+            Some(ch)
+        } else {
+            None
+        }
     }
 
     fn consume_ident_into_token(&mut self) -> Token {
-        let starting_cursor = self.cursor;
+        let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.get_next_char() {
-            if self.could_be_ident(ch) {
-                value.push(ch);
-            } else {
-                self.cursor -= 1;
-                break;
-            }
+        while let Some(ch) = self.could_be_ident(self.cursor.next()) {
+            value.push(ch);
         }
 
         Token {
             value: value.clone(),
-            span: (starting_cursor, self.cursor),
+            span: (starting_cursor, self.cursor.position),
             token_type: match value.clone() {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
