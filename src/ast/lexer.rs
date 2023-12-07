@@ -17,6 +17,7 @@ pub enum TokenType {
     Ident(String),
     Symbol(String),
     Whitespace(String),
+    AccessModifier(String),
 }
 
 impl std::fmt::Display for TokenType {
@@ -34,6 +35,7 @@ impl std::fmt::Display for TokenType {
             TokenType::Symbol(value) => write!(f, "Symbol: {}", value),
             TokenType::DoubleSpeechMark => write!(f, "\""),
             TokenType::SingleSpeechMark => write!(f, "'"),
+            TokenType::AccessModifier(value) => write!(f, "Access modifier: {}", value),
         }
     }
 }
@@ -162,10 +164,11 @@ impl Lexer {
         let mut value: String = "".to_string();
 
         while let Some(ch) = self.cursor.next().current_char {
-            if !ch.is_whitespace() && !self.could_be_ident(ch) {
-                value.push(ch);
-            } else {
-                break;
+            match !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_some() {
+                true => {
+                    value.push(ch);
+                }
+                false => break,
             }
         }
 
@@ -186,17 +189,17 @@ impl Lexer {
     fn consume_next_token(&mut self) -> Result<Token, Error> {
         let next_token: Result<Token, Error>;
 
-        if self.cursor + 1 >= self.input.len() - 1 {
+        if self.cursor.next_char.is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
-                span: (self.cursor, self.cursor),
+                span: (self.cursor.position, self.cursor.position),
                 value: "".to_string(),
             });
         }
 
         // Peek at the next char to get what function to call then we can advance the cursor.
-        if let Some(ch) = self.input.chars().nth(self.cursor + 1) {
-            next_token = if self.could_be_ident(ch) {
+        if let Some(ch) = self.cursor.next_char {
+            next_token = if self.could_be_ident(ch).is_some() {
                 Ok(self.consume_ident_into_token())
             } else if ch.is_whitespace() {
                 Ok(self.consume_whitespace_into_token())
