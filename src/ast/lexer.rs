@@ -60,20 +60,22 @@ impl Cursor {
         }
     }
 
-    pub fn next(&mut self) -> Option<char> {
+    pub fn next(&mut self) -> Self {
         self.prev_char = self.current_char;
         self.current_char = self.next_char;
-        self.position += 1;
         self.next_char = self.input.chars().nth(self.position);
-        self.current_char
+        self.to_owned()
     }
 
-    pub fn prev(&mut self) -> Option<char> {
+    pub fn prev(&mut self) -> Self {
         self.next_char = self.current_char;
         self.current_char = self.prev_char;
         self.prev_char = self.input.chars().nth(self.position - 1);
-        self.position -= 1;
-        self.current_char
+        self.to_owned()
+    }
+
+    pub fn consume(&mut self) {
+        self.position += 1;
     }
 }
 
@@ -104,11 +106,16 @@ impl Lexer {
         }
     }
 
-    fn could_be_ident(&mut self, ch: char) -> Option<char> {
-        if ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_' {
-            Some(ch)
-        } else {
-            None
+    fn could_be_ident(&mut self, ch: Option<char>) -> Option<char> {
+        match ch {
+            None => None,
+            Some(ch) => {
+                if ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_' {
+                    Some(ch)
+                } else {
+                    None
+                }
+            }
         }
     }
 
