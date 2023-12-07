@@ -1,4 +1,5 @@
 import { AsyncQueue, String } from "elp"
+
 import { getBlogPost } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
@@ -6,7 +7,7 @@ interface Params {
     id: string
 }
 
-export fn BlogPost(): Screen<Params> {
+export final fn BlogPost(): Screen<Params> {
     let post: Content
     let error: Error
 

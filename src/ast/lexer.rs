@@ -1,5 +1,3 @@
-use std::str::Chars;
-
 #[derive(Debug)]
 pub enum Error {
     UnknownToken(String), // Add more error variants as needed
@@ -123,8 +121,9 @@ impl Lexer {
         let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.could_be_ident(self.cursor.next()) {
+        while let Some(ch) = self.could_be_ident(self.cursor.next().current_char) {
             value.push(ch);
+            self.cursor.consume();
         }
 
         Token {
@@ -139,41 +138,40 @@ impl Lexer {
     }
 
     fn consume_whitespace_into_token(&mut self) -> Token {
-        let starting_cursor = self.cursor;
+        let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.get_next_char() {
+        while let Some(ch) = self.cursor.next().current_char {
             if ch.is_whitespace() {
                 value.push(ch);
+                self.cursor.consume();
             } else {
-                self.cursor -= 1;
                 break;
             }
         }
 
-        Token {
+        return Token {
             value: value.clone(),
-            span: (starting_cursor, self.cursor),
+            span: (starting_cursor, self.cursor.position),
             token_type: TokenType::Whitespace(value.clone()),
-        }
+        };
     }
 
     fn consume_symbol_into_token(&mut self) -> Token {
-        let starting_cursor = self.cursor;
+        let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.get_next_char() {
+        while let Some(ch) = self.cursor.next().current_char {
             if !ch.is_whitespace() && !self.could_be_ident(ch) {
                 value.push(ch);
             } else {
-                self.cursor -= 1;
                 break;
             }
         }
 
         Token {
             value: value.clone(),
-            span: (starting_cursor, self.cursor),
+            span: (starting_cursor, self.cursor.position),
             token_type: match value.clone() {
                 s if s == "{" => TokenType::OpenBlock,
                 s if s == "}" => TokenType::CloseBlock,
