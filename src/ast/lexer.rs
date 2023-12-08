@@ -44,9 +44,7 @@ impl std::fmt::Display for TokenType {
 pub struct Cursor {
     input: String,
     pub position: usize,
-    pub prev_char: Option<char>,
     pub current_char: Option<char>,
-    pub next_char: Option<char>,
 }
 
 impl Cursor {
@@ -54,24 +52,13 @@ impl Cursor {
         Self {
             input,
             position: 0,
-            prev_char: None,
             current_char: None,
-            next_char: None,
         }
     }
 
-    pub fn next(&mut self) -> Self {
-        self.prev_char = self.current_char;
-        self.current_char = self.next_char;
-        self.next_char = self.input.chars().nth(self.position);
-        self.to_owned()
-    }
-
-    pub fn prev(&mut self) -> Self {
-        self.next_char = self.current_char;
-        self.current_char = self.prev_char;
-        self.prev_char = self.input.chars().nth(self.position - 1);
-        self.to_owned()
+    pub fn next(&mut self) -> Option<char> {
+        self.current_char = self.input.chars().nth(self.position + 1);
+        self.current_char
     }
 
     pub fn consume(&mut self) {
@@ -88,7 +75,6 @@ pub struct Token {
 
 #[derive(Debug)]
 pub struct Lexer {
-    input: String,
     cursor: Cursor,
     tokens: Vec<Token>,
 }
@@ -96,7 +82,6 @@ pub struct Lexer {
 impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
-            input,
             cursor: Cursor::new(input),
             tokens: vec![Token {
                 token_type: TokenType::SOI,
@@ -120,10 +105,11 @@ impl Lexer {
     }
 
     fn consume_ident_into_token(&mut self) -> Token {
-        let starting_cursor = self.cursor.position;
+        let mut cursor = self.cursor.clone();
+        let starting_cursor = cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.could_be_ident(self.cursor.next().current_char) {
+        while let Some(ch) = self.could_be_ident(cursor.next()) {
             value.push(ch);
             self.cursor.consume();
         }
@@ -143,7 +129,7 @@ impl Lexer {
         let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.cursor.next().current_char {
+        while let Some(ch) = self.cursor.next() {
             if ch.is_whitespace() {
                 value.push(ch);
                 self.cursor.consume();
@@ -163,10 +149,11 @@ impl Lexer {
         let starting_cursor = self.cursor.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.cursor.next().current_char {
+        while let Some(ch) = self.cursor.next() {
             match !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_some() {
                 true => {
                     value.push(ch);
+                    self.cursor.consume();
                 }
                 false => break,
             }
@@ -189,7 +176,7 @@ impl Lexer {
     fn consume_next_token(&mut self) -> Result<Token, Error> {
         let next_token: Result<Token, Error>;
 
-        if self.cursor.next_char.is_none() {
+        if self.cursor.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
                 span: (self.cursor.position, self.cursor.position),
@@ -198,12 +185,12 @@ impl Lexer {
         }
 
         // Peek at the next char to get what function to call then we can advance the cursor.
-        if let Some(ch) = self.cursor.next_char {
-            next_token = if self.could_be_ident(ch).is_some() {
+        if let Some(ch) = self.cursor.next() {
+            next_token = if self.could_be_ident(Some(ch)).is_some() {
                 Ok(self.consume_ident_into_token())
             } else if ch.is_whitespace() {
                 Ok(self.consume_whitespace_into_token())
-            } else if !ch.is_whitespace() && !self.could_be_ident(ch) {
+            } else if !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_some() {
                 Ok(self.consume_symbol_into_token())
             } else {
                 Err(Error::UnknownToken("Unknown token.".to_string()))
