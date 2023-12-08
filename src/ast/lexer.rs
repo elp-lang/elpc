@@ -20,46 +20,6 @@ pub enum TokenType {
     AccessModifier(String),
 }
 
-impl std::fmt::Display for TokenType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TokenType::SOI => write!(f, "SOI"),
-            TokenType::EOF => write!(f, "EOF"),
-            TokenType::LiteralBoolean(value) => write!(f, "Boolean: {}", value),
-            TokenType::Keyword(value) => write!(f, "Keyword: {}", value),
-            TokenType::OpenBlock => write!(f, "Open block"),
-            TokenType::CloseBlock => write!(f, "Close block"),
-            TokenType::ReturnType => write!(f, "Return type '->'"),
-            TokenType::Ident(value) => write!(f, "Ident: {}", value),
-            TokenType::Whitespace(value) => write!(f, "Whitespace: '{:#?}'", value),
-            TokenType::Symbol(value) => write!(f, "Symbol: {}", value),
-            TokenType::DoubleSpeechMark => write!(f, "\""),
-            TokenType::SingleSpeechMark => write!(f, "'"),
-            TokenType::AccessModifier(value) => write!(f, "Access modifier: {}", value),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Cursor {
-    input: String,
-    pub position: usize,
-}
-
-impl Cursor {
-    pub fn new(input: String) -> Self {
-        Self { input, position: 0 }
-    }
-
-    pub fn next(&self) -> Option<char> {
-        self.input.chars().nth(self.position + 1)
-    }
-
-    pub fn consume(&mut self) {
-        self.position += 1;
-    }
-}
-
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Token {
     pub token_type: TokenType,
@@ -69,20 +29,30 @@ pub struct Token {
 
 #[derive(Debug)]
 pub struct Lexer {
-    cursor: Cursor,
     tokens: Vec<Token>,
+    input: String,
+    position: usize,
 }
 
 impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
-            cursor: Cursor::new(input),
+            position: 0,
+            input,
             tokens: vec![Token {
                 token_type: TokenType::SOI,
                 value: "".to_string(),
                 span: (0, 0),
             }],
         }
+    }
+
+    fn next(&self) -> Option<char> {
+        self.input.chars().nth(self.position)
+    }
+
+    fn consume(&mut self) {
+        self.position += 1;
     }
 
     fn could_be_ident(&self, ch: Option<char>) -> Option<char> {
@@ -115,7 +85,7 @@ impl Lexer {
         match ch {
             None => None,
             Some(ch) => {
-                if !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_some() {
+                if !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_none() {
                     Some(ch)
                 } else {
                     None
@@ -125,19 +95,17 @@ impl Lexer {
     }
 
     fn consume_ident_into_token(&mut self) -> Token {
-        print!("consume ident");
-        let cursor = self.cursor.clone();
-        let starting_cursor = cursor.position;
+        let starting_cursor = self.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.could_be_ident(cursor.next()) {
+        while let Some(ch) = self.could_be_ident(self.next()) {
             value.push(ch);
-            self.cursor.consume();
+            self.consume();
         }
 
         Token {
             value: value.clone(),
-            span: (starting_cursor, self.cursor.position),
+            span: (starting_cursor, self.position),
             token_type: match value.clone() {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
@@ -149,37 +117,33 @@ impl Lexer {
     }
 
     fn consume_whitespace_into_token(&mut self) -> Token {
-        print!("consume whitespace");
-        let cursor = self.cursor.clone();
-        let starting_cursor = cursor.position;
+        let starting_cursor = self.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.is_whitespace(cursor.next()) {
+        while let Some(ch) = self.is_whitespace(self.next()) {
             value.push(ch);
-            self.cursor.consume();
-        }
-
-        return Token {
-            value: value.clone(),
-            span: (starting_cursor, self.cursor.position),
-            token_type: TokenType::Whitespace(value.clone()),
-        };
-    }
-
-    fn consume_symbol_into_token(&mut self) -> Token {
-        print!("consume symbol");
-        let cursor = self.cursor.clone();
-        let starting_cursor = self.cursor.position;
-        let mut value: String = "".to_string();
-
-        while let Some(ch) = self.is_symbol(cursor.next()) {
-            value.push(ch);
-            self.cursor.consume();
+            self.consume();
         }
 
         Token {
             value: value.clone(),
-            span: (starting_cursor, self.cursor.position),
+            span: (starting_cursor, self.position - 1),
+            token_type: TokenType::Whitespace(value.clone()),
+        }
+    }
+
+    fn consume_symbol_into_token(&mut self) -> Token {
+        let starting_cursor = self.position;
+        let mut value: String = "".to_string();
+
+        while let Some(ch) = self.is_symbol(self.next()) {
+            value.push(ch);
+            self.consume();
+        }
+
+        Token {
+            value: value.clone(),
+            span: (starting_cursor, self.position - 1),
             token_type: match value.clone() {
                 s if s == "{" => TokenType::OpenBlock,
                 s if s == "}" => TokenType::CloseBlock,
@@ -192,52 +156,40 @@ impl Lexer {
     }
 
     fn consume_next_token(&mut self) -> Result<Token, Error> {
-        print!("consume next tokens");
         let next_token: Result<Token, Error>;
 
-        print!("{}", self.cursor.next().is_none());
-        if self.cursor.next().is_none() {
+        if self.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
-                span: (self.cursor.position, self.cursor.position),
+                span: (self.position, self.position - 1),
                 value: "".to_string(),
             });
         }
 
         // Peek at the next char to get what function to call then we can advance the cursor.
-        if let Some(ch) = self.cursor.next() {
-            print!("{}", ch);
-            next_token = if self.could_be_ident(Some(ch)).is_some() {
-                Ok(self.consume_ident_into_token())
-            } else if ch.is_whitespace() {
-                Ok(self.consume_whitespace_into_token())
-            } else if !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_some() {
-                Ok(self.consume_symbol_into_token())
-            } else {
-                Err(Error::UnknownToken("Unknown token.".to_string()))
-            }
+        let ch = self.next();
+        if self.could_be_ident(ch).is_some() {
+            Ok(self.consume_ident_into_token())
+        } else if self.is_whitespace(ch).is_some() {
+            Ok(self.consume_whitespace_into_token())
+        } else if self.is_symbol(ch).is_some() {
+            Ok(self.consume_symbol_into_token())
         } else {
-            next_token = Err(Error::UnknownToken("Unknown token.".to_string()));
+            Err(Error::UnknownToken("Unknown token.".to_string()))
         }
-
-        next_token
     }
 
-    pub fn consume_all_tokens(&mut self) -> &Vec<Token> {
-        print!("consuming all tokens");
+    pub fn consume_all_tokens(&mut self) -> Vec<Token> {
         while let Ok(next_token) = self.consume_next_token() {
-            print!("{:#?}", next_token);
-            if self.cursor == self.cursor && next_token.token_type != TokenType::EOF {
-                print!("Parsed token but cursor didn't move {:#?}\n", next_token);
-            }
+            self.tokens.push(next_token.to_owned());
 
-            self.tokens.push(next_token.clone());
             if next_token.token_type == TokenType::EOF {
+                print!("\n\nEOF\n\n");
                 break;
             }
         }
 
-        &self.tokens
+        self.tokens.to_owned()
     }
 }
 
