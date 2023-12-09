@@ -105,7 +105,7 @@ impl Lexer {
 
         Token {
             value: value.clone(),
-            span: (starting_cursor, self.position),
+            span: (starting_cursor, self.position - 1),
             token_type: match value.clone() {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
@@ -161,7 +161,7 @@ impl Lexer {
         if self.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
-                span: (self.position, self.position - 1),
+                span: (self.position, self.position),
                 value: "".to_string(),
             });
         }
@@ -208,7 +208,7 @@ mod tests {
             };
             let eof = Token {
                 token_type: TokenType::EOF,
-                span: ($str.len()-1, $str.len()-1),
+                span: ($str.len(), $str.len()),
                 value: "".to_string(),
             };
             let mut v = Vec::new();
