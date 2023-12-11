@@ -146,14 +146,35 @@ impl Parser {
 
                     // Collect all tokens until we get to lexer::TokenType::CloseBlock
                     // this will include Ident, Comma and Whitespace.
+                    let mut found_opening_brace = false;
+                    let mut found_closing_brace = false;
                     let mut imports: Vec<lexer::Token> = vec![];
                     while self.consume().is_some() {
-                        if let Some(openingBrace) = self.current_token {
-                            match openingBrace.token_type {
-                                lexer::TokenType::OpenBlock => continue,
+                        if let Some(token) = self.current_token {
+                            match token.token_type {
+                                // Skip whitespace and the opening brace but mark it as found.
+                                lexer::TokenType::OpenBlock => {
+                                    if found_opening_brace {
+                                        Err("Unexpected opening brace")
+                                    } else {
+                                        found_opening_brace = true;
+                                        continue;
+                                    }
+                                }
+                                lexer::TokenType::CloseBlock => {
+                                    if !found_opening_brace {
+                                        Err("Expected opening brace but found closing brace.")
+                                    } else {
+                                        found_closing_brace = true;
+                                        break;
+                                    }
+                                }
                                 lexer::TokenType::Whitespace(..) => continue,
-                                lexer::TokenType::Ident(..) => imports.append(openingBrace),
-                                _ => Err(format!("Expected import value. got {:#?}", openingBrace)),
+                                lexer::TokenType::Ident(..) => {
+                                    imports.append(token);
+                                    continue;
+                                }
+                                _ => Err(format!("Expected import value. got {:#?}", token)),
                             };
                         }
                     }
@@ -178,6 +199,8 @@ impl Parser {
         while let Some(token) = self.current_token {
             let node = match token.token_type {
                 lexer::TokenType::Keyword(lexer::Keyword::Import) => self.parse_import(),
+                lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
                 lexer::TokenType::SOI => todo!(),
                 lexer::TokenType::EOF => todo!(),
                 lexer::TokenType::LiteralBoolean(_) => todo!(),
