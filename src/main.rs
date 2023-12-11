@@ -1,6 +1,7 @@
 mod ast;
 
 use ast::lexer::Lexer;
+use ast::lexer_parser::Parser;
 use std::fs;
 
 fn main() {
@@ -10,5 +11,8 @@ fn main() {
     let mut lexer = Lexer::new(source);
 
     let tokens = lexer.consume_all_tokens();
-    print!("TOKENS: \n{:#?}\n", tokens);
+    let mut parser = Parser::new(tokens);
+
+    let ast = parser.parse();
+    print!("ast: {:#?}", ast);
 }

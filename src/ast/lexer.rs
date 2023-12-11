@@ -4,11 +4,32 @@ pub enum Error {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
+pub enum AccessModifier {
+    Const,
+    Pub,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum Keyword {
+    Fn,
+    Var,
+    Import,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum Whitespace {
+    Return,
+    NewLine,
+    Tab,
+    Other(String),
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TokenType {
     SOI,
     EOF,
     LiteralBoolean(bool),
-    Keyword(String),
+    Keyword(Keyword),
     DoubleSpeechMark,
     SingleSpeechMark,
     OpenBlock,
@@ -16,8 +37,8 @@ pub enum TokenType {
     ReturnType,
     Ident(String),
     Symbol(String),
-    Whitespace(String),
-    AccessModifier(String),
+    Whitespace(Whitespace),
+    AccessModifier(AccessModifier),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -109,8 +130,11 @@ impl Lexer {
             token_type: match value.clone() {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
-                s if s == "pub" => TokenType::AccessModifier("pub".to_string()),
-                s if s == "fn" => TokenType::Keyword("fn".to_string()),
+                s if s == "pub" => TokenType::AccessModifier(AccessModifier::Pub),
+                s if s == "const" => TokenType::AccessModifier(AccessModifier::Const),
+                s if s == "fn" => TokenType::Keyword(Keyword::Fn),
+                s if s == "var" => TokenType::Keyword(Keyword::Var),
+                s if s == "import" => TokenType::Keyword(Keyword::Import),
                 _ => TokenType::Ident(value.clone()),
             },
         }
@@ -128,7 +152,11 @@ impl Lexer {
         Token {
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
-            token_type: TokenType::Whitespace(value.clone()),
+            token_type: TokenType::Whitespace(match value.clone() {
+                s if s == "\n" => Whitespace::NewLine,
+                s if s == "\t" => Whitespace::Tab,
+                _ => Whitespace::Other(value.clone()),
+            }),
         }
     }
 
