@@ -250,17 +250,18 @@ mod tests {
         let input = "import { Thing } from \"elp\"".to_string();
         let mut lexer = Lexer::new(input.clone());
         let tokens = lexer.consume_all_tokens();
-        let parser = Parser::new(tokens);
+        let mut parser = Parser::new(tokens);
 
         assert_eq!(
             parser.parse(),
             Trie {
-                nodes: vec!(AstNode {
-                    Import: ImportStatement {
-                        members: vec!("Thing".to_string()),
-                        source_path: todo!()
-                    }
-                })
+                nodes: vec!(AstNode::Import(ImportStatement {
+                    members: vec!(Identifier {
+                        name: "Thing".to_string(),
+                        access_modifier: lexer::AccessModifier::Const,
+                    }),
+                    source_path: "elp".to_string(),
+                }))
             }
         );
     }
