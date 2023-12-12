@@ -1,6 +1,6 @@
 use crate::ast::lexer;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
     Import(ImportStatement),
     InterfaceDeclaration(Identifier, Vec<InterfaceProperty>),
@@ -12,48 +12,48 @@ pub enum AstNode {
     MatchStatement(Expression, Vec<MatchCase>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Trie {
     pub nodes: Vec<AstNode>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ImportStatement {
     pub members: Vec<Identifier>,
     pub source_path: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct InterfaceProperty {
     pub name: Identifier,
     pub r#type: Type,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct EnumVariant {
     pub name: Identifier,
     pub variant_type: Option<EnumVariantType>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum EnumVariantType {
     Option,
     Action(Vec<Parameter>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Parameter {
     pub name: Identifier,
     pub r#type: Type,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Type {
     TypeName(Identifier),
     FunctionType(Vec<Type>, Box<Type>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Expression {
     Identifier(Identifier),
     Literal(Literal),
@@ -62,44 +62,44 @@ pub enum Expression {
     // Other expression types can be added based on your language's syntax.
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Literal {
     String(String),
     Number(i64),
     Boolean(bool),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Argument {
     pub name: Option<Identifier>,
     pub value: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Block {
     pub statements: Vec<AstNode>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct IfStatement {
     pub condition: Expression,
     pub body: Option<Block>,
     pub else_statement: Option<Box<AstNode>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct MatchCase {
     pub pattern: Pattern,
     pub body: AstNode,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Pattern {
     MemberAccess(Identifier),
     Boolean(bool),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Identifier {
     pub access_modifier: lexer::AccessModifier,
     pub name: String,
@@ -129,17 +129,17 @@ impl Parser {
             None
         };
 
-        self.current_token
+        self.current_token.clone()
     }
 
     fn parse_import(&mut self) -> Result<AstNode, String> {
-        match self.current_token {
-            None => Err(format!("Expected 'import'")),
+        match &self.current_token {
+            None => return Err(format!("Expected 'import'")),
             Some(token) => {
                 if token.token_type != lexer::TokenType::Keyword(lexer::Keyword::Import) {
-                    Err(format!("Expected 'import', got '{:#?}'.", token.token_type))
+                    return Err(format!("Expected 'import', got '{:#?}'.", token.token_type));
                 } else {
-                    let import_statement = ImportStatement {
+                    let mut import_statement = ImportStatement {
                         members: vec![],
                         source_path: "".to_string(),
                     };
@@ -150,12 +150,14 @@ impl Parser {
                     let mut found_closing_brace = false;
                     let mut imports: Vec<lexer::Token> = vec![];
                     while self.consume().is_some() {
-                        if let Some(token) = self.current_token {
+                        if let Some(token) = &self.current_token {
                             match token.token_type {
                                 // Skip whitespace and the opening brace but mark it as found.
                                 lexer::TokenType::OpenBlock => {
                                     if found_opening_brace {
-                                        Err("Unexpected opening brace")
+                                        return Err::<AstNode, String>(
+                                            "Unexpected opening brace".to_string(),
+                                        );
                                     } else {
                                         found_opening_brace = true;
                                         continue;
@@ -163,7 +165,10 @@ impl Parser {
                                 }
                                 lexer::TokenType::CloseBlock => {
                                     if !found_opening_brace {
-                                        Err("Expected opening brace but found closing brace.")
+                                        return Err(
+                                            "Expected opening brace but found closing brace."
+                                                .to_string(),
+                                        );
                                     } else {
                                         found_closing_brace = true;
                                         break;
@@ -171,32 +176,37 @@ impl Parser {
                                 }
                                 lexer::TokenType::Whitespace(..) => continue,
                                 lexer::TokenType::Ident(..) => {
-                                    imports.append(token);
+                                    imports.push(token.clone());
                                     continue;
                                 }
-                                _ => Err(format!("Expected import value. got {:#?}", token)),
+                                _ => break,
                             };
                         }
                     }
 
+                    if !found_closing_brace {
+                        return Err("Expected a }".to_string());
+                    }
+
                     import_statement.members = imports
                         .iter()
-                        .map(|&token| Identifier {
-                            name: token.value,
+                        .map(|token| Identifier {
+                            name: token.value.clone(),
                             access_modifier: lexer::AccessModifier::Pub,
                         })
                         .collect();
 
-                    Ok(AstNode::Import(import_statement))
+                    return Ok(AstNode::Import(import_statement));
                 }
             }
         }
     }
 
-    pub fn parse(&mut self) {
+    pub fn parse(&mut self) -> Trie {
         let mut tree = Trie { nodes: vec![] };
 
-        while let Some(token) = self.current_token {
+        while let Some(token) = &self.current_token {
+            print!("{:#?}", token);
             let node = match token.token_type {
                 lexer::TokenType::Keyword(lexer::Keyword::Import) => self.parse_import(),
                 lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
@@ -215,7 +225,43 @@ impl Parser {
                 lexer::TokenType::AccessModifier(_) => todo!(),
             };
 
+            match node {
+                Ok(node) => {
+                    tree.nodes.push(node);
+                }
+                Err(e) => panic!("{}", e),
+            };
+
             self.consume();
         }
+
+        tree
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Lexer;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_parse_input() {
+        let input = "import { Thing } from \"elp\"".to_string();
+        let mut lexer = Lexer::new(input.clone());
+        let tokens = lexer.consume_all_tokens();
+        let parser = Parser::new(tokens);
+
+        assert_eq!(
+            parser.parse(),
+            Trie {
+                nodes: vec!(AstNode {
+                    Import: ImportStatement {
+                        members: vec!("Thing".to_string()),
+                        source_path: todo!()
+                    }
+                })
+            }
+        );
     }
 }

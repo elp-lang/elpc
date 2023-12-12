@@ -155,7 +155,7 @@ impl Lexer {
             token_type: TokenType::Whitespace(match value.clone() {
                 s if s == "\n" => Whitespace::NewLine,
                 s if s == "\t" => Whitespace::Tab,
-                _ => Whitespace::Other(value.clone()),
+                _ => Whitespace::Other(value.clone().to_string()),
             }),
         }
     }
@@ -248,16 +248,6 @@ mod tests {
     };
 }
 
-    macro_rules! whitespace {
-        ($x:expr, $value:expr) => {
-            Token {
-                token_type: TokenType::Whitespace($value.to_string()),
-                span: ($x, $x),
-                value: $value.to_string(),
-            }
-        };
-    }
-
     #[test]
     fn test_lexer_sanity() {
         let input = "import { Thing } from \"elp\"".to_string();
@@ -265,40 +255,61 @@ mod tests {
             println!("{}: {}", index, character);
         }
         let mut lexer = Lexer::new(input.clone());
+        let space = Whitespace::Other(" ".to_string());
 
         assert_eq!(
             results!(
                 input.clone(),
                 Token {
-                    token_type: TokenType::Ident("import".to_string()),
+                    token_type: TokenType::Keyword(Keyword::Import),
                     span: (0, 5),
                     value: "import".to_string(),
                 },
-                whitespace!(6, " "),
+                Token {
+                    token_type: TokenType::Whitespace(space.clone()),
+                    span: (6, 6),
+                    value: " ".to_string(),
+                },
                 Token {
                     token_type: TokenType::OpenBlock,
                     span: (7, 7),
                     value: "{".to_string(),
                 },
-                whitespace!(8, " "),
+                Token {
+                    token_type: TokenType::Whitespace(space.clone()),
+                    span: (8, 8),
+                    value: " ".to_string(),
+                },
                 Token {
                     token_type: TokenType::Ident("Thing".to_string()),
                     span: (9, 13),
                     value: "Thing".to_string(),
                 },
-                whitespace!(14, " "),
+                Token {
+                    token_type: TokenType::Whitespace(space.clone()),
+                    span: (14, 14),
+                    value: " ".to_string(),
+                },
                 Token {
                     token_type: TokenType::CloseBlock,
                     span: (15, 15),
                     value: "}".to_string(),
                 },
-                whitespace!(16, " "),
+                Token {
+                    token_type: TokenType::Whitespace(space.clone()),
+                    span: (16, 16),
+                    value: " ".to_string(),
+                },
                 Token {
                     token_type: TokenType::Ident("from".to_string()),
                     span: (17, 20),
                     value: "from".to_string(),
                 },
-                whitespace!(21, " "),
+                Token {
+                    token_type: TokenType::Whitespace(space.clone()),
+                    span: (21, 21),
+                    value: " ".to_string(),
+                },
                 Token {
                     token_type: TokenType::DoubleSpeechMark,
                     span: (22, 22),
