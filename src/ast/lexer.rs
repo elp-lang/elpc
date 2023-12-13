@@ -26,18 +26,23 @@ pub enum Whitespace {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
+pub enum Symbol {
+    DoubleSpeechMark,
+    SingleSpeechMark,
+    OpenBlock,
+    CloseBlock,
+    Equal,
+    Other(String),
+}
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TokenType {
     SOI,
     EOF,
     LiteralBoolean(bool),
     Keyword(Keyword),
-    DoubleSpeechMark,
-    SingleSpeechMark,
-    OpenBlock,
-    CloseBlock,
     ReturnType,
     Ident(String),
-    Symbol(String),
+    Symbol(Symbol),
     Whitespace(Whitespace),
     AccessModifier(AccessModifier),
 }
@@ -155,6 +160,7 @@ impl Lexer {
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
             token_type: TokenType::Whitespace(match value.clone() {
+                s if s == "\r" => Whitespace::Return,
                 s if s == "\n" => Whitespace::NewLine,
                 s if s == "\t" => Whitespace::Tab,
                 _ => Whitespace::Other(value.clone().to_string()),
@@ -175,19 +181,17 @@ impl Lexer {
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
             token_type: match value.clone() {
-                s if s == "{" => TokenType::OpenBlock,
-                s if s == "}" => TokenType::CloseBlock,
+                s if s == "{" => TokenType::Symbol(Symbol::OpenBlock),
+                s if s == "}" => TokenType::Symbol(Symbol::CloseBlock),
                 s if s == "->" => TokenType::ReturnType,
-                s if s == "\"" => TokenType::DoubleSpeechMark,
-                s if s == "'" => TokenType::SingleSpeechMark,
-                _ => TokenType::Symbol(value),
+                s if s == "\"" => TokenType::Symbol(Symbol::DoubleSpeechMark),
+                s if s == "'" => TokenType::Symbol(Symbol::SingleSpeechMark),
+                _ => TokenType::Symbol(Symbol::Other(value)),
             },
         }
     }
 
     fn consume_next_token(&mut self) -> Result<Token, Error> {
-        let next_token: Result<Token, Error>;
-
         if self.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
@@ -273,7 +277,7 @@ mod tests {
                     value: " ".to_string(),
                 },
                 Token {
-                    token_type: TokenType::OpenBlock,
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
                     span: (7, 7),
                     value: "{".to_string(),
                 },
@@ -293,7 +297,7 @@ mod tests {
                     value: " ".to_string(),
                 },
                 Token {
-                    token_type: TokenType::CloseBlock,
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
                     span: (15, 15),
                     value: "}".to_string(),
                 },
@@ -303,7 +307,7 @@ mod tests {
                     value: " ".to_string(),
                 },
                 Token {
-                    token_type: TokenType::Ident("from".to_string()),
+                    token_type: TokenType::Keyword(Keyword::From),
                     span: (17, 20),
                     value: "from".to_string(),
                 },
@@ -313,7 +317,7 @@ mod tests {
                     value: " ".to_string(),
                 },
                 Token {
-                    token_type: TokenType::DoubleSpeechMark,
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
                     span: (22, 22),
                     value: "\"".to_string(),
                 },
@@ -323,7 +327,7 @@ mod tests {
                     value: "elp".to_string(),
                 },
                 Token {
-                    token_type: TokenType::DoubleSpeechMark,
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
                     span: (26, 26),
                     value: "\"".to_string(),
                 },
