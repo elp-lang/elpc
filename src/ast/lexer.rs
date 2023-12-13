@@ -35,6 +35,7 @@ pub enum Whitespace {
 pub enum Symbol {
     DoubleSpeechMark,
     SingleSpeechMark,
+    Colon,
     OpenBlock,
     CloseBlock,
     Equal,
@@ -193,6 +194,7 @@ impl Lexer {
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
             token_type: match value.clone() {
+                s if s == ":" => TokenType::Symbol(Symbol::Colon),
                 s if s == "{" => TokenType::Symbol(Symbol::OpenBlock),
                 s if s == "}" => TokenType::Symbol(Symbol::CloseBlock),
                 s if s == "->" => TokenType::ReturnType,

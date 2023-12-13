@@ -1,5 +1,5 @@
 use crate::ast::{
-    lexer::{self, TokenType},
+    lexer::{self, Symbol, TokenType},
     syntax_error::SyntaxError,
 };
 
@@ -24,6 +24,12 @@ pub struct Trie {
 pub struct ImportStatement {
     pub members: Vec<Identifier>,
     pub source_path: String,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Interface {
+    pub name: Identifier,
+    pub members: Vec<InterfaceProperty>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -232,6 +238,65 @@ impl Parser {
 
     fn parse_interface_declaration(&mut self) -> Result<AstNode, SyntaxError> {
         println!("parsing interface");
+        match &self.current_token.clone() {
+            None => return Err(SyntaxError::MissingToken("interface")),
+            Some(token) => {
+                let mut found_opening_brace = false;
+                let mut found_closing_brace = false;
+                let mut interface: Interface = Interface {
+                    name: Identifier {
+                        immutable: true,
+                        access_modifier: lexer::AccessModifier::Pub,
+                        name: "".to_string(),
+                    },
+                    members: vec![],
+                };
+
+                while self.consume().is_some() {
+                    while self.consume().is_some() {
+                        if let Some(token) = &self.current_token {
+                            match &token.token_type {
+                                TokenType::Keyword(lexer::Keyword::Interface) => continue,
+                                TokenType::Ident(name) => {
+                                    if found_opening_brace && interface.members.len() == 0 {
+                                        interface.name.name = name.to_string();
+                                    } else {
+                                        // We want to look ahead two tokens to get the type,
+                                        // this will advance the cursor for us.
+                                        // The "next" token *should* be a Symbol::Colon followed by
+                                        // an Ident
+                                        // @TODO Support pointer types.
+                                        if let Some(colon) = self.consume() {
+                                            if colon.token_type != TokenType::Symbol(Symbol::Colon)
+                                            {
+                                                return Err(SyntaxError::UnexpectedTokenButGot(
+                                                    TokenType::Symbol(Symbol::Colon),
+                                                    colon,
+                                                ));
+                                            }
+                                        }
+
+                                        interface.members.push(InterfaceProperty {
+                                            name: Identifier {
+                                                immutable: true,
+                                                access_modifier: lexer::AccessModifier::Pub,
+                                                name: name.to_string(),
+                                            },
+                                            r#type,
+                                        });
+                                    }
+                                }
+                                _ => {
+                                    return Err(SyntaxError::UnexpectedToken(
+                                        self.current_token.clone().unwrap(),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
 
         return Ok(());
     }
@@ -248,6 +313,11 @@ impl Parser {
                 lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::From) => continue,
+                lexer::TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::Match) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::If) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::ElseIf) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::Else) => todo!(),
                 lexer::TokenType::SOI => continue,
                 lexer::TokenType::EOF => break,
                 lexer::TokenType::LiteralBoolean(_) => todo!(),
