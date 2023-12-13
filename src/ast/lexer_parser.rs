@@ -1,4 +1,7 @@
-use crate::ast::lexer;
+use crate::ast::{
+    lexer::{self, TokenType},
+    syntax_error::SyntaxError,
+};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
@@ -133,13 +136,16 @@ impl Parser {
         self.current_token.clone()
     }
 
-    fn parse_import(&mut self) -> Result<AstNode, String> {
+    fn parse_import(&mut self) -> Result<AstNode, SyntaxError> {
         println!("parsing import");
-        match &self.current_token {
-            None => return Err(format!("Expected 'import'")),
+        match &self.current_token.clone() {
+            None => return Err(SyntaxError::MissingToken("import")),
             Some(token) => {
                 if token.token_type != lexer::TokenType::Keyword(lexer::Keyword::Import) {
-                    return Err(format!("Expected 'import', got '{:#?}'.", token.token_type));
+                    return Err(SyntaxError::UnexpectedTokenButGot(
+                        lexer::TokenType::Keyword(lexer::Keyword::Import),
+                        token.clone(),
+                    ));
                 } else {
                     let mut import_statement = ImportStatement {
                         members: vec![],
@@ -158,8 +164,8 @@ impl Parser {
                                 // Skip whitespace and the opening brace but mark it as found.
                                 lexer::TokenType::Symbol(lexer::Symbol::OpenBlock) => {
                                     if found_opening_brace {
-                                        return Err::<AstNode, String>(
-                                            "Unexpected opening brace".to_string(),
+                                        return Err::<AstNode, SyntaxError>(
+                                            SyntaxError::UnexpectedToken(token.clone()),
                                         );
                                     } else {
                                         found_opening_brace = true;
@@ -167,10 +173,10 @@ impl Parser {
                                 }
                                 lexer::TokenType::Symbol(lexer::Symbol::CloseBlock) => {
                                     if !found_opening_brace {
-                                        return Err(
-                                            "Expected opening brace but found closing brace."
-                                                .to_string(),
-                                        );
+                                        return Err(SyntaxError::UnexpectedTokenButGot(
+                                            TokenType::Symbol(lexer::Symbol::OpenBlock),
+                                            token.clone(),
+                                        ));
                                     } else {
                                         found_closing_brace = true;
                                     }
@@ -180,7 +186,10 @@ impl Parser {
                                 }
                                 lexer::TokenType::Keyword(lexer::Keyword::From) => {
                                     if !found_closing_brace {
-                                        return Err("Expected } but found from.".to_string());
+                                        return Err(SyntaxError::UnexpectedTokenButGot(
+                                            TokenType::Symbol(lexer::Symbol::CloseBlock),
+                                            token.clone(),
+                                        ));
                                     }
                                 }
                                 lexer::TokenType::Symbol(..) => continue,
@@ -193,15 +202,17 @@ impl Parser {
                                     }
                                 }
                                 lexer::TokenType::EOF => break,
-                                tok => {
-                                    return Err(format!("Found unexpected {:#?}", tok.clone()));
+                                _ => {
+                                    return Err(SyntaxError::UnexpectedToken(
+                                        self.current_token.clone().unwrap(),
+                                    ));
                                 }
                             };
                         }
                     }
 
                     if !found_closing_brace {
-                        return Err("Expected a }".to_string());
+                        return Err(SyntaxError::MissingToken("}"));
                     }
 
                     import_statement.members = imports
@@ -219,17 +230,26 @@ impl Parser {
         }
     }
 
+    fn parse_interface_declaration(&mut self) -> Result<AstNode, SyntaxError> {
+        println!("parsing interface");
+
+        return Ok(());
+    }
+
     pub fn parse(&mut self) -> Trie {
         let mut tree = Trie { nodes: vec![] };
 
         while let Some(token) = &self.current_token {
             let node = match token.token_type {
                 lexer::TokenType::Keyword(lexer::Keyword::Import) => self.parse_import(),
+                lexer::TokenType::Keyword(lexer::Keyword::Interface) => {
+                    self.parse_interface_declaration()
+                }
                 lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::From) => continue,
                 lexer::TokenType::SOI => continue,
-                lexer::TokenType::EOF => todo!(),
+                lexer::TokenType::EOF => break,
                 lexer::TokenType::LiteralBoolean(_) => todo!(),
                 lexer::TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => todo!(),
                 lexer::TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => todo!(),

@@ -15,6 +15,12 @@ pub enum Keyword {
     Var,
     Import,
     From,
+    Interface,
+    Enum,
+    Match,
+    If,
+    ElseIf,
+    Else,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -142,6 +148,12 @@ impl Lexer {
                 s if s == "var" => TokenType::Keyword(Keyword::Var),
                 s if s == "import" => TokenType::Keyword(Keyword::Import),
                 s if s == "from" => TokenType::Keyword(Keyword::From),
+                s if s == "interface" => TokenType::Keyword(Keyword::Interface),
+                s if s == "enum" => TokenType::Keyword(Keyword::Enum),
+                s if s == "match" => TokenType::Keyword(Keyword::Match),
+                s if s == "if" => TokenType::Keyword(Keyword::If),
+                s if s == "elseif" => TokenType::Keyword(Keyword::ElseIf),
+                s if s == "else" => TokenType::Keyword(Keyword::Else),
                 _ => TokenType::Ident(value.clone()),
             },
         }
