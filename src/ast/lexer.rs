@@ -14,6 +14,7 @@ pub enum Keyword {
     Fn,
     Var,
     Import,
+    From,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -135,6 +136,7 @@ impl Lexer {
                 s if s == "fn" => TokenType::Keyword(Keyword::Fn),
                 s if s == "var" => TokenType::Keyword(Keyword::Var),
                 s if s == "import" => TokenType::Keyword(Keyword::Import),
+                s if s == "from" => TokenType::Keyword(Keyword::From),
                 _ => TokenType::Ident(value.clone()),
             },
         }

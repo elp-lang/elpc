@@ -114,9 +114,9 @@ pub struct Parser {
 impl Parser {
     pub fn new(tokens: Vec<lexer::Token>) -> Parser {
         Parser {
-            tokens,
+            tokens: tokens.clone(),
             position: 0,
-            current_token: None,
+            current_token: tokens.get(1).cloned(),
         }
     }
 
@@ -133,6 +133,7 @@ impl Parser {
     }
 
     fn parse_import(&mut self) -> Result<AstNode, String> {
+        print!("parsing import\n");
         match &self.current_token {
             None => return Err(format!("Expected 'import'")),
             Some(token) => {
@@ -150,8 +151,9 @@ impl Parser {
                     let mut found_closing_brace = false;
                     let mut imports: Vec<lexer::Token> = vec![];
                     while self.consume().is_some() {
+                        print!("in import loop, token: {:#?}\n", self.current_token);
                         if let Some(token) = &self.current_token {
-                            match token.token_type {
+                            match &token.token_type {
                                 // Skip whitespace and the opening brace but mark it as found.
                                 lexer::TokenType::OpenBlock => {
                                     if found_opening_brace {
@@ -160,7 +162,6 @@ impl Parser {
                                         );
                                     } else {
                                         found_opening_brace = true;
-                                        continue;
                                     }
                                 }
                                 lexer::TokenType::CloseBlock => {
@@ -171,15 +172,28 @@ impl Parser {
                                         );
                                     } else {
                                         found_closing_brace = true;
-                                        break;
+                                    }
+                                }
+                                lexer::TokenType::Keyword(lexer::Keyword::Import) => {
+                                    continue;
+                                }
+                                lexer::TokenType::Keyword(lexer::Keyword::From) => {
+                                    if !found_closing_brace {
+                                        return Err("Expected } but found from.".to_string());
                                     }
                                 }
                                 lexer::TokenType::Whitespace(..) => continue,
                                 lexer::TokenType::Ident(..) => {
-                                    imports.push(token.clone());
-                                    continue;
+                                    if found_closing_brace {
+                                        import_statement.source_path = token.value.clone();
+                                    } else {
+                                        imports.push(token.clone());
+                                    }
                                 }
-                                _ => break,
+                                tok => {
+                                    println!("Found unexpected {:#?}", tok.clone());
+                                    break;
+                                }
                             };
                         }
                     }
@@ -206,12 +220,12 @@ impl Parser {
         let mut tree = Trie { nodes: vec![] };
 
         while let Some(token) = &self.current_token {
-            print!("{:#?}", token);
+            print!("current: {:#?}\n", token);
             let node = match token.token_type {
                 lexer::TokenType::Keyword(lexer::Keyword::Import) => self.parse_import(),
                 lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
-                lexer::TokenType::SOI => todo!(),
+                lexer::TokenType::SOI => continue,
                 lexer::TokenType::EOF => todo!(),
                 lexer::TokenType::LiteralBoolean(_) => todo!(),
                 lexer::TokenType::DoubleSpeechMark => todo!(),
@@ -221,10 +235,11 @@ impl Parser {
                 lexer::TokenType::ReturnType => todo!(),
                 lexer::TokenType::Ident(_) => todo!(),
                 lexer::TokenType::Symbol(_) => todo!(),
-                lexer::TokenType::Whitespace(_) => todo!(),
+                lexer::TokenType::Whitespace(_) => continue,
                 lexer::TokenType::AccessModifier(_) => todo!(),
             };
 
+            print!("got node? {:#?}\n", node);
             match node {
                 Ok(node) => {
                     tree.nodes.push(node);
