@@ -253,44 +253,45 @@ impl Parser {
                 };
 
                 while self.consume().is_some() {
-                    while self.consume().is_some() {
-                        if let Some(token) = &self.current_token {
-                            match &token.token_type {
-                                TokenType::Keyword(lexer::Keyword::Interface) => continue,
-                                TokenType::Ident(name) => {
-                                    if found_opening_brace && interface.members.len() == 0 {
-                                        interface.name.name = name.to_string();
-                                    } else {
-                                        // We want to look ahead two tokens to get the type,
-                                        // this will advance the cursor for us.
-                                        // The "next" token *should* be a Symbol::Colon followed by
-                                        // an Ident
-                                        // @TODO Support pointer types.
-                                        if let Some(colon) = self.consume() {
-                                            if colon.token_type != TokenType::Symbol(Symbol::Colon)
-                                            {
-                                                return Err(SyntaxError::UnexpectedTokenButGot(
-                                                    TokenType::Symbol(Symbol::Colon),
-                                                    colon,
-                                                ));
-                                            }
+                    if let Some(token) = &self.current_token {
+                        match &token.token_type {
+                            TokenType::Keyword(lexer::Keyword::Interface) => continue,
+                            TokenType::Ident(name) => {
+                                if found_opening_brace && interface.members.len() == 0 {
+                                    interface.name.name = name.to_string();
+                                } else {
+                                    // We want to look ahead two tokens to get the type,
+                                    // this will advance the cursor for us.
+                                    // The "next" token *should* be a Symbol::Colon followed by
+                                    // an Ident
+                                    // @TODO Support pointer types.
+                                    if let Some(colon) = self.consume() {
+                                        if colon.token_type != TokenType::Symbol(Symbol::Colon) {
+                                            return Err(SyntaxError::UnexpectedTokenButGot(
+                                                TokenType::Symbol(Symbol::Colon),
+                                                colon,
+                                            ));
                                         }
-
-                                        interface.members.push(InterfaceProperty {
-                                            name: Identifier {
-                                                immutable: true,
-                                                access_modifier: lexer::AccessModifier::Pub,
-                                                name: name.to_string(),
-                                            },
-                                            r#type,
-                                        });
                                     }
+
+                                    interface.members.push(InterfaceProperty {
+                                        name: Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: name.to_string(),
+                                        },
+                                        r#type: Type::TypeName(Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: "unknown".to_string(),
+                                        }),
+                                    });
                                 }
-                                _ => {
-                                    return Err(SyntaxError::UnexpectedToken(
-                                        self.current_token.clone().unwrap(),
-                                    ));
-                                }
+                            }
+                            _ => {
+                                return Err(SyntaxError::UnexpectedToken(
+                                    self.current_token.clone().unwrap(),
+                                ));
                             }
                         }
                     }
