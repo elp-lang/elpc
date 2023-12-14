@@ -132,16 +132,30 @@ impl Parser {
         }
     }
 
-    pub fn consume_n(&mut self, n: i32) -> Option<vec![lexer::Token]> {
-        self.position += 1;
+    // Consume N number of tokens (skipping any whitespace entirely)
+    pub fn consume_n(&mut self, n: i32) -> Result<Vec<lexer::Token>, &'static str> {
+        let mut results = vec![];
+        let mut consumed = 0;
 
-        self.current_token = if let Some(token) = self.tokens.get(self.position) {
-            Some(token.to_owned())
-        } else {
-            None
-        };
+        while consumed <= n {
+            self.position += 1;
+            consumed += 1;
+            if let Some(token) = self.tokens.get(self.position) {
+                match token.token_type {
+                    TokenType::Whitespace(..) => {
+                        consumed -= 1;
+                        self.position -= 1;
+                    }
+                    _ => {
+                        results.push(token.to_owned());
+                    }
+                }
+            } else {
+                return Err("Not enough tokens to consume");
+            };
+        }
 
-        self.current_token.clone()
+        Ok(results)
     }
 
     pub fn consume(&mut self) -> Option<lexer::Token> {

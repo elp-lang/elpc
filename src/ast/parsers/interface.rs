@@ -51,30 +51,29 @@ pub fn parse_interface_declaration(parser: &mut Parser) -> Result<AstNode, Synta
                     }),
                 };
 
-                while parser.consume().is_some() {
-                    if let Some(token) = &parser.current_token {
-                        match &token.token_type {
-                            // Skip whitespace.
-                            TokenType::Whitespace(..) => continue,
-                            TokenType::Symbol(Symbol::Colon) => continue,
-                            TokenType::Symbol(Symbol::Comma) => break,
-                            TokenType::Ident(name) => {
+                while let Some(token) = parser.consume() {
+                    match &token.token_type {
+                        // Skip whitespace.
+                        TokenType::Whitespace(..) => continue,
+                        TokenType::Symbol(Symbol::Colon) => continue,
+                        TokenType::Symbol(Symbol::Comma) => break,
+                        TokenType::Ident(name) => {
+                            // If we have an Ident but no opening block,
+                            // then we have a named interface and not an anonymous one.
+                            if !found_opening_brace {
                                 if property.name.name != "".to_string() {
                                     property.name.name = name.to_string();
                                     continue;
-                                } else {
-                                    property.r#type = Type::TypeName(Identifier {
-                                        name: name.to_string(),
-                                        access_modifier: lexer::AccessModifier::Pub,
-                                        immutable: true,
-                                    });
                                 }
                             }
-                            _ => {
-                                return Err(SyntaxError::UnexpectedToken(
-                                    parser.current_token.clone().unwrap(),
-                                ));
+                            // Otherwise, we probably have a property name or type to deal with.
+                            else {
                             }
+                        }
+                        _ => {
+                            return Err(SyntaxError::UnexpectedToken(
+                                parser.current_token.clone().unwrap(),
+                            ));
                         }
                     }
                 }
