@@ -39,6 +39,7 @@ pub enum Symbol {
     OpenBlock,
     CloseBlock,
     Period,
+    Comma,
     Other(String),
 }
 #[derive(Debug, PartialEq, Eq, Clone)]

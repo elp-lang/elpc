@@ -2,6 +2,9 @@ import { AsyncQueue, String } from "elp"
 
 interface MyInterface {
   .property: string
+  .data: interface {
+    .property: string
+  }
 }
 
 enum MyEnum {
