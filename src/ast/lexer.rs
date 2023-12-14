@@ -38,7 +38,7 @@ pub enum Symbol {
     Colon,
     OpenBlock,
     CloseBlock,
-    Equal,
+    Period,
     Other(String),
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -197,6 +197,7 @@ impl Lexer {
                 s if s == ":" => TokenType::Symbol(Symbol::Colon),
                 s if s == "{" => TokenType::Symbol(Symbol::OpenBlock),
                 s if s == "}" => TokenType::Symbol(Symbol::CloseBlock),
+                s if s == "." => TokenType::Symbol(Symbol::Period),
                 s if s == "->" => TokenType::ReturnType,
                 s if s == "\"" => TokenType::Symbol(Symbol::DoubleSpeechMark),
                 s if s == "'" => TokenType::Symbol(Symbol::SingleSpeechMark),
