@@ -1,21 +1,24 @@
 import { AsyncQueue, String } from "elp"
 
+// Comments for devex
 interface MyInterface {
   .property: string
   .data: interface {
     .property: string
   }
+  async fn update() -> thing
 }
 
 enum MyEnum {
   .OPTION
-  .ACTION(arg: string)
+  .ACTION(string)
 }
 
 const NAME: string
-variable: string
+const NAME: string = "hello"
+variable: string = "world"
 binding = 1
-variadic, binding = 1
+variadic, binding = 1, 2
 
 fn MyFunction {}
 fn MyFunction() {}

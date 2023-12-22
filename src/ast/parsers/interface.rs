@@ -1,6 +1,6 @@
 use crate::ast::{
     lexer::{self, Symbol, TokenType},
-    lexer_parser::{AstNode, Identifier, InterfaceDeclaration, InterfaceProperty, Parser, Type},
+    lexer_parser::{Identifier, InterfaceDeclaration, InterfaceProperty, Parser, Type},
     syntax_error::SyntaxError,
 };
 
@@ -8,11 +8,64 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
     println!("parsing interface property");
     match &parser.current_token.clone() {
         None => return Err(SyntaxError::MissingToken("property")),
-        Some(_token) => Ok(property),
+        Some(_token) => {
+            let mut property = InterfaceProperty {
+                name: Identifier {
+                    immutable: true,
+                    access_modifier: lexer::AccessModifier::Pub,
+                    name: "anonymous".to_string(),
+                },
+                r#type: Type::TypeName(Identifier {
+                    immutable: true,
+                    access_modifier: lexer::AccessModifier::Pub,
+                    name: "unknown".to_string(),
+                }),
+            };
+
+            let tokens = parser.consume_n(3);
+
+            match tokens {
+                Ok(tokens) => {
+                    // first token must be an ident,
+                    // second will be a colon
+                    // third will be a type expression
+                    if let Some(ident) = tokens.get(0) {
+                        property.name.name = ident.value.clone();
+                    } else {
+                        return Err(SyntaxError::MissingToken("ident"));
+                    }
+
+                    let colon = tokens.get(1).unwrap();
+                    if colon.token_type != TokenType::Symbol(Symbol::Colon) {
+                        return Err(SyntaxError::MissingToken(":"));
+                    }
+
+                    let type_hint = tokens.get(2).unwrap();
+                    match type_hint.token_type {
+                        TokenType::Keyword(lexer::Keyword::Interface) => {
+                            let interface = parse_interface_declaration(parser);
+
+                            property.r#type = Type::InterfaceType(interface.unwrap());
+                        }
+                        _ => {
+                            return Err(SyntaxError::UnexpectedTokenButGot(
+                                TokenType::Keyword(lexer::Keyword::Interface),
+                                type_hint.clone(),
+                            ))
+                        }
+                    };
+
+                    return Ok(property);
+                }
+                Err(_) => Err(SyntaxError::MissingToken("ident")),
+            }
+        }
     }
 }
 
-pub fn parse_interface_declaration(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
+pub fn parse_interface_declaration(
+    parser: &mut Parser,
+) -> Result<InterfaceDeclaration, SyntaxError> {
     println!("parsing interface");
     let mut interface: InterfaceDeclaration = InterfaceDeclaration {
         name: Identifier {
@@ -37,47 +90,10 @@ pub fn parse_interface_declaration(parser: &mut Parser) -> Result<AstNode, Synta
             lexer::TokenType::Symbol(lexer::Symbol::CloseBlock) => {
                 found_closing_brace = true;
             }
-            lexer::TokenType::Symbol(Symbol::Period) => {
-                let mut property = InterfaceProperty {
-                    name: Identifier {
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                        name: "anonymous".to_string(),
-                    },
-                    r#type: Type::TypeName(Identifier {
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                        name: "unknown".to_string(),
-                    }),
-                };
-
-                while let Some(token) = parser.consume() {
-                    match &token.token_type {
-                        // Skip whitespace.
-                        TokenType::Whitespace(..) => continue,
-                        TokenType::Symbol(Symbol::Colon) => continue,
-                        TokenType::Symbol(Symbol::Comma) => break,
-                        TokenType::Ident(name) => {
-                            // If we have an Ident but no opening block,
-                            // then we have a named interface and not an anonymous one.
-                            if !found_opening_brace {
-                                if property.name.name != "".to_string() {
-                                    property.name.name = name.to_string();
-                                    continue;
-                                }
-                            }
-                            // Otherwise, we probably have a property name or type to deal with.
-                            else {
-                            }
-                        }
-                        _ => {
-                            return Err(SyntaxError::UnexpectedToken(
-                                parser.current_token.clone().unwrap(),
-                            ));
-                        }
-                    }
-                }
-            }
+            lexer::TokenType::Symbol(Symbol::Period) => match parse_interface_property(parser) {
+                Ok(interface_property) => interface.members.push(interface_property),
+                Err(error) => return Err(error),
+            },
             lexer::TokenType::EOF => break,
             TokenType::Symbol(Symbol::Colon) => {
                 if !found_opening_brace {
@@ -109,6 +125,5 @@ pub fn parse_interface_declaration(parser: &mut Parser) -> Result<AstNode, Synta
         }
     }
 
-    Ok(AstNode::InterfaceDeclaration(interface))
+    Ok(interface)
 }
-

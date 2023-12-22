@@ -3,13 +3,13 @@ use std::fmt;
 use super::lexer::{Token, TokenType};
 
 #[derive(Debug)]
-pub enum SyntaxError<'a> {
+pub enum SyntaxError {
     UnexpectedToken(Token),
     UnexpectedTokenButGot(TokenType, Token),
-    MissingToken(&'a str),
+    MissingToken(&'static str),
 }
 
-impl fmt::Display for SyntaxError<'_> {
+impl fmt::Display for SyntaxError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SyntaxError::UnexpectedToken(token) => write!(f, "Unexpected token: {:#?}", token),
@@ -21,4 +21,4 @@ impl fmt::Display for SyntaxError<'_> {
     }
 }
 
-impl std::error::Error for SyntaxError<'_> {}
+impl std::error::Error for SyntaxError {}

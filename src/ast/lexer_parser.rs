@@ -29,6 +29,13 @@ pub struct ImportStatement {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+pub struct ObjectDeclaration {
+    pub name: Identifier,
+    pub implements: *const InterfaceDeclaration,
+    pub members: Vec<*const InterfaceProperty>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub struct InterfaceDeclaration {
     pub name: Identifier,
     pub members: Vec<InterfaceProperty>,
@@ -47,6 +54,11 @@ pub struct EnumVariant {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+pub struct Enum {
+    pub variants: Vec<EnumVariant>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub enum EnumVariantType {
     Option,
     Action(Vec<Parameter>),
@@ -62,6 +74,9 @@ pub struct Parameter {
 pub enum Type {
     TypeName(Identifier),
     FunctionType(Vec<Type>, Box<Type>),
+    InterfaceType(InterfaceDeclaration),
+    ObjectType(ObjectDeclaration),
+    EnumType(Enum),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -120,6 +135,8 @@ pub struct Identifier {
 pub struct Parser {
     position: usize,
     tokens: Vec<lexer::Token>,
+    anonymous_interfaces: Vec<InterfaceDeclaration>,
+    anonymous_objects: Vec<ObjectDeclaration>,
     pub current_token: Option<lexer::Token>,
 }
 
@@ -129,6 +146,8 @@ impl Parser {
             tokens: tokens.clone(),
             position: 0,
             current_token: tokens.get(1).cloned(),
+            anonymous_interfaces: vec![],
+            anonymous_objects: vec![],
         }
     }
 
