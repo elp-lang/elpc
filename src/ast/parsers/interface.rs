@@ -41,11 +41,18 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
                     }
 
                     let type_hint = tokens.get(2).unwrap();
-                    match type_hint.token_type {
+                    match &type_hint.token_type {
                         TokenType::Keyword(lexer::Keyword::Interface) => {
                             let interface = parse_interface_declaration(parser);
 
                             property.r#type = Type::InterfaceType(interface.unwrap());
+                        }
+                        TokenType::Ident(ident) => {
+                            property.r#type = Type::TypeName(Identifier {
+                                immutable: true,
+                                access_modifier: lexer::AccessModifier::Pub,
+                                name: ident.clone(),
+                            })
                         }
                         _ => {
                             return Err(SyntaxError::UnexpectedTokenButGot(

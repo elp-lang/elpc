@@ -151,6 +151,27 @@ impl Parser {
         }
     }
 
+    pub fn peek(&self) -> Result<lexer::Token, &'static str> {
+        let mut iters = 1;
+
+        loop {
+            if let Some(token) = self.tokens.get(self.position + iters) {
+                match &token.token_type {
+                    TokenType::Whitespace(..) => {
+                        iters += 1;
+                        continue;
+                    }
+                    TokenType::EOF => {
+                        return Err("ran out of tokens");
+                    }
+                    _ => {
+                        return Ok(token.clone());
+                    }
+                }
+            }
+        }
+    }
+
     // Consume N number of tokens (skipping any whitespace entirely)
     pub fn consume_n(&mut self, n: i32) -> Result<Vec<lexer::Token>, &'static str> {
         let mut results = vec![];
@@ -163,7 +184,6 @@ impl Parser {
                 match token.token_type {
                     TokenType::Whitespace(..) => {
                         consumed -= 1;
-                        self.position -= 1;
                     }
                     _ => {
                         results.push(token.to_owned());
@@ -198,7 +218,12 @@ impl Parser {
                     parsers::import::parse_import(self)
                 }
                 lexer::TokenType::Keyword(lexer::Keyword::Interface) => {
-                    parsers::interface::parse_interface_declaration(self)
+                    let interface = parsers::interface::parse_interface_declaration(self);
+
+                    match interface {
+                        Ok(new_interface) => Ok(AstNode::InterfaceDeclaration(new_interface)),
+                        Err(error) => Err(error),
+                    }
                 }
                 lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
@@ -265,7 +290,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_interface() {
+    fn test_parse_basic_interface() {
         let input = "interface MyInterface {
             .property: string
         }"
@@ -298,5 +323,91 @@ mod tests {
                 }))
             }
         );
+
+        print!("trie {:#?}", parser.parse());
+    }
+
+    #[test]
+    fn test_parse_interface() {
+        let input = "interface MyInterface {
+            .property: string
+            .property: interface {
+                .property: int32
+                .property : number
+            }
+        }"
+        .to_string();
+        let mut lexer = Lexer::new(input.clone());
+        let tokens = lexer.consume_all_tokens();
+        let mut parser = Parser::new(tokens);
+
+        assert_eq!(
+            parser.parse(),
+            Trie {
+                nodes: vec!(AstNode::InterfaceDeclaration(InterfaceDeclaration {
+                    name: Identifier {
+                        immutable: true,
+                        access_modifier: lexer::AccessModifier::Pub,
+                        name: "MyInterface".to_string(),
+                    },
+                    members: vec!(
+                        InterfaceProperty {
+                            name: Identifier {
+                                immutable: true,
+                                access_modifier: lexer::AccessModifier::Pub,
+                                name: "property".to_string()
+                            },
+                            r#type: Type::TypeName(Identifier {
+                                immutable: true,
+                                access_modifier: lexer::AccessModifier::Pub,
+                                name: "string".to_string()
+                            })
+                        },
+                        InterfaceProperty {
+                            name: Identifier {
+                                immutable: true,
+                                access_modifier: lexer::AccessModifier::Pub,
+                                name: "property".to_string()
+                            },
+                            r#type: Type::InterfaceType(InterfaceDeclaration {
+                                name: Identifier {
+                                    name: "".into(),
+                                    immutable: true,
+                                    access_modifier: lexer::AccessModifier::Pub,
+                                },
+                                members: vec!(
+                                    InterfaceProperty {
+                                        name: Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: "property".to_string()
+                                        },
+                                        r#type: Type::TypeName(Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: "string".to_string()
+                                        })
+                                    },
+                                    InterfaceProperty {
+                                        name: Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: "property".to_string()
+                                        },
+                                        r#type: Type::TypeName(Identifier {
+                                            immutable: true,
+                                            access_modifier: lexer::AccessModifier::Pub,
+                                            name: "number".to_string()
+                                        })
+                                    },
+                                )
+                            })
+                        }
+                    ),
+                }))
+            }
+        );
+
+        print!("trie {:#?}", parser.parse());
     }
 }
