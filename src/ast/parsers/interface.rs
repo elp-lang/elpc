@@ -24,6 +24,7 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
 
             let tokens = parser.consume_n(3);
 
+            print!("tokens {:#?}", tokens);
             match tokens {
                 Ok(tokens) => {
                     // first token must be an ident,
@@ -41,6 +42,7 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
                     }
 
                     let type_hint = tokens.get(2).unwrap();
+                    print!("token hint {:#?}", type_hint.token_type);
                     match &type_hint.token_type {
                         TokenType::Keyword(lexer::Keyword::Interface) => {
                             let interface = parse_interface_declaration(parser);

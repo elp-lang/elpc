@@ -341,6 +341,7 @@ mod tests {
         let tokens = lexer.consume_all_tokens();
         let mut parser = Parser::new(tokens);
 
+        print!("TRIE {:#?}", parser.parse());
         assert_eq!(
             parser.parse(),
             Trie {
@@ -407,7 +408,5 @@ mod tests {
                 }))
             }
         );
-
-        print!("trie {:#?}", parser.parse());
     }
 }
