@@ -5,7 +5,6 @@ use crate::ast::{
 };
 
 pub fn parse_import(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
-    println!("parsing import");
     match parser.current_token.clone() {
         None => return Err(SyntaxError::MissingToken("import")),
         Some(token) => {
@@ -98,4 +97,3 @@ pub fn parse_import(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
         }
     }
 }
-

@@ -5,7 +5,6 @@ use crate::ast::{
 };
 
 fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, SyntaxError> {
-    println!("parsing interface property");
     match &parser.current_token.clone() {
         None => return Err(SyntaxError::MissingToken("property")),
         Some(_token) => {
@@ -24,7 +23,6 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
 
             let tokens = parser.consume_n(3);
 
-            print!("tokens {:#?}", tokens);
             match tokens {
                 Ok(tokens) => {
                     // first token must be an ident,
@@ -42,12 +40,19 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
                     }
 
                     let type_hint = tokens.get(2).unwrap();
-                    print!("token hint {:#?}", type_hint.token_type);
+
                     match &type_hint.token_type {
                         TokenType::Keyword(lexer::Keyword::Interface) => {
                             let interface = parse_interface_declaration(parser);
 
-                            property.r#type = Type::InterfaceType(interface.unwrap());
+                            match interface {
+                                Ok(interface) => {
+                                    property.r#type = Type::InterfaceType(interface);
+                                }
+                                Err(error) => {
+                                    return Err(error);
+                                }
+                            }
                         }
                         TokenType::Ident(ident) => {
                             property.r#type = Type::TypeName(Identifier {
@@ -75,7 +80,6 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
 pub fn parse_interface_declaration(
     parser: &mut Parser,
 ) -> Result<InterfaceDeclaration, SyntaxError> {
-    println!("parsing interface");
     let mut interface: InterfaceDeclaration = InterfaceDeclaration {
         name: Identifier {
             immutable: true,
@@ -87,7 +91,6 @@ pub fn parse_interface_declaration(
 
     let mut found_interface_name = false;
     let mut found_opening_brace = false;
-    let mut found_closing_brace = false;
 
     while let Some(token) = parser.consume() {
         match &token.token_type {
@@ -97,7 +100,7 @@ pub fn parse_interface_declaration(
                 found_opening_brace = true;
             }
             lexer::TokenType::Symbol(lexer::Symbol::CloseBlock) => {
-                found_closing_brace = true;
+                break;
             }
             lexer::TokenType::Symbol(Symbol::Period) => match parse_interface_property(parser) {
                 Ok(interface_property) => interface.members.push(interface_property),

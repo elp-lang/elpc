@@ -234,7 +234,6 @@ impl Lexer {
             self.tokens.push(next_token.to_owned());
 
             if next_token.token_type == TokenType::EOF {
-                print!("\n\nEOF\n\n");
                 break;
             }
         }
@@ -273,9 +272,6 @@ mod tests {
     #[test]
     fn test_lexer_sanity() {
         let input = "import { Thing } from \"elp\"".to_string();
-        for (index, character) in input.chars().enumerate() {
-            println!("{}: {}", index, character);
-        }
         let mut lexer = Lexer::new(input.clone());
         let space = Whitespace::Other(" ".to_string());
 

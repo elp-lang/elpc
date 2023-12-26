@@ -177,7 +177,7 @@ impl Parser {
         let mut results = vec![];
         let mut consumed = 0;
 
-        while consumed <= n {
+        while consumed < n {
             self.position += 1;
             consumed += 1;
             if let Some(token) = self.tokens.get(self.position) {
@@ -210,6 +210,8 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Trie {
+        self.position = 0;
+
         let mut tree = Trie { nodes: vec![] };
 
         while let Some(token) = &self.current_token {
@@ -323,8 +325,6 @@ mod tests {
                 }))
             }
         );
-
-        print!("trie {:#?}", parser.parse());
     }
 
     #[test]
@@ -341,7 +341,6 @@ mod tests {
         let tokens = lexer.consume_all_tokens();
         let mut parser = Parser::new(tokens);
 
-        print!("TRIE {:#?}", parser.parse());
         assert_eq!(
             parser.parse(),
             Trie {
@@ -386,7 +385,7 @@ mod tests {
                                         r#type: Type::TypeName(Identifier {
                                             immutable: true,
                                             access_modifier: lexer::AccessModifier::Pub,
-                                            name: "string".to_string()
+                                            name: "int32".to_string()
                                         })
                                     },
                                     InterfaceProperty {
