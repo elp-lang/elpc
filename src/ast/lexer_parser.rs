@@ -3,7 +3,7 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-use super::parsers;
+use super::{lexer::AccessModifier, parsers};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
@@ -20,6 +20,13 @@ pub enum AstNode {
 #[derive(Debug, PartialEq, Eq)]
 pub struct Trie {
     pub nodes: Vec<AstNode>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Fn {
+    pub name: Identifier,
+    pub params: Vec<Parameter>,
+    pub returns: Identifier,
 }
 
 #[derive(Debug, PartialEq, Eq)]

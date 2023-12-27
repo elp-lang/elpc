@@ -6,7 +6,7 @@ interface MyInterface {
   .data: interface {
     .property: string
   }
-  async fn update() -> thing
+  fn update() -> thing
 }
 
 enum MyEnum {

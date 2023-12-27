@@ -80,7 +80,7 @@ fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, Sy
 pub fn parse_interface_declaration(
     parser: &mut Parser,
 ) -> Result<InterfaceDeclaration, SyntaxError> {
-    let mut interface: InterfaceDeclaration = InterfaceDeclaration {
+    let mut interface = InterfaceDeclaration {
         name: Identifier {
             immutable: true,
             access_modifier: lexer::AccessModifier::Pub,
