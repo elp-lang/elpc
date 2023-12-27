@@ -35,6 +35,8 @@ pub enum Whitespace {
 pub enum Symbol {
     DoubleSpeechMark,
     SingleSpeechMark,
+    OpenParen,
+    CloseParen,
     Colon,
     OpenBlock,
     CloseBlock,
