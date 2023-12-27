@@ -32,12 +32,17 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
                                 let tokens = parser.consume_n(2);
 
                                 match tokens {
-                                    Ok(tokens) => {}
+                                    Ok(tokens) => {
+                                        match tokens.get(1) {
+                                            Some(type_hint) => 
+                                        }
+                                    }
                                     Err(_) => return Err(SyntaxError::MissingToken("ident")),
                                 }
                             }
                             _ => {
-                                return Err(SyntaxError::UnexpectedToken(
+                                return Err(SyntaxError::UnexpectedTokenButGot(
+                                    TokenType::Symbol(Symbol::Comma),
                                     parser.current_token.clone().unwrap(),
                                 ));
                             }

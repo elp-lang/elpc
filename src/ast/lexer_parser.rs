@@ -1,9 +1,6 @@
-use crate::ast::{
-    lexer::{self, Symbol, Token, TokenType},
-    syntax_error::SyntaxError,
-};
+use crate::ast::lexer::{self, TokenType};
 
-use super::{lexer::AccessModifier, parsers};
+use super::parsers;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
