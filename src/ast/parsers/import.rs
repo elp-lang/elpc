@@ -4,7 +4,7 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-pub fn parse_import(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
+pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError> {
     match parser.current_token.clone() {
         None => return Err(SyntaxError::MissingToken("import")),
         Some(token) => {
@@ -31,9 +31,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
                             // Skip whitespace and the opening brace but mark it as found.
                             lexer::TokenType::Symbol(lexer::Symbol::OpenBlock) => {
                                 if found_opening_brace {
-                                    return Err::<AstNode, SyntaxError>(
-                                        SyntaxError::UnexpectedToken(token.clone()),
-                                    );
+                                    return Err(SyntaxError::UnexpectedToken(token.clone()));
                                 } else {
                                     found_opening_brace = true;
                                 }
@@ -92,7 +90,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<AstNode, SyntaxError> {
                     })
                     .collect();
 
-                return Ok(AstNode::Import(import_statement));
+                return Ok(import_statement);
             }
         }
     }

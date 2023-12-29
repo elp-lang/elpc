@@ -221,8 +221,12 @@ impl Parser {
         while let Some(token) = &self.current_token {
             let node = match token.token_type {
                 lexer::TokenType::Keyword(lexer::Keyword::Import) => {
-                    parsers::import::parse_import(self)
+                    match parsers::import::parse_import(self) {
+                        Ok(import) => Ok(AstNode::Import(import)),
+                        Err(error) => Err(error),
+                    }
                 }
+
                 lexer::TokenType::Keyword(lexer::Keyword::Interface) => {
                     let interface = parsers::interface::parse_interface_declaration(self);
 
@@ -251,6 +255,15 @@ impl Parser {
                 lexer::TokenType::Symbol(_) => todo!(),
                 lexer::TokenType::Whitespace(_) => continue,
                 lexer::TokenType::AccessModifier(_) => todo!(),
+                TokenType::SOI => todo!(),
+                TokenType::EOF => todo!(),
+                TokenType::LiteralBoolean(_) => todo!(),
+                TokenType::Keyword(_) => todo!(),
+                TokenType::ReturnType => todo!(),
+                TokenType::Ident(_) => todo!(),
+                TokenType::Symbol(_) => todo!(),
+                TokenType::Whitespace(_) => todo!(),
+                TokenType::AccessModifier(_) => todo!(),
             };
 
             match node {
