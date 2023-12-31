@@ -19,27 +19,27 @@ pub struct Trie {
     pub nodes: Vec<AstNode>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct Fn {
-    pub name: Identifier,
+    pub name: Option<Identifier>,
     pub params: Vec<Parameter>,
     pub returns: Identifier,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct ImportStatement {
     pub members: Vec<Identifier>,
     pub source_path: String,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct ObjectDeclaration {
     pub name: Identifier,
-    pub implements: *const InterfaceDeclaration,
+    pub implements: Vec<*const InterfaceDeclaration>,
     pub members: Vec<*const InterfaceProperty>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct InterfaceDeclaration {
     pub name: Identifier,
     pub members: Vec<InterfaceProperty>,
@@ -70,14 +70,14 @@ pub enum EnumVariantType {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Parameter {
-    pub name: Identifier,
+    pub name: Option<Identifier>,
     pub r#type: Type,
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Type {
     TypeName(Identifier),
-    FunctionType(Vec<Type>, Box<Type>),
+    FnType(Fn),
     InterfaceType(InterfaceDeclaration),
     ObjectType(ObjectDeclaration),
     EnumType(Enum),
@@ -129,7 +129,7 @@ pub enum Pattern {
     Boolean(bool),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct Identifier {
     pub immutable: bool,
     pub access_modifier: lexer::AccessModifier,
@@ -139,8 +139,6 @@ pub struct Identifier {
 pub struct Parser {
     position: usize,
     tokens: Vec<lexer::Token>,
-    anonymous_interfaces: Vec<InterfaceDeclaration>,
-    anonymous_objects: Vec<ObjectDeclaration>,
     pub current_token: Option<lexer::Token>,
 }
 
@@ -150,8 +148,6 @@ impl Parser {
             tokens: tokens.clone(),
             position: 0,
             current_token: tokens.get(1).cloned(),
-            anonymous_interfaces: vec![],
-            anonymous_objects: vec![],
         }
     }
 

@@ -3,9 +3,10 @@ pub enum Error {
     UnknownToken(String), // Add more error variants as needed
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
 pub enum AccessModifier {
     Const,
+    #[default]
     Pub,
 }
 
