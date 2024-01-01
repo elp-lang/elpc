@@ -4,7 +4,7 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, SyntaxError> {
+pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, SyntaxError> {
     match &parser.current_token.clone() {
         None => return Err(SyntaxError::MissingToken("property")),
         Some(_token) => {

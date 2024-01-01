@@ -56,7 +56,7 @@ pub fn parse_fn_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, Syntax
     Ok(params)
 }
 
-pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
+pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError> {
     let mut fn_declaration = Fn {
         name: Some(Identifier {
             name: "".into(),
@@ -83,6 +83,7 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
                     immutable: true,
                 })
             }
+            TokenType::ReturnType => {}
             TokenType::Symbol(Symbol::OpenParen) => match parser.peek() {
                 Ok(next) => match next.token_type {
                     TokenType::Ident(_) => {

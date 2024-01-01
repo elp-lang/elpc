@@ -1,6 +1,6 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers;
+use super::parsers::{self, funcs::parse_fn};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
@@ -8,7 +8,7 @@ pub enum AstNode {
     InterfaceDeclaration(InterfaceDeclaration),
     EnumDeclaration(Identifier, Vec<EnumVariant>),
     VariableDeclaration(Identifier, Option<Type>, Option<Expression>),
-    FunctionDeclaration(Identifier, Vec<Parameter>, Option<Type>, Option<Block>),
+    FunctionDeclaration(Fn),
     ExpressionStatement(Expression),
     IfStatement(Expression, Option<Block>, Option<IfStatement>),
     MatchStatement(Expression, Vec<MatchCase>),
@@ -231,7 +231,10 @@ impl Parser {
                         Err(error) => Err(error),
                     }
                 }
-                lexer::TokenType::Keyword(lexer::Keyword::Fn) => todo!(),
+                lexer::TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self) {
+                    Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
+                    Err(error) => Err(error),
+                },
                 lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
                 lexer::TokenType::Keyword(lexer::Keyword::From) => continue,
                 lexer::TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
