@@ -4,6 +4,8 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
+use super::type_expression::parse_type_expression;
+
 pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError> {
     let mut param = Parameter {
         name: None,
@@ -83,7 +85,14 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
                     immutable: true,
                 })
             }
-            TokenType::ReturnType => {}
+            TokenType::ReturnType => match parse_type_expression(parser) {
+                Ok(expr) => {
+                    fn_declaration.returns = expr;
+                }
+                Err(error) => {
+                    return Err(error);
+                }
+            },
             TokenType::Symbol(Symbol::OpenParen) => match parser.peek() {
                 Ok(next) => match next.token_type {
                     TokenType::Ident(_) => {

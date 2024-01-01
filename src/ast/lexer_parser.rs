@@ -19,11 +19,11 @@ pub struct Trie {
     pub nodes: Vec<AstNode>,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Fn {
     pub name: Option<Identifier>,
     pub params: Vec<Parameter>,
-    pub returns: Identifier,
+    pub returns: Box<Type>,
 }
 
 #[derive(Default, Debug, PartialEq, Eq)]
@@ -222,7 +222,6 @@ impl Parser {
                         Err(error) => Err(error),
                     }
                 }
-
                 lexer::TokenType::Keyword(lexer::Keyword::Interface) => {
                     let interface = parsers::interface::parse_interface_declaration(self);
 
@@ -231,7 +230,7 @@ impl Parser {
                         Err(error) => Err(error),
                     }
                 }
-                lexer::TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self) {
+                lexer::TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self, false) {
                     Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
                     Err(error) => Err(error),
                 },
