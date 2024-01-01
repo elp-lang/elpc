@@ -6,6 +6,7 @@ use super::lexer::{Token, TokenType};
 pub enum SyntaxError {
     UnexpectedToken(Token),
     UnexpectedTokenButGot(TokenType, Token),
+    UnexpectedTokenButGotL(Vec<TokenType>, Token),
     MissingToken(&'static str),
 }
 
@@ -16,6 +17,14 @@ impl fmt::Display for SyntaxError {
             SyntaxError::MissingToken(token) => write!(f, "Missing token: {:#?}", token),
             SyntaxError::UnexpectedTokenButGot(expected, got) => {
                 write!(f, "Expected {:#?} but got {:#?}", expected, got)
+            }
+            SyntaxError::UnexpectedTokenButGotL(expected, got) => {
+                let joined: String = expected
+                    .iter()
+                    .map(|t| t.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" or ");
+                write!(f, "Expected {} but got {:#?}", joined, got)
             }
         }
     }

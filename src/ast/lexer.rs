@@ -59,6 +59,45 @@ pub enum TokenType {
     AccessModifier(AccessModifier),
 }
 
+impl ToString for TokenType {
+    fn to_string(&self) -> String {
+        match self {
+            TokenType::SOI => "SOI (Start Of Input)".into(),
+            TokenType::EOF => "EOF (End Of File)".into(),
+            TokenType::LiteralBoolean(_) => "boolean".into(),
+            TokenType::Keyword(Keyword::Interface) => "interface".into(),
+            TokenType::Keyword(Keyword::Enum) => "enum".into(),
+            TokenType::Keyword(Keyword::Fn) => "fn".into(),
+            TokenType::Keyword(Keyword::Var) => "keyword".into(),
+            TokenType::Keyword(Keyword::Import) => "import".into(),
+            TokenType::Keyword(Keyword::From) => "from".into(),
+            TokenType::Keyword(Keyword::Object) => "object".into(),
+            TokenType::Keyword(Keyword::Match) => "match".into(),
+            TokenType::Keyword(Keyword::If) => "if".into(),
+            TokenType::Keyword(Keyword::ElseIf) => "elseif".into(),
+            TokenType::Keyword(Keyword::Else) => "else".into(),
+            TokenType::ReturnType => "return type expression".into(),
+            TokenType::Ident(s) => format!("Ident {}", s),
+            TokenType::Symbol(Symbol::CloseParen) => ")".into(),
+            TokenType::Symbol(Symbol::DoubleSpeechMark) => "\"".into(),
+            TokenType::Symbol(Symbol::SingleSpeechMark) => "'".into(),
+            TokenType::Symbol(Symbol::OpenParen) => "(".into(),
+            TokenType::Symbol(Symbol::Colon) => ":".into(),
+            TokenType::Symbol(Symbol::OpenBlock) => "{".into(),
+            TokenType::Symbol(Symbol::CloseBlock) => "}".into(),
+            TokenType::Symbol(Symbol::Period) => ".".into(),
+            TokenType::Symbol(Symbol::Comma) => ",".into(),
+            TokenType::Symbol(Symbol::Other(s)) => s.to_string(),
+            TokenType::Whitespace(Whitespace::Tab) => "tab \\t".into(),
+            TokenType::Whitespace(Whitespace::Return) => "return \\r".into(),
+            TokenType::Whitespace(Whitespace::NewLine) => "new line \\n".into(),
+            TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
+            TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
+            TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Token {
     pub token_type: TokenType,

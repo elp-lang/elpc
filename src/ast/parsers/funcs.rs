@@ -66,11 +66,7 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
             access_modifier: Pub,
         }),
         params: vec![],
-        returns: Identifier {
-            name: "".into(),
-            immutable: true,
-            access_modifier: Pub,
-        },
+        returns: Box::new(Type::Undefined),
     };
 
     // the next 3 tokens could/should be an ident, opening parenthesis and parameter.
@@ -87,7 +83,7 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
             }
             TokenType::ReturnType => match parse_type_expression(parser) {
                 Ok(expr) => {
-                    fn_declaration.returns = expr;
+                    fn_declaration.returns = Box::new(expr);
                 }
                 Err(error) => {
                     return Err(error);
@@ -112,6 +108,12 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
                     return Err(SyntaxError::MissingToken(") or param"));
                 }
             },
+            TokenType::Symbol(Symbol::OpenBlock) => {
+                if !with_body {
+                    return Err(SyntaxError::UnexpectedToken(name.clone()));
+                }
+                todo!("body parsing")
+            }
             _ => {
                 return Err(SyntaxError::UnexpectedTokenButGot(
                     TokenType::Ident("ident or (".into()),
@@ -127,8 +129,8 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
 #[cfg(test)]
 mod tests {
     use crate::ast::{
-        lexer::Lexer,
-        lexer_parser::{Fn, Identifier, Parser},
+        lexer::{AccessModifier, Lexer},
+        lexer_parser::{Fn, Identifier, Parser, Type},
         parsers::funcs::parse_fn,
     };
     use pretty_assertions::assert_eq;
@@ -142,19 +144,19 @@ mod tests {
         parser.consume();
 
         assert_eq!(
-            parse_fn(&mut parser).unwrap(),
+            parse_fn(&mut parser, false).unwrap(),
             Fn {
                 name: Some(Identifier {
                     name: "MyFunction".into(),
                     immutable: true,
-                    access_modifier: crate::ast::lexer::AccessModifier::Pub,
+                    access_modifier: AccessModifier::Pub,
                 }),
                 params: vec!(),
-                returns: Identifier {
-                    name: "thing".into(),
+                returns: Box::new(Type::TypeName(Identifier {
                     immutable: true,
-                    access_modifier: crate::ast::lexer::AccessModifier::Pub,
-                }
+                    access_modifier: AccessModifier::Pub,
+                    name: "thing".into()
+                }))
             }
         );
     }

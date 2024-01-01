@@ -74,13 +74,15 @@ pub struct Parameter {
     pub r#type: Type,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub enum Type {
     TypeName(Identifier),
     FnType(Fn),
     InterfaceType(InterfaceDeclaration),
     ObjectType(ObjectDeclaration),
     EnumType(Enum),
+    #[default]
+    Undefined,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -216,43 +218,41 @@ impl Parser {
 
         while let Some(token) = &self.current_token {
             let node = match token.token_type {
-                lexer::TokenType::Keyword(lexer::Keyword::Import) => {
+                TokenType::Keyword(lexer::Keyword::Import) => {
                     match parsers::import::parse_import(self) {
                         Ok(import) => Ok(AstNode::Import(import)),
                         Err(error) => Err(error),
                     }
                 }
-                lexer::TokenType::Keyword(lexer::Keyword::Interface) => {
-                    let interface = parsers::interface::parse_interface_declaration(self);
-
-                    match interface {
+                TokenType::Keyword(lexer::Keyword::Interface) => {
+                    match parsers::interface::parse_interface_declaration(self) {
                         Ok(new_interface) => Ok(AstNode::InterfaceDeclaration(new_interface)),
                         Err(error) => Err(error),
                     }
                 }
-                lexer::TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self, false) {
+                TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self, false) {
                     Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
                     Err(error) => Err(error),
                 },
-                lexer::TokenType::Keyword(lexer::Keyword::Var) => todo!(),
-                lexer::TokenType::Keyword(lexer::Keyword::From) => continue,
-                lexer::TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
-                lexer::TokenType::Keyword(lexer::Keyword::Match) => todo!(),
-                lexer::TokenType::Keyword(lexer::Keyword::If) => todo!(),
-                lexer::TokenType::Keyword(lexer::Keyword::ElseIf) => todo!(),
-                lexer::TokenType::Keyword(lexer::Keyword::Else) => todo!(),
-                lexer::TokenType::SOI => continue,
-                lexer::TokenType::EOF => break,
-                lexer::TokenType::LiteralBoolean(_) => todo!(),
-                lexer::TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => todo!(),
-                lexer::TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => todo!(),
-                lexer::TokenType::Symbol(lexer::Symbol::OpenBlock) => todo!(),
-                lexer::TokenType::Symbol(lexer::Symbol::CloseBlock) => todo!(),
-                lexer::TokenType::ReturnType => todo!(),
-                lexer::TokenType::Ident(_) => todo!(),
-                lexer::TokenType::Symbol(_) => todo!(),
-                lexer::TokenType::Whitespace(_) => continue,
-                lexer::TokenType::AccessModifier(_) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Var) => todo!(),
+                TokenType::Keyword(lexer::Keyword::From) => continue,
+                TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Match) => todo!(),
+                TokenType::Keyword(lexer::Keyword::If) => todo!(),
+                TokenType::Keyword(lexer::Keyword::ElseIf) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Else) => todo!(),
+                TokenType::SOI => continue,
+                TokenType::EOF => break,
+                TokenType::LiteralBoolean(_) => todo!(),
+                TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => todo!(),
+                TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => todo!(),
+                TokenType::Symbol(lexer::Symbol::OpenBlock) => todo!(),
+                TokenType::Symbol(lexer::Symbol::CloseBlock) => todo!(),
+                TokenType::ReturnType => todo!(),
+                TokenType::Ident(_) => todo!(),
+                TokenType::Symbol(_) => todo!(),
+                TokenType::Whitespace(_) => continue,
+                TokenType::AccessModifier(_) => todo!(),
                 TokenType::SOI => todo!(),
                 TokenType::EOF => todo!(),
                 TokenType::LiteralBoolean(_) => todo!(),
