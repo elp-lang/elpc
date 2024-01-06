@@ -81,8 +81,9 @@ pub enum Type {
     InterfaceType(InterfaceDeclaration),
     ObjectType(ObjectDeclaration),
     EnumType(Enum),
-    #[default]
     Undefined,
+    #[default]
+    Void,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -252,16 +253,10 @@ impl Parser {
                 TokenType::Ident(_) => todo!(),
                 TokenType::Symbol(_) => todo!(),
                 TokenType::Whitespace(_) => continue,
+                TokenType::Void => continue,
                 TokenType::AccessModifier(_) => todo!(),
-                TokenType::SOI => todo!(),
-                TokenType::EOF => todo!(),
-                TokenType::LiteralBoolean(_) => todo!(),
                 TokenType::Keyword(_) => todo!(),
-                TokenType::ReturnType => todo!(),
-                TokenType::Ident(_) => todo!(),
-                TokenType::Symbol(_) => todo!(),
-                TokenType::Whitespace(_) => todo!(),
-                TokenType::AccessModifier(_) => todo!(),
+                TokenType::Unknown => todo!(),
             };
 
             match node {

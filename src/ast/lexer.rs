@@ -48,6 +48,8 @@ pub enum Symbol {
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TokenType {
+    Void,
+    Unknown,
     SOI,
     EOF,
     LiteralBoolean(bool),
@@ -62,6 +64,7 @@ pub enum TokenType {
 impl ToString for TokenType {
     fn to_string(&self) -> String {
         match self {
+            TokenType::Void => "void".into(),
             TokenType::SOI => "SOI (Start Of Input)".into(),
             TokenType::EOF => "EOF (End Of File)".into(),
             TokenType::LiteralBoolean(_) => "boolean".into(),
@@ -94,6 +97,7 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
             TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
+            TokenType::Unknown => "unknown".into(),
         }
     }
 }
@@ -228,27 +232,44 @@ impl Lexer {
 
     fn consume_symbol_into_token(&mut self) -> Token {
         let starting_cursor = self.position;
-        let mut value: String = "".to_string();
 
-        while let Some(ch) = self.is_symbol(self.next()) {
-            value.push(ch);
-            self.consume();
-        }
-
-        Token {
-            value: value.clone(),
+        let ch = self.is_symbol(self.next()).unwrap();
+        self.consume();
+        let mut token = Token {
+            value: ch.into(),
             span: (starting_cursor, self.position - 1),
-            token_type: match value.clone() {
-                s if s == ":" => TokenType::Symbol(Symbol::Colon),
-                s if s == "{" => TokenType::Symbol(Symbol::OpenBlock),
-                s if s == "}" => TokenType::Symbol(Symbol::CloseBlock),
-                s if s == "." => TokenType::Symbol(Symbol::Period),
-                s if s == "->" => TokenType::ReturnType,
-                s if s == "\"" => TokenType::Symbol(Symbol::DoubleSpeechMark),
-                s if s == "'" => TokenType::Symbol(Symbol::SingleSpeechMark),
-                _ => TokenType::Symbol(Symbol::Other(value)),
-            },
-        }
+            token_type: TokenType::Unknown,
+        };
+
+        token.token_type = match ch {
+            s if s == ':' => TokenType::Symbol(Symbol::Colon),
+            s if s == '{' => TokenType::Symbol(Symbol::OpenBlock),
+            s if s == '}' => TokenType::Symbol(Symbol::CloseBlock),
+            s if s == '(' => TokenType::Symbol(Symbol::OpenParen),
+            s if s == ')' => TokenType::Symbol(Symbol::CloseParen),
+            s if s == '.' => TokenType::Symbol(Symbol::Period),
+            s if s == ',' => TokenType::Symbol(Symbol::Comma),
+            //s if s == "->" => TokenType::ReturnType,
+            s if s == '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
+            s if s == '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
+            s if s == '-' => {
+                if let Some(next) = self.is_symbol(self.next()) {
+                    if next == '>' {
+                        self.consume();
+                        token.value = "->".into();
+                        token.span.1 += 1;
+                        TokenType::ReturnType
+                    } else {
+                        TokenType::Symbol(Symbol::Other(ch.into()))
+                    }
+                } else {
+                    TokenType::Symbol(Symbol::Other(ch.into()))
+                }
+            }
+            _ => TokenType::Symbol(Symbol::Other(ch.into())),
+        };
+
+        token
     }
 
     fn consume_next_token(&mut self) -> Result<Token, Error> {

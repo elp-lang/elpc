@@ -69,11 +69,8 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
         returns: Box::new(Type::Undefined),
     };
 
-    // the next 3 tokens could/should be an ident, opening parenthesis and parameter.
-    if let Ok(next_tokens) = parser.consume_n(3) {
-        let name = next_tokens.get(0).unwrap();
-
-        match &name.token_type {
+    while let Some(token) = parser.consume() {
+        match &token.token_type {
             TokenType::Ident(name) => {
                 fn_declaration.name = Some(Identifier {
                     name: name.into(),
@@ -100,6 +97,7 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
                             }
                         }
                     }
+                    TokenType::Symbol(Symbol::CloseParen) => continue,
                     _ => {
                         return Err(SyntaxError::MissingToken(") or param"));
                     }
@@ -108,16 +106,22 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
                     return Err(SyntaxError::MissingToken(") or param"));
                 }
             },
+            TokenType::Symbol(Symbol::CloseParen) => continue,
             TokenType::Symbol(Symbol::OpenBlock) => {
                 if !with_body {
-                    return Err(SyntaxError::UnexpectedToken(name.clone()));
+                    return Err(SyntaxError::UnexpectedToken(token.clone()));
                 }
                 todo!("body parsing")
             }
+            TokenType::Whitespace(_) => continue,
+            TokenType::EOF => break,
             _ => {
-                return Err(SyntaxError::UnexpectedTokenButGot(
-                    TokenType::Ident("ident or (".into()),
-                    name.clone(),
+                return Err(SyntaxError::UnexpectedTokenButGotL(
+                    vec![
+                        TokenType::Ident("".into()),
+                        TokenType::Symbol(Symbol::OpenParen),
+                    ],
+                    token.clone(),
                 ));
             }
         }
@@ -135,29 +139,37 @@ mod tests {
     };
     use pretty_assertions::assert_eq;
 
+    struct Test {
+        input: &'static str,
+        expected: Fn,
+    }
+
     #[test]
     fn test_fn_signature_parser() {
-        let input = "fn MyFunction() -> thing".to_string();
-        let mut lexer = Lexer::new(input.clone());
-        let tokens = lexer.consume_all_tokens();
-        let mut parser = Parser::new(tokens);
-        parser.consume();
-
-        assert_eq!(
-            parse_fn(&mut parser, false).unwrap(),
-            Fn {
+        let tests: Vec<Test> = vec![Test {
+            input: "fn MyFunction() -> thing",
+            expected: Fn {
                 name: Some(Identifier {
                     name: "MyFunction".into(),
                     immutable: true,
                     access_modifier: AccessModifier::Pub,
                 }),
-                params: vec!(),
+                params: vec![],
                 returns: Box::new(Type::TypeName(Identifier {
                     immutable: true,
                     access_modifier: AccessModifier::Pub,
-                    name: "thing".into()
-                }))
-            }
-        );
+                    name: "thing".into(),
+                })),
+            },
+        }];
+
+        for test in tests {
+            let mut lexer = Lexer::new(test.input.to_string());
+            let tokens = lexer.consume_all_tokens();
+            let mut parser = Parser::new(tokens);
+            parser.consume();
+
+            assert_eq!(parse_fn(&mut parser, false).unwrap(), test.expected);
+        }
     }
 }
