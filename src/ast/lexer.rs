@@ -44,6 +44,7 @@ pub enum Symbol {
     CloseBlock,
     Period,
     Comma,
+    BackSlash,
     Other(String),
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -90,6 +91,7 @@ impl ToString for TokenType {
             TokenType::Symbol(Symbol::CloseBlock) => "}".into(),
             TokenType::Symbol(Symbol::Period) => ".".into(),
             TokenType::Symbol(Symbol::Comma) => ",".into(),
+            TokenType::Symbol(Symbol::BackSlash) => "\\".into(),
             TokenType::Symbol(Symbol::Other(s)) => s.to_string(),
             TokenType::Whitespace(Whitespace::Tab) => "tab \\t".into(),
             TokenType::Whitespace(Whitespace::Return) => "return \\r".into(),
@@ -204,6 +206,7 @@ impl Lexer {
                 s if s == "if" => TokenType::Keyword(Keyword::If),
                 s if s == "elseif" => TokenType::Keyword(Keyword::ElseIf),
                 s if s == "else" => TokenType::Keyword(Keyword::Else),
+                s if s == "void" => TokenType::Void,
                 _ => TokenType::Ident(value.clone()),
             },
         }
@@ -252,6 +255,7 @@ impl Lexer {
             //s if s == "->" => TokenType::ReturnType,
             s if s == '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
             s if s == '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
+            s if s == '\\' => TokenType::Symbol(Symbol::BackSlash),
             s if s == '-' => {
                 if let Some(next) = self.is_symbol(self.next()) {
                     if next == '>' {
@@ -312,104 +316,141 @@ mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
 
-    macro_rules! results {
-    ($str:expr, $($middle:expr),*,) => {
-        {
-            let soi = Token {
-                token_type: TokenType::SOI,
-                span: (0, 0),
-                value: "".to_string(),
-            };
-            let eof = Token {
-                token_type: TokenType::EOF,
-                span: ($str.len(), $str.len()),
-                value: "".to_string(),
-            };
-            let mut v = Vec::new();
-            v.push(soi);
-            $(v.push($middle);)*
-            v.push(eof);
-            v
-        }
-    };
-}
+    struct Test {
+        input: &'static str,
+        expected: Vec<Token>,
+    }
 
     #[test]
     fn test_lexer_sanity() {
-        let input = "import { Thing } from \"elp\"".to_string();
-        let mut lexer = Lexer::new(input.clone());
         let space = Whitespace::Other(" ".to_string());
+        let tests = vec![
+            Test {
+                input: "import { Thing } from \"elp\"",
+                expected: vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        span: (0, 0),
+                        value: "".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Keyword(Keyword::Import),
+                        span: (0, 5),
+                        value: "import".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Whitespace(space.clone()),
+                        span: (6, 6),
+                        value: " ".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::OpenBlock),
+                        span: (7, 7),
+                        value: "{".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Whitespace(space.clone()),
+                        span: (8, 8),
+                        value: " ".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Ident("Thing".to_string()),
+                        span: (9, 13),
+                        value: "Thing".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Whitespace(space.clone()),
+                        span: (14, 14),
+                        value: " ".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::CloseBlock),
+                        span: (15, 15),
+                        value: "}".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Whitespace(space.clone()),
+                        span: (16, 16),
+                        value: " ".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Keyword(Keyword::From),
+                        span: (17, 20),
+                        value: "from".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Whitespace(space.clone()),
+                        span: (21, 21),
+                        value: " ".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                        span: (22, 22),
+                        value: "\"".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Ident("elp".to_string()),
+                        span: (23, 25),
+                        value: "elp".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                        span: (26, 26),
+                        value: "\"".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        span: (27, 27),
+                        value: "".to_string(),
+                    },
+                ],
+            },
+            Test {
+                input: "\\\"escaped\\\"",
+                expected: vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        span: (0, 0),
+                        value: "".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::BackSlash),
+                        span: (0, 0),
+                        value: "\\".into(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                        span: (1, 1),
+                        value: "\"".into(),
+                    },
+                    Token {
+                        token_type: TokenType::Ident("escaped".into()),
+                        span: (2, 8),
+                        value: "escaped".into(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::BackSlash),
+                        span: (9, 9),
+                        value: "\\".into(),
+                    },
+                    Token {
+                        token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                        span: (10, 10),
+                        value: "\"".into(),
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        span: (11, 11),
+                        value: "".to_string(),
+                    },
+                ],
+            },
+        ];
 
-        assert_eq!(
-            results!(
-                input.clone(),
-                Token {
-                    token_type: TokenType::Keyword(Keyword::Import),
-                    span: (0, 5),
-                    value: "import".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Whitespace(space.clone()),
-                    span: (6, 6),
-                    value: " ".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::OpenBlock),
-                    span: (7, 7),
-                    value: "{".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Whitespace(space.clone()),
-                    span: (8, 8),
-                    value: " ".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Ident("Thing".to_string()),
-                    span: (9, 13),
-                    value: "Thing".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Whitespace(space.clone()),
-                    span: (14, 14),
-                    value: " ".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::CloseBlock),
-                    span: (15, 15),
-                    value: "}".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Whitespace(space.clone()),
-                    span: (16, 16),
-                    value: " ".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Keyword(Keyword::From),
-                    span: (17, 20),
-                    value: "from".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Whitespace(space.clone()),
-                    span: (21, 21),
-                    value: " ".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
-                    span: (22, 22),
-                    value: "\"".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Ident("elp".to_string()),
-                    span: (23, 25),
-                    value: "elp".to_string(),
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
-                    span: (26, 26),
-                    value: "\"".to_string(),
-                },
-            ),
-            *lexer.consume_all_tokens(),
-        );
+        for test in tests {
+            let mut lexer = Lexer::new(test.input.to_string());
+
+            assert_eq!(*lexer.consume_all_tokens(), test.expected);
+        }
     }
 }

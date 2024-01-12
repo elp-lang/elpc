@@ -139,3 +139,158 @@ pub fn parse_interface_declaration(
 
     Ok(interface)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ast::{
+            lexer::AccessModifier,
+            lexer_parser::{
+                AstNode, Identifier, ImportStatement, InterfaceDeclaration, InterfaceProperty,
+                Parser, Trie, Type,
+            },
+        },
+        Lexer,
+    };
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_parse_import() {
+        let input = "import { Thing } from \"elp\"".to_string();
+        let mut lexer = Lexer::new(input.clone());
+        let tokens = lexer.consume_all_tokens();
+        let mut parser = Parser::new(tokens);
+
+        assert_eq!(
+            parser.parse(),
+            Trie {
+                nodes: vec!(AstNode::Import(ImportStatement {
+                    members: vec!(Identifier {
+                        name: "Thing".to_string(),
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                    }),
+                    source_path: "elp".to_string(),
+                }))
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_basic_interface() {
+        let input = "interface MyInterface {
+            .property: string
+        }"
+        .to_string();
+        let mut lexer = Lexer::new(input.clone());
+        let tokens = lexer.consume_all_tokens();
+        let mut parser = Parser::new(tokens);
+
+        assert_eq!(
+            parser.parse(),
+            Trie {
+                nodes: vec!(AstNode::InterfaceDeclaration(InterfaceDeclaration {
+                    name: Identifier {
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                        name: "MyInterface".to_string(),
+                    },
+                    members: vec!(InterfaceProperty {
+                        name: Identifier {
+                            immutable: true,
+                            access_modifier: AccessModifier::Pub,
+                            name: "property".to_string()
+                        },
+                        r#type: Type::TypeName(Identifier {
+                            immutable: true,
+                            access_modifier: AccessModifier::Pub,
+                            name: "string".to_string()
+                        })
+                    }),
+                }))
+            }
+        );
+    }
+
+    #[test]
+    fn test_parse_interface() {
+        let input = "interface MyInterface {
+            .property: string
+            .property: interface {
+                .property: int32
+                .property : number
+            }
+        }"
+        .to_string();
+        let mut lexer = Lexer::new(input.clone());
+        let tokens = lexer.consume_all_tokens();
+        let mut parser = Parser::new(tokens);
+
+        assert_eq!(
+            parser.parse(),
+            Trie {
+                nodes: vec!(AstNode::InterfaceDeclaration(InterfaceDeclaration {
+                    name: Identifier {
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                        name: "MyInterface".to_string(),
+                    },
+                    members: vec!(
+                        InterfaceProperty {
+                            name: Identifier {
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                                name: "property".to_string()
+                            },
+                            r#type: Type::TypeName(Identifier {
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                                name: "string".to_string()
+                            })
+                        },
+                        InterfaceProperty {
+                            name: Identifier {
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                                name: "property".to_string()
+                            },
+                            r#type: Type::InterfaceType(InterfaceDeclaration {
+                                name: Identifier {
+                                    name: "".into(),
+                                    immutable: true,
+                                    access_modifier: AccessModifier::Pub,
+                                },
+                                members: vec!(
+                                    InterfaceProperty {
+                                        name: Identifier {
+                                            immutable: true,
+                                            access_modifier: AccessModifier::Pub,
+                                            name: "property".to_string()
+                                        },
+                                        r#type: Type::TypeName(Identifier {
+                                            immutable: true,
+                                            access_modifier: AccessModifier::Pub,
+                                            name: "int32".to_string()
+                                        })
+                                    },
+                                    InterfaceProperty {
+                                        name: Identifier {
+                                            immutable: true,
+                                            access_modifier: AccessModifier::Pub,
+                                            name: "property".to_string()
+                                        },
+                                        r#type: Type::TypeName(Identifier {
+                                            immutable: true,
+                                            access_modifier: AccessModifier::Pub,
+                                            name: "number".to_string()
+                                        })
+                                    },
+                                )
+                            })
+                        }
+                    ),
+                }))
+            }
+        );
+    }
+}

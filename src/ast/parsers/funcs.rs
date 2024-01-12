@@ -134,7 +134,7 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{Fn, Identifier, Parser, Type},
+        lexer_parser::{Fn, Identifier, InterfaceProperty, Parser, Type},
         parsers::funcs::parse_fn,
     };
     use pretty_assertions::assert_eq;
@@ -146,22 +146,56 @@ mod tests {
 
     #[test]
     fn test_fn_signature_parser() {
-        let tests: Vec<Test> = vec![Test {
-            input: "fn MyFunction() -> thing",
-            expected: Fn {
-                name: Some(Identifier {
-                    name: "MyFunction".into(),
-                    immutable: true,
-                    access_modifier: AccessModifier::Pub,
-                }),
-                params: vec![],
-                returns: Box::new(Type::TypeName(Identifier {
-                    immutable: true,
-                    access_modifier: AccessModifier::Pub,
-                    name: "thing".into(),
-                })),
+        let tests: Vec<Test> = vec![
+            Test {
+                input: "fn MyFunction() -> thing",
+                expected: Fn {
+                    name: Some(Identifier {
+                        name: "MyFunction".into(),
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                    }),
+                    params: vec![],
+                    returns: Box::new(Type::TypeName(Identifier {
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                        name: "thing".into(),
+                    })),
+                },
             },
-        }];
+            Test {
+                input: "fn MyFunction() -> interface { .first: thing }",
+                expected: Fn {
+                    name: Some(Identifier {
+                        name: "MyFunction".into(),
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                    }),
+                    params: vec![],
+                    returns: Box::new(Type::InterfaceType(
+                        crate::ast::lexer_parser::InterfaceDeclaration {
+                            name: Identifier {
+                                name: "".into(),
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                            },
+                            members: vec![InterfaceProperty {
+                                name: Identifier {
+                                    name: "first".into(),
+                                    immutable: true,
+                                    access_modifier: AccessModifier::Pub,
+                                },
+                                r#type: Type::TypeName(Identifier {
+                                    immutable: true,
+                                    access_modifier: AccessModifier::Pub,
+                                    name: "thing".into(),
+                                }),
+                            }],
+                        },
+                    )),
+                },
+            },
+        ];
 
         for test in tests {
             let mut lexer = Lexer::new(test.input.to_string());

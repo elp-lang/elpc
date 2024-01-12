@@ -1,6 +1,6 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers::{self, funcs::parse_fn};
+use super::parsers::{self, funcs::parse_fn, literals::parse_literal};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
@@ -78,6 +78,7 @@ pub struct Parameter {
 pub enum Type {
     TypeName(Identifier),
     FnType(Fn),
+    Literal(Literal),
     InterfaceType(InterfaceDeclaration),
     ObjectType(ObjectDeclaration),
     EnumType(Enum),
@@ -99,6 +100,7 @@ pub enum Expression {
 pub enum Literal {
     String(String),
     Number(i64),
+    // Float(f64),
     Boolean(bool),
 }
 
@@ -236,7 +238,6 @@ impl Parser {
                     Err(error) => Err(error),
                 },
                 TokenType::Keyword(lexer::Keyword::Var) => todo!(),
-                TokenType::Keyword(lexer::Keyword::From) => continue,
                 TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
                 TokenType::Keyword(lexer::Keyword::Match) => todo!(),
                 TokenType::Keyword(lexer::Keyword::If) => todo!(),
@@ -245,18 +246,32 @@ impl Parser {
                 TokenType::SOI => continue,
                 TokenType::EOF => break,
                 TokenType::LiteralBoolean(_) => todo!(),
-                TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => todo!(),
-                TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => todo!(),
+                TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => {
+                    match parse_literal(self, lexer::Symbol::DoubleSpeechMark) {
+                        Ok(literal) => {
+                            Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
+                        }
+                        Err(error) => Err(error),
+                    }
+                }
+                TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => {
+                    match parse_literal(self, lexer::Symbol::SingleSpeechMark) {
+                        Ok(literal) => {
+                            Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
+                        }
+                        Err(error) => Err(error),
+                    }
+                }
                 TokenType::Symbol(lexer::Symbol::OpenBlock) => todo!(),
                 TokenType::Symbol(lexer::Symbol::CloseBlock) => todo!(),
-                TokenType::ReturnType => todo!(),
                 TokenType::Ident(_) => todo!(),
-                TokenType::Symbol(_) => todo!(),
                 TokenType::Whitespace(_) => continue,
                 TokenType::Void => continue,
                 TokenType::AccessModifier(_) => todo!(),
                 TokenType::Keyword(_) => todo!(),
-                TokenType::Unknown => todo!(),
+                _ => Err(super::syntax_error::SyntaxError::UnexpectedToken(
+                    token.clone(),
+                )),
             };
 
             match node {
@@ -270,152 +285,5 @@ impl Parser {
         }
 
         tree
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::Lexer;
-    use pretty_assertions::assert_eq;
-
-    #[test]
-    fn test_parse_import() {
-        let input = "import { Thing } from \"elp\"".to_string();
-        let mut lexer = Lexer::new(input.clone());
-        let tokens = lexer.consume_all_tokens();
-        let mut parser = Parser::new(tokens);
-
-        assert_eq!(
-            parser.parse(),
-            Trie {
-                nodes: vec!(AstNode::Import(ImportStatement {
-                    members: vec!(Identifier {
-                        name: "Thing".to_string(),
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                    }),
-                    source_path: "elp".to_string(),
-                }))
-            }
-        );
-    }
-
-    #[test]
-    fn test_parse_basic_interface() {
-        let input = "interface MyInterface {
-            .property: string
-        }"
-        .to_string();
-        let mut lexer = Lexer::new(input.clone());
-        let tokens = lexer.consume_all_tokens();
-        let mut parser = Parser::new(tokens);
-
-        assert_eq!(
-            parser.parse(),
-            Trie {
-                nodes: vec!(AstNode::InterfaceDeclaration(InterfaceDeclaration {
-                    name: Identifier {
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                        name: "MyInterface".to_string(),
-                    },
-                    members: vec!(InterfaceProperty {
-                        name: Identifier {
-                            immutable: true,
-                            access_modifier: lexer::AccessModifier::Pub,
-                            name: "property".to_string()
-                        },
-                        r#type: Type::TypeName(Identifier {
-                            immutable: true,
-                            access_modifier: lexer::AccessModifier::Pub,
-                            name: "string".to_string()
-                        })
-                    }),
-                }))
-            }
-        );
-    }
-
-    #[test]
-    fn test_parse_interface() {
-        let input = "interface MyInterface {
-            .property: string
-            .property: interface {
-                .property: int32
-                .property : number
-            }
-        }"
-        .to_string();
-        let mut lexer = Lexer::new(input.clone());
-        let tokens = lexer.consume_all_tokens();
-        let mut parser = Parser::new(tokens);
-
-        assert_eq!(
-            parser.parse(),
-            Trie {
-                nodes: vec!(AstNode::InterfaceDeclaration(InterfaceDeclaration {
-                    name: Identifier {
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                        name: "MyInterface".to_string(),
-                    },
-                    members: vec!(
-                        InterfaceProperty {
-                            name: Identifier {
-                                immutable: true,
-                                access_modifier: lexer::AccessModifier::Pub,
-                                name: "property".to_string()
-                            },
-                            r#type: Type::TypeName(Identifier {
-                                immutable: true,
-                                access_modifier: lexer::AccessModifier::Pub,
-                                name: "string".to_string()
-                            })
-                        },
-                        InterfaceProperty {
-                            name: Identifier {
-                                immutable: true,
-                                access_modifier: lexer::AccessModifier::Pub,
-                                name: "property".to_string()
-                            },
-                            r#type: Type::InterfaceType(InterfaceDeclaration {
-                                name: Identifier {
-                                    name: "".into(),
-                                    immutable: true,
-                                    access_modifier: lexer::AccessModifier::Pub,
-                                },
-                                members: vec!(
-                                    InterfaceProperty {
-                                        name: Identifier {
-                                            immutable: true,
-                                            access_modifier: lexer::AccessModifier::Pub,
-                                            name: "property".to_string()
-                                        },
-                                        r#type: Type::TypeName(Identifier {
-                                            immutable: true,
-                                            access_modifier: lexer::AccessModifier::Pub,
-                                            name: "int32".to_string()
-                                        })
-                                    },
-                                    InterfaceProperty {
-                                        name: Identifier {
-                                            immutable: true,
-                                            access_modifier: lexer::AccessModifier::Pub,
-                                            name: "property".to_string()
-                                        },
-                                        r#type: Type::TypeName(Identifier {
-                                            immutable: true,
-                                            access_modifier: lexer::AccessModifier::Pub,
-                                            name: "number".to_string()
-                                        })
-                                    },
-                                )
-                            })
-                        }
-                    ),
-                }))
-            }
-        );
     }
 }
