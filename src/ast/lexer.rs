@@ -47,6 +47,7 @@ pub enum Symbol {
     BackSlash,
     Other(String),
 }
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TokenType {
     Void,
@@ -54,7 +55,8 @@ pub enum TokenType {
     SOI,
     EOF,
     LiteralBoolean(bool),
-    Numeric(String),
+    IntegerLiteral(String),
+    FloatLiteral(String),
     Keyword(Keyword),
     ReturnType,
     Ident(String),
@@ -99,7 +101,8 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::NewLine) => "new line \\n".into(),
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
-            TokenType::Numeric(n) => format!("numeric '{}'", n),
+            TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
+            TokenType::FloatLiteral(n) => format!("float '{}'", n),
             TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
             TokenType::Unknown => "unknown".into(),
         }
@@ -189,14 +192,14 @@ impl Lexer {
 
         while let Some(ch) = self.next() {
             if value.is_empty() {
-                if ch.is_ascii_alphabetic() {
+                if ch.is_ascii_alphabetic() || ch == '_' {
                     value.push(ch);
                     self.consume();
                 } else {
                     break;
                 }
             } else {
-                if ch.is_ascii_alphanumeric() {
+                if ch.is_ascii_alphanumeric() || ch == '_' {
                     value.push(ch);
                     self.consume();
                 } else {
@@ -297,10 +300,19 @@ impl Lexer {
     fn consume_numerics_into_token(&mut self) -> Token {
         let mut value: String = "".into();
         let starting_cursor = self.position;
+        let mut probably_int = true;
 
         while let Some(ch) = self.next() {
-            if !ch.is_numeric() {
+            if value.is_empty() {
+                if !ch.is_numeric() {
+                    break;
+                }
+            } else if !ch.is_numeric() && ch != '_' && ch != '.' && ch != 'e' {
                 break;
+            }
+
+            if ch == '.' {
+                probably_int = false;
             }
 
             value.push(ch);
@@ -309,7 +321,10 @@ impl Lexer {
         }
 
         return Token {
-            token_type: TokenType::Numeric(value.clone()),
+            token_type: match probably_int {
+                true => TokenType::IntegerLiteral(value.clone()),
+                false => TokenType::FloatLiteral(value.clone()),
+            },
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
         };
@@ -375,13 +390,53 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::Numeric("123".into()),
+                        token_type: TokenType::IntegerLiteral("123".into()),
                         value: "123".into(),
                         span: (0, 2),
                     },
                     Token {
                         token_type: TokenType::EOF,
                         span: (3, 3),
+                        value: "".to_string(),
+                    },
+                ],
+            },
+            Test {
+                input: "0.3",
+                expected: vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        span: (0, 0),
+                        value: "".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::FloatLiteral("0.3".into()),
+                        value: "0.3".into(),
+                        span: (0, 2),
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        span: (3, 3),
+                        value: "".to_string(),
+                    },
+                ],
+            },
+            Test {
+                input: "0.1e3",
+                expected: vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        span: (0, 0),
+                        value: "".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::FloatLiteral("0.1e3".into()),
+                        value: "0.1e3".into(),
+                        span: (0, 4),
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        span: (5, 5),
                         value: "".to_string(),
                     },
                 ],
