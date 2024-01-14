@@ -54,6 +54,7 @@ pub enum TokenType {
     SOI,
     EOF,
     LiteralBoolean(bool),
+    Numeric(String),
     Keyword(Keyword),
     ReturnType,
     Ident(String),
@@ -98,6 +99,7 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::NewLine) => "new line \\n".into(),
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
+            TokenType::Numeric(n) => format!("numeric '{}'", n),
             TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
             TokenType::Unknown => "unknown".into(),
         }
@@ -143,7 +145,7 @@ impl Lexer {
         match ch {
             None => None,
             Some(ch) => {
-                if ch.is_ascii_alphabetic() || ch.is_numeric() || ch == '_' {
+                if ch.is_ascii_alphabetic() || ch == '_' {
                     Some(ch)
                 } else {
                     None
@@ -169,7 +171,10 @@ impl Lexer {
         match ch {
             None => None,
             Some(ch) => {
-                if !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_none() {
+                if !ch.is_whitespace()
+                    && self.could_be_ident(Some(ch)).is_none()
+                    && !ch.is_numeric()
+                {
                     Some(ch)
                 } else {
                     None
@@ -182,9 +187,22 @@ impl Lexer {
         let starting_cursor = self.position;
         let mut value: String = "".to_string();
 
-        while let Some(ch) = self.could_be_ident(self.next()) {
-            value.push(ch);
-            self.consume();
+        while let Some(ch) = self.next() {
+            if value.is_empty() {
+                if ch.is_ascii_alphabetic() {
+                    value.push(ch);
+                    self.consume();
+                } else {
+                    break;
+                }
+            } else {
+                if ch.is_ascii_alphanumeric() {
+                    value.push(ch);
+                    self.consume();
+                } else {
+                    break;
+                }
+            }
         }
 
         Token {
@@ -276,6 +294,27 @@ impl Lexer {
         token
     }
 
+    fn consume_numerics_into_token(&mut self) -> Token {
+        let mut value: String = "".into();
+        let starting_cursor = self.position;
+
+        while let Some(ch) = self.next() {
+            if !ch.is_numeric() {
+                break;
+            }
+
+            value.push(ch);
+
+            self.consume();
+        }
+
+        return Token {
+            token_type: TokenType::Numeric(value.clone()),
+            value: value.clone(),
+            span: (starting_cursor, self.position - 1),
+        };
+    }
+
     fn consume_next_token(&mut self) -> Result<Token, Error> {
         if self.next().is_none() {
             return Ok(Token {
@@ -293,6 +332,8 @@ impl Lexer {
             Ok(self.consume_whitespace_into_token())
         } else if self.is_symbol(ch).is_some() {
             Ok(self.consume_symbol_into_token())
+        } else if ch.unwrap().is_numeric() {
+            Ok(self.consume_numerics_into_token())
         } else {
             Err(Error::UnknownToken("Unknown token.".to_string()))
         }
@@ -325,6 +366,26 @@ mod tests {
     fn test_lexer_sanity() {
         let space = Whitespace::Other(" ".to_string());
         let tests = vec![
+            Test {
+                input: "123",
+                expected: vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        span: (0, 0),
+                        value: "".to_string(),
+                    },
+                    Token {
+                        token_type: TokenType::Numeric("123".into()),
+                        value: "123".into(),
+                        span: (0, 2),
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        span: (3, 3),
+                        value: "".to_string(),
+                    },
+                ],
+            },
             Test {
                 input: "import { Thing } from \"elp\"",
                 expected: vec![

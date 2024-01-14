@@ -11,7 +11,6 @@ pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, Synta
             let mut value: String = "".into();
 
             while let Some(token) = parser.consume() {
-                println!("matching {:#?}", token);
                 match token.token_type {
                     TokenType::Symbol(Symbol::BackSlash) => {
                         if escaped {
@@ -25,7 +24,6 @@ pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, Synta
                     TokenType::Symbol(Symbol::DoubleSpeechMark) => {
                         if escaped {
                             value += token.value.as_str();
-                            println!("VAL {}", value);
                             escaped = false;
                             continue;
                         } else {
@@ -34,7 +32,6 @@ pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, Synta
                     }
                     _ => {
                         value += token.value.as_str();
-                        println!("VAL {}", value);
                     }
                 }
             }
