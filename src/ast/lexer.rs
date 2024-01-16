@@ -1,7 +1,6 @@
-#[derive(Debug)]
-pub enum Error {
-    UnknownToken(String), // Add more error variants as needed
-}
+use crate::ast::syntax_error::SyntaxError;
+
+use super::parsing_error::ParsingError;
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 pub enum AccessModifier {
@@ -55,8 +54,8 @@ pub enum TokenType {
     SOI,
     EOF,
     LiteralBoolean(bool),
-    IntegerLiteral(String),
-    FloatLiteral(String),
+    IntegerLiteral(i64),
+    FloatLiteral((i64, i64)),
     Keyword(Keyword),
     ReturnType,
     Ident(String),
@@ -102,7 +101,7 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
             TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
-            TokenType::FloatLiteral(n) => format!("float '{}'", n),
+            TokenType::FloatLiteral((n, d)) => format!("float '{}.{}'", n, d),
             TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
             TokenType::Unknown => "unknown".into(),
         }
@@ -297,13 +296,14 @@ impl Lexer {
         token
     }
 
-    fn consume_numerics_into_token(&mut self) -> Token {
-        let mut value: String = "".into();
+    fn consume_numerics_into_token(&mut self) -> Result<Token, ParsingError> {
+        let mut value: (i64, i64) = (0, 0);
+        let mut current_value: String = "".into();
         let starting_cursor = self.position;
         let mut probably_int = true;
 
         while let Some(ch) = self.next() {
-            if value.is_empty() {
+            if current_value.is_empty() {
                 if !ch.is_numeric() {
                     break;
                 }
@@ -313,24 +313,45 @@ impl Lexer {
 
             if ch == '.' {
                 probably_int = false;
+                match current_value.parse::<i64>() {
+                    Ok(int) => {
+                        value.1 = int;
+                    }
+                    Err(err) => return Err(ParsingError::InvalidInt(err)),
+                }
+                current_value.clear();
             }
 
-            value.push(ch);
+            current_value.push(ch);
 
             self.consume();
         }
 
-        return Token {
-            token_type: match probably_int {
-                true => TokenType::IntegerLiteral(value.clone()),
-                false => TokenType::FloatLiteral(value.clone()),
-            },
-            value: value.clone(),
+        let mut token_type: TokenType;
+
+        if probably_int {
+            match current_value.parse::<i64>() {
+                Ok(int) => {
+                    token_type = TokenType::IntegerLiteral(int);
+                }
+                Err(err) => return Err(ParsingError::InvalidInt(err)),
+            }
+
+            return Ok(Token {
+                token_type,
+                value: format!("{}", current_value),
+                span: (starting_cursor, self.position - 1),
+            });
+        }
+
+        return Ok(Token {
+            token_type,
+            value: format!("{}.{}", value.0, value.1),
             span: (starting_cursor, self.position - 1),
-        };
+        });
     }
 
-    fn consume_next_token(&mut self) -> Result<Token, Error> {
+    fn consume_next_token(&mut self) -> Result<Token, ParsingError> {
         if self.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
@@ -348,9 +369,9 @@ impl Lexer {
         } else if self.is_symbol(ch).is_some() {
             Ok(self.consume_symbol_into_token())
         } else if ch.unwrap().is_numeric() {
-            Ok(self.consume_numerics_into_token())
+            self.consume_numerics_into_token()
         } else {
-            Err(Error::UnknownToken("Unknown token.".to_string()))
+            Err(ParsingError::UnknownChar(ch.unwrap()))
         }
     }
 
@@ -390,7 +411,7 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::IntegerLiteral("123".into()),
+                        token_type: TokenType::IntegerLiteral(123),
                         value: "123".into(),
                         span: (0, 2),
                     },
@@ -410,7 +431,7 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::FloatLiteral("0.3".into()),
+                        token_type: TokenType::FloatLiteral((0, 3)),
                         value: "0.3".into(),
                         span: (0, 2),
                     },
@@ -430,7 +451,7 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::FloatLiteral("0.1e3".into()),
+                        token_type: TokenType::FloatLiteral((0, 1e3)),
                         value: "0.1e3".into(),
                         span: (0, 4),
                     },

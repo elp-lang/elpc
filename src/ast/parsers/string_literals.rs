@@ -4,7 +4,7 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, SyntaxError> {
+pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, SyntaxError> {
     match hint {
         Symbol::DoubleSpeechMark => {
             let mut escaped = false;
@@ -45,7 +45,7 @@ pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, Synta
 
 #[cfg(test)]
 mod tests {
-    use super::parse_literal;
+    use super::parse_string_literal;
     use crate::ast::{
         lexer::Lexer,
         lexer_parser::{Literal, Parser},
@@ -59,7 +59,7 @@ mod tests {
         let tokens = lexer.consume_all_tokens();
         let mut parser = Parser::new(tokens);
         assert_eq!(
-            parse_literal(&mut parser, crate::ast::lexer::Symbol::DoubleSpeechMark).unwrap(),
+            parse_string_literal(&mut parser, crate::ast::lexer::Symbol::DoubleSpeechMark).unwrap(),
             Literal::String("\"test\"".into())
         );
     }

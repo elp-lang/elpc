@@ -1,6 +1,9 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers::{self, funcs::parse_fn, literals::parse_literal};
+use super::parsers::{
+    self, funcs::parse_fn, number_literals::parse_number_literal,
+    string_literals::parse_string_literal,
+};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum AstNode {
@@ -9,6 +12,7 @@ pub enum AstNode {
     EnumDeclaration(Identifier, Vec<EnumVariant>),
     VariableDeclaration(Identifier, Option<Type>, Option<Expression>),
     FunctionDeclaration(Fn),
+    LiteralNumberic(Literal),
     ExpressionStatement(Expression),
     IfStatement(Expression, Option<Block>, Option<IfStatement>),
     MatchStatement(Expression, Vec<MatchCase>),
@@ -93,14 +97,13 @@ pub enum Expression {
     Literal(Literal),
     FunctionCall(Identifier, Vec<Argument>),
     Block(Vec<AstNode>),
-    // Other expression types can be added based on your language's syntax.
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Literal {
     String(String),
     Number(i64),
-    // Float(f64),
+    Float((i64, i64)),
     Boolean(bool),
 }
 
@@ -245,9 +248,12 @@ impl Parser {
                 TokenType::Keyword(lexer::Keyword::Else) => todo!(),
                 TokenType::SOI => continue,
                 TokenType::EOF => break,
-                TokenType::LiteralBoolean(_) => todo!(),
+                TokenType::IntegerLiteral(value) => match parse_number_literal(self) {
+                    Ok(number) => Ok(AstNode::LiteralNumberic(number)),
+                    Err(error) => Err(error),
+                },
                 TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => {
-                    match parse_literal(self, lexer::Symbol::DoubleSpeechMark) {
+                    match parse_string_literal(self, lexer::Symbol::DoubleSpeechMark) {
                         Ok(literal) => {
                             Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
                         }
@@ -255,7 +261,7 @@ impl Parser {
                     }
                 }
                 TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => {
-                    match parse_literal(self, lexer::Symbol::SingleSpeechMark) {
+                    match parse_string_literal(self, lexer::Symbol::SingleSpeechMark) {
                         Ok(literal) => {
                             Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
                         }

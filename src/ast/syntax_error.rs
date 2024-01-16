@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, num::ParseIntError};
 
 use super::lexer::{Token, TokenType};
 
@@ -30,6 +30,7 @@ impl fmt::Display for SyntaxError {
                     .join(" or ");
                 write!(f, "Expected {} but got {:#?}", joined, got)
             }
+            SyntaxError::InvalidNumber(n) => write!(f, "Invalid number found {}", n),
         }
     }
 }
