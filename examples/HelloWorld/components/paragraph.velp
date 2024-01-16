@@ -1,6 +1,6 @@
 import { Text, Component } from "ellipsis"
 
-export fn Paragraph(const text string): Component {
+export fn Paragraph(text: string): Component {
 	Text(text)
 }
 

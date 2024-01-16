@@ -1,9 +1,15 @@
-import { App } from "elp"
+import { App } from "elp/app"
+import { Message, User } from "$types/chat"
+import { Message as MessageView } from "$components/message"
 
 export fn Chat: App {
-	.name: string?
+	.name: *string
+	.messages: []Message
+	.members: []User
 
 	if name not Empty {
-
+		ForEach(messages) { message in
+			MessageView(user = message.user, body = message.body)
+		}
 	}
 }
