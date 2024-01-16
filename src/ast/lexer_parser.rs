@@ -1,84 +1,82 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers::{
-    self, funcs::parse_fn, number_literals::parse_number_literal,
-    string_literals::parse_string_literal,
-};
+use super::parsers::{self, funcs::parse_fn, string_literals::parse_string_literal};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum AstNode {
     Import(ImportStatement),
     InterfaceDeclaration(InterfaceDeclaration),
     EnumDeclaration(Identifier, Vec<EnumVariant>),
     VariableDeclaration(Identifier, Option<Type>, Option<Expression>),
     FunctionDeclaration(Fn),
-    LiteralNumberic(Literal),
+    LiteralNumber(Literal),
+    LiteralFloat(Literal),
     ExpressionStatement(Expression),
     IfStatement(Expression, Option<Block>, Option<IfStatement>),
     MatchStatement(Expression, Vec<MatchCase>),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Trie {
     pub nodes: Vec<AstNode>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Fn {
     pub name: Option<Identifier>,
     pub params: Vec<Parameter>,
     pub returns: Box<Type>,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct ImportStatement {
     pub members: Vec<Identifier>,
     pub source_path: String,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct ObjectDeclaration {
     pub name: Identifier,
     pub implements: Vec<*const InterfaceDeclaration>,
     pub members: Vec<*const InterfaceProperty>,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct InterfaceDeclaration {
     pub name: Identifier,
     pub members: Vec<InterfaceProperty>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct InterfaceProperty {
     pub name: Identifier,
     pub r#type: Type,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct EnumVariant {
     pub name: Identifier,
     pub variant_type: Option<EnumVariantType>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Enum {
     pub variants: Vec<EnumVariant>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum EnumVariantType {
     Option,
     Action(Vec<Parameter>),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Parameter {
     pub name: Option<Identifier>,
     pub r#type: Type,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq)]
 pub enum Type {
     TypeName(Identifier),
     FnType(Fn),
@@ -91,7 +89,7 @@ pub enum Type {
     Void,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum Expression {
     Identifier(Identifier),
     Literal(Literal),
@@ -99,45 +97,45 @@ pub enum Expression {
     Block(Vec<AstNode>),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum Literal {
     String(String),
     Number(i64),
-    Float((i64, i64)),
+    Float(f64),
     Boolean(bool),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Argument {
     pub name: Option<Identifier>,
     pub value: Expression,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Block {
     pub statements: Vec<AstNode>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct IfStatement {
     pub condition: Expression,
     pub body: Option<Block>,
     pub else_statement: Option<Box<AstNode>>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct MatchCase {
     pub pattern: Pattern,
     pub body: AstNode,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum Pattern {
     MemberAccess(Identifier),
     Boolean(bool),
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Identifier {
     pub immutable: bool,
     pub access_modifier: lexer::AccessModifier,
@@ -248,10 +246,10 @@ impl Parser {
                 TokenType::Keyword(lexer::Keyword::Else) => todo!(),
                 TokenType::SOI => continue,
                 TokenType::EOF => break,
-                TokenType::IntegerLiteral(value) => match parse_number_literal(self) {
-                    Ok(number) => Ok(AstNode::LiteralNumberic(number)),
-                    Err(error) => Err(error),
-                },
+                TokenType::IntegerLiteral(value) => {
+                    Ok(AstNode::LiteralNumber(Literal::Number(value)))
+                }
+                TokenType::FloatLiteral(f) => Ok(AstNode::LiteralFloat(Literal::Float(f))),
                 TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => {
                     match parse_string_literal(self, lexer::Symbol::DoubleSpeechMark) {
                         Ok(literal) => {

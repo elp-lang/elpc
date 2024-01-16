@@ -47,7 +47,7 @@ pub enum Symbol {
     Other(String),
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     Void,
     Unknown,
@@ -55,7 +55,7 @@ pub enum TokenType {
     EOF,
     LiteralBoolean(bool),
     IntegerLiteral(i64),
-    FloatLiteral((i64, i64)),
+    FloatLiteral(f64),
     Keyword(Keyword),
     ReturnType,
     Ident(String),
@@ -101,14 +101,14 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
             TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
-            TokenType::FloatLiteral((n, d)) => format!("float '{}.{}'", n, d),
+            TokenType::FloatLiteral(f) => format!("float '{:e}'", f),
             TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
             TokenType::Unknown => "unknown".into(),
         }
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Token {
     pub token_type: TokenType,
     pub span: (usize, usize),
@@ -297,13 +297,12 @@ impl Lexer {
     }
 
     fn consume_numerics_into_token(&mut self) -> Result<Token, ParsingError> {
-        let mut value: (i64, i64) = (0, 0);
-        let mut current_value: String = "".into();
+        let mut value: String = "".into();
         let starting_cursor = self.position;
         let mut probably_int = true;
 
         while let Some(ch) = self.next() {
-            if current_value.is_empty() {
+            if value.is_empty() {
                 if !ch.is_numeric() {
                     break;
                 }
@@ -313,16 +312,9 @@ impl Lexer {
 
             if ch == '.' {
                 probably_int = false;
-                match current_value.parse::<i64>() {
-                    Ok(int) => {
-                        value.1 = int;
-                    }
-                    Err(err) => return Err(ParsingError::InvalidInt(err)),
-                }
-                current_value.clear();
             }
 
-            current_value.push(ch);
+            value.push(ch);
 
             self.consume();
         }
@@ -330,7 +322,7 @@ impl Lexer {
         let mut token_type: TokenType;
 
         if probably_int {
-            match current_value.parse::<i64>() {
+            match value.parse::<i64>() {
                 Ok(int) => {
                     token_type = TokenType::IntegerLiteral(int);
                 }
@@ -339,14 +331,19 @@ impl Lexer {
 
             return Ok(Token {
                 token_type,
-                value: format!("{}", current_value),
+                value: format!("{}", value),
                 span: (starting_cursor, self.position - 1),
             });
+        } else {
+            match value.parse::<f64>() {
+                Ok(f) => token_type = TokenType::FloatLiteral(f),
+                Err(err) => return Err(ParsingError::InvalidFloat(err)),
+            }
         }
 
         return Ok(Token {
             token_type,
-            value: format!("{}.{}", value.0, value.1),
+            value: format!("{}", value),
             span: (starting_cursor, self.position - 1),
         });
     }
@@ -431,7 +428,7 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::FloatLiteral((0, 3)),
+                        token_type: TokenType::FloatLiteral(0.3),
                         value: "0.3".into(),
                         span: (0, 2),
                     },
@@ -451,7 +448,7 @@ mod tests {
                         value: "".to_string(),
                     },
                     Token {
-                        token_type: TokenType::FloatLiteral((0, 1e3)),
+                        token_type: TokenType::FloatLiteral(0.1e3),
                         value: "0.1e3".into(),
                         span: (0, 4),
                     },
