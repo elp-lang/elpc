@@ -1,6 +1,6 @@
 use crate::ast::{
     lexer::{self, TokenType},
-    lexer_parser::{AstNode, Identifier, ImportStatement, Parser},
+    lexer_parser::{Identifier, ImportStatement, Parser},
     syntax_error::SyntaxError,
 };
 

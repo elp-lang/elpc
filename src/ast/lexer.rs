@@ -1,5 +1,3 @@
-use crate::ast::syntax_error::SyntaxError;
-
 use super::parsing_error::ParsingError;
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
@@ -11,6 +9,7 @@ pub enum AccessModifier {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Keyword {
+    As,
     Fn,
     Var,
     Import,
@@ -71,6 +70,7 @@ impl ToString for TokenType {
             TokenType::SOI => "SOI (Start Of Input)".into(),
             TokenType::EOF => "EOF (End Of File)".into(),
             TokenType::LiteralBoolean(_) => "boolean".into(),
+            TokenType::Keyword(Keyword::As) => "as".into(),
             TokenType::Keyword(Keyword::Interface) => "interface".into(),
             TokenType::Keyword(Keyword::Enum) => "enum".into(),
             TokenType::Keyword(Keyword::Fn) => "fn".into(),
