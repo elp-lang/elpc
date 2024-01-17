@@ -1,7 +1,7 @@
-mod ast;
-
-use ast::lexer::Lexer;
-use ast::lexer_parser::Parser;
+use parser::{
+    self,
+    ast::{lexer::Lexer, lexer_parser::Parser},
+};
 use std::fs;
 
 fn main() {
