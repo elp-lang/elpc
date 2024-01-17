@@ -142,15 +142,12 @@ pub fn parse_interface_declaration(
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ast::{
-            lexer::AccessModifier,
-            lexer_parser::{
-                AstNode, Identifier, ImportStatement, InterfaceDeclaration, InterfaceProperty,
-                Parser, Trie, Type,
-            },
+    use crate::ast::{
+        lexer::{AccessModifier, Lexer},
+        lexer_parser::{
+            AstNode, Identifier, ImportStatement, InterfaceDeclaration, InterfaceProperty, Parser,
+            Trie, Type,
         },
-        Lexer,
     };
     use pretty_assertions::assert_eq;
 
