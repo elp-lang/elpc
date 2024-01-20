@@ -235,18 +235,17 @@ impl Lexer {
         };
 
         token.token_type = match ch {
-            s if s == ':' => TokenType::Symbol(Symbol::Colon),
-            s if s == '{' => TokenType::Symbol(Symbol::OpenBlock),
-            s if s == '}' => TokenType::Symbol(Symbol::CloseBlock),
-            s if s == '(' => TokenType::Symbol(Symbol::OpenParen),
-            s if s == ')' => TokenType::Symbol(Symbol::CloseParen),
-            s if s == '.' => TokenType::Symbol(Symbol::Period),
-            s if s == ',' => TokenType::Symbol(Symbol::Comma),
-            //s if s == "->" => TokenType::ReturnType,
-            s if s == '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
-            s if s == '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
-            s if s == '\\' => TokenType::Symbol(Symbol::BackSlash),
-            s if s == '-' => {
+            ':' => TokenType::Symbol(Symbol::Colon),
+            '{' => TokenType::Symbol(Symbol::OpenBlock),
+            '}' => TokenType::Symbol(Symbol::CloseBlock),
+            '(' => TokenType::Symbol(Symbol::OpenParen),
+            ')' => TokenType::Symbol(Symbol::CloseParen),
+            '.' => TokenType::Symbol(Symbol::Period),
+            ',' => TokenType::Symbol(Symbol::Comma),
+            '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
+            '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
+            '\\' => TokenType::Symbol(Symbol::BackSlash),
+            '-' => {
                 if let Some(next) = self.is_symbol(self.next()) {
                     if next == '>' {
                         self.consume();
