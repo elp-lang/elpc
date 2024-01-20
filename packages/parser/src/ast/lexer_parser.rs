@@ -53,7 +53,7 @@ pub struct InterfaceProperty {
     pub r#type: Type,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct EnumVariant {
     pub name: Identifier,
     pub r#type: Option<EnumVariantType>,
@@ -61,11 +61,13 @@ pub struct EnumVariant {
 
 #[derive(Debug, PartialEq)]
 pub struct EnumDeclaration {
+    pub name: Option<Identifier>,
     pub variants: Vec<EnumVariant>,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum EnumVariantType {
+    #[default]
     Option,
     Action(Vec<Parameter>),
 }
