@@ -136,18 +136,15 @@ mod tests {
         lexer::{AccessModifier, Lexer},
         lexer_parser::{Fn, Identifier, InterfaceProperty, Parser, Type},
         parsers::funcs::parse_fn,
+        testing::Test,
     };
     use pretty_assertions::assert_eq;
 
-    struct Test {
-        input: &'static str,
-        expected: Fn,
-    }
-
     #[test]
     fn test_fn_signature_parser() {
-        let tests: Vec<Test> = vec![
+        let tests: Vec<Test<&'static str, Fn>> = vec![
             Test {
+                name: "basic",
                 input: "fn MyFunction() -> thing",
                 expected: Fn {
                     name: Some(Identifier {
@@ -164,6 +161,7 @@ mod tests {
                 },
             },
             Test {
+                name: "return inline interface",
                 input: "fn MyFunction() -> interface { .first: thing }",
                 expected: Fn {
                     name: Some(Identifier {

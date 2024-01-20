@@ -65,14 +65,14 @@ pub struct EnumDeclaration {
     pub variants: Vec<EnumVariant>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub enum EnumVariantType {
     #[default]
     Option,
     Action(Vec<Parameter>),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Parameter {
     pub name: Option<Identifier>,
     pub r#type: Type,
@@ -207,6 +207,14 @@ impl Parser {
 
     pub fn consume(&mut self) -> Option<lexer::Token> {
         self.position += 1;
+
+        self.current_token = self.tokens.get(self.position).map(|token| token.to_owned());
+
+        self.current_token.clone()
+    }
+
+    pub fn unconsume(&mut self) -> Option<lexer::Token> {
+        self.position -= 1;
 
         self.current_token = self.tokens.get(self.position).map(|token| token.to_owned());
 

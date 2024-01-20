@@ -4,7 +4,7 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-use super::interface::parse_interface_declaration;
+use super::{enums::parse_enum_declaration, interface::parse_interface_declaration};
 
 pub fn parse_type_expression(parser: &mut Parser) -> Result<Type, SyntaxError> {
     while let Some(token) = parser.consume() {
@@ -25,6 +25,14 @@ pub fn parse_type_expression(parser: &mut Parser) -> Result<Type, SyntaxError> {
                     access_modifier: Pub,
                 }))
             }
+            TokenType::Keyword(Keyword::Enum) => match parse_enum_declaration(parser) {
+                Ok(enum_declaration) => {
+                    return Ok(Type::EnumType(enum_declaration));
+                }
+                Err(error) => {
+                    return Err(error);
+                }
+            },
             TokenType::Whitespace(_) => continue,
             _ => {
                 return Err(SyntaxError::UnexpectedTokenButGotL(
