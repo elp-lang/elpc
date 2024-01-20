@@ -56,11 +56,11 @@ pub struct InterfaceProperty {
 #[derive(Debug, PartialEq)]
 pub struct EnumVariant {
     pub name: Identifier,
-    pub variant_type: Option<EnumVariantType>,
+    pub r#type: Option<EnumVariantType>,
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Enum {
+pub struct EnumDeclaration {
     pub variants: Vec<EnumVariant>,
 }
 
@@ -83,7 +83,7 @@ pub enum Type {
     Literal(Literal),
     InterfaceType(InterfaceDeclaration),
     ObjectType(ObjectDeclaration),
-    EnumType(Enum),
+    EnumType(EnumDeclaration),
     Undefined,
     #[default]
     Void,
@@ -264,11 +264,8 @@ impl Parser {
                 }
                 TokenType::Symbol(lexer::Symbol::OpenBlock) => todo!(),
                 TokenType::Symbol(lexer::Symbol::CloseBlock) => todo!(),
-                TokenType::Ident(_) => todo!(),
                 TokenType::Whitespace(_) => continue,
                 TokenType::Void => continue,
-                TokenType::AccessModifier(_) => todo!(),
-                TokenType::Keyword(_) => todo!(),
                 _ => Err(super::syntax_error::SyntaxError::UnexpectedToken(
                     token.clone(),
                 )),

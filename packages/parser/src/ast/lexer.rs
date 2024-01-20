@@ -21,6 +21,8 @@ pub enum Keyword {
     If,
     ElseIf,
     Else,
+    Nil,
+    Empty,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -82,6 +84,8 @@ impl ToString for TokenType {
             TokenType::Keyword(Keyword::If) => "if".into(),
             TokenType::Keyword(Keyword::ElseIf) => "elseif".into(),
             TokenType::Keyword(Keyword::Else) => "else".into(),
+            TokenType::Keyword(Keyword::Nil) => "nil".into(),
+            TokenType::Keyword(Keyword::Empty) => "empty".into(),
             TokenType::ReturnType => "return type expression".into(),
             TokenType::Ident(s) => format!("Ident {}", s),
             TokenType::Symbol(Symbol::CloseParen) => ")".into(),
