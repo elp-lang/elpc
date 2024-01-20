@@ -6,13 +6,13 @@ use crate::ast::{
 
 pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError> {
     match parser.current_token.clone() {
-        None => return Err(SyntaxError::MissingToken("import")),
+        None => Err(SyntaxError::MissingToken("import")),
         Some(token) => {
             if token.token_type != lexer::TokenType::Keyword(lexer::Keyword::Import) {
-                return Err(SyntaxError::UnexpectedTokenButGot(
+                Err(SyntaxError::UnexpectedTokenButGot(
                     lexer::TokenType::Keyword(lexer::Keyword::Import),
                     token.clone(),
-                ));
+                ))
             } else {
                 let mut import_statement = ImportStatement {
                     members: vec![],
@@ -90,7 +90,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                     })
                     .collect();
 
-                return Ok(import_statement);
+                Ok(import_statement)
             }
         }
     }

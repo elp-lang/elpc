@@ -206,11 +206,7 @@ impl Parser {
     pub fn consume(&mut self) -> Option<lexer::Token> {
         self.position += 1;
 
-        self.current_token = if let Some(token) = self.tokens.get(self.position) {
-            Some(token.to_owned())
-        } else {
-            None
-        };
+        self.current_token = self.tokens.get(self.position).map(|token| token.to_owned());
 
         self.current_token.clone()
     }

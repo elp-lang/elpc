@@ -38,5 +38,5 @@ pub fn parse_type_expression(parser: &mut Parser) -> Result<Type, SyntaxError> {
         }
     }
 
-    return Ok(Type::Void);
+    Ok(Type::Void)
 }

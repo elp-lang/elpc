@@ -6,7 +6,7 @@ use crate::ast::{
 
 pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, SyntaxError> {
     match &parser.current_token.clone() {
-        None => return Err(SyntaxError::MissingToken("property")),
+        None => Err(SyntaxError::MissingToken("property")),
         Some(_token) => {
             let mut property = InterfaceProperty {
                 name: Identifier {
@@ -28,7 +28,7 @@ pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty
                     // first token must be an ident,
                     // second will be a colon
                     // third will be a type expression
-                    if let Some(ident) = tokens.get(0) {
+                    if let Some(ident) = tokens.first() {
                         property.name.name = ident.value.clone();
                     } else {
                         return Err(SyntaxError::MissingToken("ident"));
@@ -69,7 +69,7 @@ pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty
                         }
                     };
 
-                    return Ok(property);
+                    Ok(property)
                 }
                 Err(_) => Err(SyntaxError::MissingToken("ident")),
             }

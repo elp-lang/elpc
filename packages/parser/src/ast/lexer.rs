@@ -144,45 +144,17 @@ impl Lexer {
     }
 
     fn could_be_ident(&self, ch: Option<char>) -> Option<char> {
-        match ch {
-            None => None,
-            Some(ch) => {
-                if ch.is_ascii_alphabetic() || ch == '_' {
-                    Some(ch)
-                } else {
-                    None
-                }
-            }
-        }
+        ch.filter(|&ch| ch.is_ascii_alphabetic() || ch == '_')
     }
 
     fn is_whitespace(&self, ch: Option<char>) -> Option<char> {
-        match ch {
-            None => None,
-            Some(ch) => {
-                if ch.is_whitespace() {
-                    Some(ch)
-                } else {
-                    None
-                }
-            }
-        }
+        ch.filter(|&ch| ch.is_whitespace())
     }
 
     fn is_symbol(&self, ch: Option<char>) -> Option<char> {
-        match ch {
-            None => None,
-            Some(ch) => {
-                if !ch.is_whitespace()
-                    && self.could_be_ident(Some(ch)).is_none()
-                    && !ch.is_numeric()
-                {
-                    Some(ch)
-                } else {
-                    None
-                }
-            }
-        }
+        ch.filter(|&ch| {
+            !ch.is_whitespace() && self.could_be_ident(Some(ch)).is_none() && !ch.is_numeric()
+        })
     }
 
     fn consume_ident_into_token(&mut self) -> Token {
@@ -197,13 +169,11 @@ impl Lexer {
                 } else {
                     break;
                 }
+            } else if ch.is_ascii_alphanumeric() || ch == '_' {
+                value.push(ch);
+                self.consume();
             } else {
-                if ch.is_ascii_alphanumeric() || ch == '_' {
-                    value.push(ch);
-                    self.consume();
-                } else {
-                    break;
-                }
+                break;
             }
         }
 
@@ -319,7 +289,7 @@ impl Lexer {
             self.consume();
         }
 
-        let mut token_type: TokenType;
+        let token_type: TokenType;
 
         if probably_int {
             match value.parse::<i64>() {
@@ -331,7 +301,7 @@ impl Lexer {
 
             return Ok(Token {
                 token_type,
-                value: format!("{}", value),
+                value: value.to_string(),
                 span: (starting_cursor, self.position - 1),
             });
         } else {
@@ -341,11 +311,11 @@ impl Lexer {
             }
         }
 
-        return Ok(Token {
+        Ok(Token {
             token_type,
-            value: format!("{}", value),
+            value: value.to_string(),
             span: (starting_cursor, self.position - 1),
-        });
+        })
     }
 
     fn consume_next_token(&mut self) -> Result<Token, ParsingError> {

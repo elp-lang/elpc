@@ -36,11 +36,11 @@ pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal
                 }
             }
 
-            return Ok(Literal::String(value));
+            Ok(Literal::String(value))
         }
         Symbol::SingleSpeechMark => todo!(),
-        _ => return Err(SyntaxError::UnexpectedTokenType(TokenType::Symbol(hint))),
-    };
+        _ => Err(SyntaxError::UnexpectedTokenType(TokenType::Symbol(hint))),
+    }
 }
 
 #[cfg(test)]
