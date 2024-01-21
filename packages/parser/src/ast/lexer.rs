@@ -269,45 +269,31 @@ impl Lexer {
             '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
             '\\' => TokenType::Symbol(Symbol::BackSlash),
             '<' => match self.is_symbol(self.next()) {
-                Some(ch) => match ch {
-                    '<' => TokenType::Symbol(Symbol::BitwiseLeftShift),
-                    _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
-                },
-                None => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                Some('<') => TokenType::Symbol(Symbol::BitwiseLeftShift),
+                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
             },
             '>' => match self.is_symbol(self.next()) {
-                Some(ch) => match ch {
-                    '>' => TokenType::Symbol(Symbol::BitwiseRightShift),
-                    _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
-                },
-                None => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                Some('>') => TokenType::Symbol(Symbol::BitwiseRightShift),
+                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
             },
             '=' => match self.is_symbol(self.next()) {
-                Some(ch) => match ch {
-                    '=' => {
-                        self.consume();
-                        token.value = "==".into();
-                        token.span.1 += 1;
-                        TokenType::Symbol(Symbol::DoubleEqual)
-                    }
-                    _ => TokenType::Symbol(Symbol::SingleEqual),
-                },
-                None => TokenType::Symbol(Symbol::SingleEqual),
-            },
-            '-' => {
-                if let Some(next) = self.is_symbol(self.next()) {
-                    if next == '>' {
-                        self.consume();
-                        token.value = "->".into();
-                        token.span.1 += 1;
-                        TokenType::ReturnType
-                    } else {
-                        TokenType::Symbol(Symbol::Other(ch.into()))
-                    }
-                } else {
-                    TokenType::Symbol(Symbol::Other(ch.into()))
+                Some('=') => {
+                    self.consume();
+                    token.value = "==".into();
+                    token.span.1 += 1;
+                    TokenType::Symbol(Symbol::DoubleEqual)
                 }
-            }
+                _ => TokenType::Symbol(Symbol::SingleEqual),
+            },
+            '-' => match self.is_symbol(self.next()) {
+                Some('>') => {
+                    self.consume();
+                    token.value = "->".into();
+                    token.span.1 += 1;
+                    TokenType::ReturnType
+                }
+                _ => TokenType::Symbol(Symbol::Other(ch.into())),
+            },
             _ => TokenType::Symbol(Symbol::Other(ch.into())),
         };
 
