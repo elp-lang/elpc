@@ -1,3 +1,5 @@
+use std::char;
+
 use super::parsing_error::ParsingError;
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
@@ -45,6 +47,13 @@ pub enum Symbol {
     Period,
     Comma,
     BackSlash,
+    SingleEqual,
+    DoubleEqual,
+    BitwiseOr,
+    BitwiseAnd,
+    BitwiseXor,
+    BitwiseLeftShift,
+    BitwiseRightShift,
     Other(String),
 }
 
@@ -91,6 +100,8 @@ impl ToString for TokenType {
             TokenType::Symbol(Symbol::CloseParen) => ")".into(),
             TokenType::Symbol(Symbol::DoubleSpeechMark) => "\"".into(),
             TokenType::Symbol(Symbol::SingleSpeechMark) => "'".into(),
+            TokenType::Symbol(Symbol::SingleEqual) => "=".into(),
+            TokenType::Symbol(Symbol::DoubleEqual) => "==".into(),
             TokenType::Symbol(Symbol::OpenParen) => "(".into(),
             TokenType::Symbol(Symbol::Colon) => ":".into(),
             TokenType::Symbol(Symbol::OpenBlock) => "{".into(),
@@ -98,6 +109,11 @@ impl ToString for TokenType {
             TokenType::Symbol(Symbol::Period) => ".".into(),
             TokenType::Symbol(Symbol::Comma) => ",".into(),
             TokenType::Symbol(Symbol::BackSlash) => "\\".into(),
+            TokenType::Symbol(Symbol::BitwiseOr) => "|".into(),
+            TokenType::Symbol(Symbol::BitwiseAnd) => "&".into(),
+            TokenType::Symbol(Symbol::BitwiseXor) => "^".into(),
+            TokenType::Symbol(Symbol::BitwiseLeftShift) => "<<".into(),
+            TokenType::Symbol(Symbol::BitwiseRightShift) => ">>".into(),
             TokenType::Symbol(Symbol::Other(s)) => s.to_string(),
             TokenType::Whitespace(Whitespace::Tab) => "tab \\t".into(),
             TokenType::Whitespace(Whitespace::Return) => "return \\r".into(),
@@ -246,9 +262,38 @@ impl Lexer {
             ')' => TokenType::Symbol(Symbol::CloseParen),
             '.' => TokenType::Symbol(Symbol::Period),
             ',' => TokenType::Symbol(Symbol::Comma),
+            '&' => TokenType::Symbol(Symbol::BitwiseAnd),
+            '|' => TokenType::Symbol(Symbol::BitwiseOr),
+            '^' => TokenType::Symbol(Symbol::BitwiseXor),
             '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
             '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
             '\\' => TokenType::Symbol(Symbol::BackSlash),
+            '<' => match self.is_symbol(self.next()) {
+                Some(ch) => match ch {
+                    '<' => TokenType::Symbol(Symbol::BitwiseLeftShift),
+                    _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                },
+                None => TokenType::Symbol(Symbol::Other(ch.to_string())),
+            },
+            '>' => match self.is_symbol(self.next()) {
+                Some(ch) => match ch {
+                    '>' => TokenType::Symbol(Symbol::BitwiseRightShift),
+                    _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                },
+                None => TokenType::Symbol(Symbol::Other(ch.to_string())),
+            },
+            '=' => match self.is_symbol(self.next()) {
+                Some(ch) => match ch {
+                    '=' => {
+                        self.consume();
+                        token.value = "==".into();
+                        token.span.1 += 1;
+                        TokenType::Symbol(Symbol::DoubleEqual)
+                    }
+                    _ => TokenType::Symbol(Symbol::SingleEqual),
+                },
+                None => TokenType::Symbol(Symbol::SingleEqual),
+            },
             '-' => {
                 if let Some(next) = self.is_symbol(self.next()) {
                     if next == '>' {

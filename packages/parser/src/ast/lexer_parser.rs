@@ -1,17 +1,19 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers::{self, funcs::parse_fn, string_literals::parse_string_literal};
+use super::parsers::{
+    self, enums::parse_enum_declaration, funcs::parse_fn, string_literals::parse_string_literal,
+};
 
 #[derive(Debug, PartialEq)]
 pub enum AstNode {
     Import(ImportStatement),
     InterfaceDeclaration(InterfaceDeclaration),
-    EnumDeclaration(Identifier, Vec<EnumVariant>),
+    EnumDeclaration(EnumDeclaration),
     VariableDeclaration(Identifier, Option<Type>, Option<Expression>),
     FunctionDeclaration(Fn),
     LiteralNumber(Literal),
     LiteralFloat(Literal),
-    ExpressionStatement(Expression),
+    Expression(Expression),
     IfStatement(Expression, Option<Block>, Option<IfStatement>),
     MatchStatement(Expression, Vec<MatchCase>),
 }
@@ -96,7 +98,8 @@ pub enum Expression {
     Identifier(Identifier),
     Literal(Literal),
     FunctionCall(Identifier, Vec<Argument>),
-    Block(Vec<AstNode>),
+    IfStatement(Box<IfStatement>),
+    Block(Vec<Expression>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -122,7 +125,7 @@ pub struct Block {
 pub struct IfStatement {
     pub condition: Expression,
     pub body: Option<Block>,
-    pub else_statement: Option<Box<AstNode>>,
+    pub branches: Option<Vec<Box<AstNode>>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -151,6 +154,8 @@ pub struct Parser {
 }
 
 impl Parser {
+    /// Create a new instance of Parser, takes a Vec<lexer::Token> from a prior run of
+    /// Lexer::consume_all_tokens. This function doesn't perform any parsing or mutations.
     pub fn new(tokens: Vec<lexer::Token>) -> Parser {
         Parser {
             tokens: tokens.clone(),
@@ -159,6 +164,8 @@ impl Parser {
         }
     }
 
+    /// Peek at the next token without consuming it (leave the cursor where it is.) Skips over whitespace, will return an error if you try to peek at a character
+    /// but we run out of tokens first.
     pub fn peek(&self) -> Result<lexer::Token, &'static str> {
         let mut iters = 1;
 
@@ -180,7 +187,7 @@ impl Parser {
         }
     }
 
-    // Consume N number of tokens (skipping any whitespace entirely)
+    /// Consume N number of tokens (skipping any whitespace entirely)
     pub fn consume_n(&mut self, n: i32) -> Result<Vec<lexer::Token>, &'static str> {
         let mut results = vec![];
         let mut consumed = 0;
@@ -205,6 +212,7 @@ impl Parser {
         Ok(results)
     }
 
+    /// Consume the next token, doesn't skip any kind of token.
     pub fn consume(&mut self) -> Option<lexer::Token> {
         self.position += 1;
 
@@ -213,6 +221,7 @@ impl Parser {
         self.current_token.clone()
     }
 
+    /// Push the cursor back one and update the current_token to the previous character.
     pub fn unconsume(&mut self) -> Option<lexer::Token> {
         self.position -= 1;
 
@@ -245,11 +254,12 @@ impl Parser {
                     Err(error) => Err(error),
                 },
                 TokenType::Keyword(lexer::Keyword::Var) => todo!(),
-                TokenType::Keyword(lexer::Keyword::Enum) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Enum) => match parse_enum_declaration(self) {
+                    Ok(new_enum) => Ok(AstNode::EnumDeclaration(new_enum)),
+                    Err(error) => Err(error),
+                },
                 TokenType::Keyword(lexer::Keyword::Match) => todo!(),
                 TokenType::Keyword(lexer::Keyword::If) => todo!(),
-                TokenType::Keyword(lexer::Keyword::ElseIf) => todo!(),
-                TokenType::Keyword(lexer::Keyword::Else) => todo!(),
                 TokenType::SOI => continue,
                 TokenType::EOF => break,
                 TokenType::IntegerLiteral(value) => {
@@ -258,17 +268,13 @@ impl Parser {
                 TokenType::FloatLiteral(f) => Ok(AstNode::LiteralFloat(Literal::Float(f))),
                 TokenType::Symbol(lexer::Symbol::DoubleSpeechMark) => {
                     match parse_string_literal(self, lexer::Symbol::DoubleSpeechMark) {
-                        Ok(literal) => {
-                            Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
-                        }
+                        Ok(literal) => Ok(AstNode::Expression(Expression::Literal(literal))),
                         Err(error) => Err(error),
                     }
                 }
                 TokenType::Symbol(lexer::Symbol::SingleSpeechMark) => {
                     match parse_string_literal(self, lexer::Symbol::SingleSpeechMark) {
-                        Ok(literal) => {
-                            Ok(AstNode::ExpressionStatement(Expression::Literal(literal)))
-                        }
+                        Ok(literal) => Ok(AstNode::Expression(Expression::Literal(literal))),
                         Err(error) => Err(error),
                     }
                 }
