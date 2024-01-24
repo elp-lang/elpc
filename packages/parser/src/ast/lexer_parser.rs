@@ -9,13 +9,20 @@ pub enum AstNode {
     Import(ImportStatement),
     InterfaceDeclaration(InterfaceDeclaration),
     EnumDeclaration(EnumDeclaration),
-    VariableDeclaration(Identifier, Option<Type>, Option<Expression>),
+    VariableDeclaration(VariableDeclaration),
     FunctionDeclaration(Fn),
     LiteralNumber(Literal),
     LiteralFloat(Literal),
     Expression(Expression),
     IfStatement(Expression, Option<Block>, Option<IfStatement>),
     MatchStatement(Expression, Vec<MatchCase>),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct VariableDeclaration {
+    pub ident: Identifier,
+    pub r#type: Type,
+    pub value: Option<Expression>,
 }
 
 #[derive(Debug, PartialEq)]

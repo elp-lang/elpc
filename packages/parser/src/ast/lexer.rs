@@ -4,8 +4,8 @@ use super::parsing_error::ParsingError;
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 pub enum AccessModifier {
-    Const,
     #[default]
+    Private,
     Pub,
 }
 
@@ -122,7 +122,7 @@ impl ToString for TokenType {
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
             TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
             TokenType::FloatLiteral(f) => format!("float '{:e}'", f),
-            TokenType::AccessModifier(AccessModifier::Const) => "const".into(),
+            TokenType::AccessModifier(AccessModifier::Private) => "private".into(),
             TokenType::Unknown => "unknown".into(),
         }
     }
@@ -204,7 +204,7 @@ impl Lexer {
                 s if s == "true" => TokenType::LiteralBoolean(true),
                 s if s == "false" => TokenType::LiteralBoolean(false),
                 s if s == "pub" => TokenType::AccessModifier(AccessModifier::Pub),
-                s if s == "const" => TokenType::AccessModifier(AccessModifier::Const),
+                s if s == "const" => TokenType::AccessModifier(AccessModifier::Private),
                 s if s == "fn" => TokenType::Keyword(Keyword::Fn),
                 s if s == "var" => TokenType::Keyword(Keyword::Var),
                 s if s == "import" => TokenType::Keyword(Keyword::Import),
