@@ -392,18 +392,15 @@ impl Lexer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ast::testing::Test;
     use pretty_assertions::assert_eq;
-
-    struct Test {
-        input: &'static str,
-        expected: Vec<Token>,
-    }
 
     #[test]
     fn test_lexer_sanity() {
         let space = Whitespace::Other(" ".to_string());
-        let tests = vec![
+        let tests: Vec<Test<&'static str, Vec<Token>>> = vec![
             Test {
+                name: "basic int",
                 input: "123",
                 expected: vec![
                     Token {
@@ -424,6 +421,7 @@ mod tests {
                 ],
             },
             Test {
+                name: "basic float",
                 input: "0.3",
                 expected: vec![
                     Token {
@@ -444,6 +442,7 @@ mod tests {
                 ],
             },
             Test {
+                name: "scientific float",
                 input: "0.1e3",
                 expected: vec![
                     Token {
@@ -464,6 +463,7 @@ mod tests {
                 ],
             },
             Test {
+                name: "basic import",
                 input: "import { Thing } from \"elp\"",
                 expected: vec![
                     Token {
@@ -544,6 +544,7 @@ mod tests {
                 ],
             },
             Test {
+                name: "escaped string",
                 input: "\\\"escaped\\\"",
                 expected: vec![
                     Token {
