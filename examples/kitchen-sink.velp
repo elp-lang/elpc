@@ -16,9 +16,9 @@ enum MyEnum {
 
 const NAME: string
 const NAME: string = "hello"
-variable: string = "world"
-binding = 1
-variadic, binding = 1, 2
+var variable: string = "world"
+var binding = 1
+var variadic, binding = Tuple(1, 2)
 
 fn MyFunction {}
 fn MyFunction() {}

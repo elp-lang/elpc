@@ -1,12 +1,13 @@
 import { UUID } from "elp/types"
 
-export interface User {
-	displayName: string
+export object User {
+	.displayName: string
 }
 
-export interface Message {
-	body: string
-	user: User
+export object Message {
+	.body: const string
+	.user: const User
+	.reactions: []string
 }
 
 export enum Actions {

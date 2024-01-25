@@ -1,6 +1,7 @@
-import { Text, Component } from "ellipsis"
+import { Component } from "elp/app"
+import { Text } from "elp/app/components"
 
-export fn Paragraph(text: string): Component {
+export fn Paragraph(text: string) implements Component {
 	Text(text)
 }
 

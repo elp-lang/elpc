@@ -1,27 +1,21 @@
-import { Column, Row, Text, Date, String } from "ellipsis"
-import { Stylesheet } from "ellipsis/styling"
+import { Column, Row, Text, Date } from "elp/app/elements"
+import { Stylesheet } from "elp/app/styling"
 import Paragraph from "$components/paragraph"
 
-export fn Home: Screen {
+export fn Home implements Screen {
     const name = "Dave"
 
     Column {
         Row(columns = 2) {
             Column {
-                Text {
-                    String("Current date:")
-                }
+                Text("Current date:")
             }
             Column {
-                Text {
-                    Date.Now(format="ll")
-                }
+                Text(Date.Now(format="ll"))
             }
         }
         Row {
-            Text {
-                String("hello {name}")
-            }
+            Text("hello {name}")
             Link(to = "about") {
                 Text("Read about Ellipsis")
             }
