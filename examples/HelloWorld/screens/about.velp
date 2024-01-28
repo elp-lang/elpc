@@ -1,24 +1,21 @@
-import { AsyncQueue } from "elp/app"
+import { AsyncQueue, Screen } from "elp/app"
 import { getAboutContent } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-export fn About() implements Screen {
-    let aboutContent: String
-    let error: Error
+export fn About() -> Screen {
+    var aboutContent, err = getAboutContent()
 
-    AsyncQueue {
-        aboutContent, error = getAboutContent()
-    }
-
-    Column {
-        if error {
-            Row(class = "error-row") {
-                Text(error.AsString())
-            }
-        } else {
-            Row {
-                Text(aboutContent.title, class = "title")
-                Paragraph(aboutContent.body)
+    Screen {
+        Column {
+            if err not None {
+                Row(class = "error-row") {
+                    Text(error.asString())
+                }
+            } else {
+                Row {
+                    Text(aboutContent.title, class = "title")
+                    Paragraph(aboutContent.body)
+                }
             }
         }
     }

@@ -1,19 +1,27 @@
-import { Error } from "ellipsis"
-import { Fetch } from "ellipsis/net"
+import { Error } from "elp"
+import { Fetch } from "elp/net"
 
-export struct Content {
-    userId string
-    id     string
-    title  string
-    body   string
+export object Content {
+    userId: string
+    id:     string
+    title:  string
+    body:   string
 }
 
-export getAboutContent() -> async (Content, Error) {
-    return Fetch<Content>("https://jsonplaceholder.typicode.com/posts/1")
+export object ApiError implements Error {
+    message: string
+
+    fn toString() -> String {
+        return .message
+    }
 }
 
-export getBlogPost(id string) -> async (Content, Error) {
-    return Fetch<Content>("https://jsonplaceholder.typicode.com/posts/1")
+export fn getAboutContent() -> Reactive<Content, ApiError> {
+    return Fetch<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/1")
+}
+
+export fn getBlogPost(id: string) -> Reactive<Content, ApiError> {
+    return Fetch<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/{id}")
 }
 
 // vim: ft=swift

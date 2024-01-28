@@ -1,8 +1,9 @@
 import { Column, Row, Text, Date } from "elp/app/elements"
 import { Stylesheet } from "elp/app/styling"
 import Paragraph from "$components/paragraph"
+import { FontWeight } fronm "elp/app/components/Text"
 
-export fn Home implements Screen {
+export fn Home -> Screen {
     const name = "Dave"
 
     Column {
@@ -29,11 +30,11 @@ Stylesheet {
     }
 
     Text {
-        .fontWeight = 500
+        .fontWeight = FontWeight.SEMIBOLD
     }
 
     Date {
-        .fontWeight = 200
+        .fontWeight = FontWeight.LIGHT
     }
 }
 
