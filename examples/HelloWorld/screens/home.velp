@@ -1,24 +1,26 @@
 import { Column, Row, Text, Date } from "elp/app/elements"
 import { Stylesheet } from "elp/app/styling"
 import Paragraph from "$components/paragraph"
-import { FontWeight } fronm "elp/app/components/Text"
+import { FontWeight } from "elp/app/components/Text"
 
 export fn Home -> Screen {
-    const name = "Dave"
+    const NAME = "Dave"
 
-    Column {
-        Row(columns = 2) {
-            Column {
-                Text("Current date:")
+    Screen {
+        Column {
+            Row(columns = 2) {
+                Column {
+                    Text("Current date:")
+                }
+                Column {
+                    Text(Date.Now(format="ll"))
+                }
             }
-            Column {
-                Text(Date.Now(format="ll"))
-            }
-        }
-        Row {
-            Text("hello {name}")
-            Link(to = "about") {
-                Text("Read about Ellipsis")
+            Row {
+                Text("hello {name}")
+                Link(to = "about") {
+                    Text("Read about Ellipsis")
+                }
             }
         }
     }

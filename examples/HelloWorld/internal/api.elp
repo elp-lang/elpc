@@ -1,27 +1,29 @@
 import { Error } from "elp"
+import { Reactive } from "elp/app"
 import { Fetch } from "elp/net"
+import { UUID } from "elp/types"
 
 export object Content {
-    userId: string
-    id:     string
-    title:  string
-    body:   string
+    .id = UUID.v4()
+    .userId: string
+    .title:  string
+    .body:   string
 }
 
 export object ApiError implements Error {
-    message: string
+    .message: string
+}
 
-    fn toString() -> String {
-        return .message
-    }
+fn ApiError.toString(self) -> String {
+    return .message
 }
 
 export fn getAboutContent() -> Reactive<Content, ApiError> {
-    return Fetch<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/1")
+    return Fetch.Get<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/1")
 }
 
 export fn getBlogPost(id: string) -> Reactive<Content, ApiError> {
-    return Fetch<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/{id}")
+    return Fetch.Get<Content, ApiError>("https://jsonplaceholder.typicode.com/posts/{id}")
 }
 
 // vim: ft=swift

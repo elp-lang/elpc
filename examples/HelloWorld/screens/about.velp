@@ -9,7 +9,7 @@ export fn About() -> Screen {
         Column {
             if err not None {
                 Row(class = "error-row") {
-                    Text(error.asString())
+                    Text(error.atString())
                 }
             } else {
                 Row {
