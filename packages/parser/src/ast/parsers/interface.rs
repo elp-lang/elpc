@@ -145,33 +145,10 @@ mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
         lexer_parser::{
-            AstNode, Identifier, ImportStatement, InterfaceDeclaration, InterfaceProperty, Parser,
-            Trie, Type,
+            AstNode, Identifier, InterfaceDeclaration, InterfaceProperty, Parser, Trie, Type,
         },
     };
     use pretty_assertions::assert_eq;
-
-    #[test]
-    fn test_parse_import() {
-        let input = "import { Thing } from \"elp\"".to_string();
-        let mut lexer = Lexer::new(input.clone());
-        let tokens = lexer.consume_all_tokens();
-        let mut parser = Parser::new(tokens);
-
-        assert_eq!(
-            parser.parse(),
-            Trie {
-                nodes: vec!(AstNode::Import(ImportStatement {
-                    members: vec!(Identifier {
-                        name: "Thing".to_string(),
-                        immutable: true,
-                        access_modifier: AccessModifier::Pub,
-                    }),
-                    source_path: "elp".to_string(),
-                }))
-            }
-        );
-    }
 
     #[test]
     fn test_parse_basic_interface() {

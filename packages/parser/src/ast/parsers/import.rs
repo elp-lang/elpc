@@ -1,8 +1,60 @@
 use crate::ast::{
-    lexer::{self, TokenType},
-    lexer_parser::{Identifier, ImportStatement, Parser},
+    lexer::{self, AccessModifier, TokenType},
+    lexer_parser::{Identifier, ImportStatement, ImportStatementMember, Parser},
     syntax_error::SyntaxError,
 };
+
+fn parse_import_ident(
+    parser: &mut Parser,
+    import_name: String,
+) -> Result<ImportStatementMember, SyntaxError> {
+    let mut member = ImportStatementMember {
+        alias: None,
+        name: Identifier {
+            immutable: true,
+            access_modifier: AccessModifier::Pub,
+            name: import_name,
+        },
+    };
+
+    let mut dangling_alias = false;
+
+    while parser.consume().is_some() {
+        if let Some(token) = &parser.current_token {
+            match &token.token_type {
+                TokenType::Symbol(lexer::Symbol::Comma) => {
+                    if dangling_alias {
+                        return Err(SyntaxError::MissingToken("ident"));
+                    }
+                    break;
+                }
+                TokenType::Keyword(lexer::Keyword::As) => {
+                    dangling_alias = true;
+                    continue;
+                }
+                TokenType::Whitespace(_) => continue,
+                TokenType::Symbol(lexer::Symbol::CloseBlock) => {
+                    if dangling_alias {
+                        return Err(SyntaxError::MissingToken("ident"));
+                    }
+                    parser.unconsume();
+                    break;
+                }
+                TokenType::Ident(value) => {
+                    member.alias = Some(value.clone());
+                    dangling_alias = false;
+                }
+                _ => {
+                    return Err(SyntaxError::UnexpectedToken(
+                        parser.current_token.clone().unwrap(),
+                    ));
+                }
+            }
+        }
+    }
+
+    return Ok(member);
+}
 
 pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError> {
     match parser.current_token.clone() {
@@ -24,7 +76,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                 // We skip most of these characters.
                 let mut found_opening_brace = false;
                 let mut found_closing_brace = false;
-                let mut imports: Vec<lexer::Token> = vec![];
+                let mut imports: Vec<ImportStatementMember> = vec![];
                 while parser.consume().is_some() {
                     if let Some(token) = &parser.current_token {
                         match &token.token_type {
@@ -60,11 +112,16 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                             }
                             lexer::TokenType::Symbol(..) => continue,
                             lexer::TokenType::Whitespace(..) => continue,
-                            lexer::TokenType::Ident(..) => {
+                            lexer::TokenType::Ident(value) => {
                                 if found_closing_brace {
                                     import_statement.source_path = token.value.clone();
                                 } else {
-                                    imports.push(token.clone());
+                                    match parse_import_ident(parser, value.clone()) {
+                                        Ok(member) => imports.push(member),
+                                        Err(err) => {
+                                            return Err(err);
+                                        }
+                                    }
                                 }
                             }
                             lexer::TokenType::EOF => break,
@@ -81,17 +138,67 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                     return Err(SyntaxError::MissingToken("}"));
                 }
 
-                import_statement.members = imports
-                    .iter()
-                    .map(|token| Identifier {
-                        name: token.value.clone(),
-                        immutable: true,
-                        access_modifier: lexer::AccessModifier::Pub,
-                    })
-                    .collect();
+                import_statement.members = imports;
 
                 Ok(import_statement)
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use tests::lexer::Lexer;
+
+    use crate::ast::testing::Test;
+
+    use self::lexer::AccessModifier;
+
+    use super::*;
+
+    #[test]
+    fn test_import() {
+        let tests: Vec<Test<&'static str, ImportStatement>> = vec![
+            Test {
+                name: "basic import",
+                input: "import { Thing } from \"elp\"",
+                expected: ImportStatement {
+                    source_path: "elp".into(),
+                    members: vec![ImportStatementMember {
+                        name: Identifier {
+                            name: "Thing".into(),
+                            access_modifier: AccessModifier::Pub,
+                            immutable: true,
+                        },
+                        alias: None,
+                    }],
+                },
+            },
+            Test {
+                name: "import as alias",
+                input: "import { Thing as Other } from \"elp\"",
+                expected: ImportStatement {
+                    source_path: "elp".into(),
+                    members: vec![ImportStatementMember {
+                        alias: Some("Other".into()),
+                        name: Identifier {
+                            name: "Thing".into(),
+                            access_modifier: AccessModifier::Pub,
+                            immutable: true,
+                        },
+                    }],
+                },
+            },
+        ];
+
+        for test in tests {
+            let mut lexer = Lexer::new(test.input.to_string());
+            let tokens = lexer.consume_all_tokens();
+            let mut parser = Parser::new(tokens);
+            parser.consume();
+
+            println!("{}", test.name);
+            assert_eq!(parse_import(&mut parser).unwrap(), test.expected);
         }
     }
 }

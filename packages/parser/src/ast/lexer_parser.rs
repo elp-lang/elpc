@@ -38,8 +38,14 @@ pub struct Fn {
 }
 
 #[derive(Default, Debug, PartialEq)]
+pub struct ImportStatementMember {
+    pub name: Identifier,
+    pub alias: Option<String>,
+}
+
+#[derive(Default, Debug, PartialEq)]
 pub struct ImportStatement {
-    pub members: Vec<Identifier>,
+    pub members: Vec<ImportStatementMember>,
     pub source_path: String,
 }
 
