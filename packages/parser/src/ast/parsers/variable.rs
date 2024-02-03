@@ -5,7 +5,7 @@ use crate::ast::{
 };
 
 pub fn parse_expression(parser: &mut Parser) -> Result<VariableDeclaration, SyntaxError> {
-    let mut declaration = VariableDeclaration {
+    let declaration = VariableDeclaration {
         ident: Identifier {
             name: "".into(),
             immutable: true,
@@ -16,10 +16,8 @@ pub fn parse_expression(parser: &mut Parser) -> Result<VariableDeclaration, Synt
     };
 
     while let Some(token) = parser.consume() {
-        match &token.token_type {
-            _ => {
-                return Err(SyntaxError::UnexpectedToken(token.clone()));
-            }
+        {
+            return Err(SyntaxError::UnexpectedToken(token.clone()));
         }
     }
 

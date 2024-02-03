@@ -53,7 +53,7 @@ fn parse_import_ident(
         }
     }
 
-    return Ok(member);
+    Ok(member)
 }
 
 pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError> {

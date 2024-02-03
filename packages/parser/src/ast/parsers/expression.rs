@@ -4,13 +4,11 @@ use crate::ast::{
 };
 
 pub fn parse_expression(parser: &mut Parser) -> Result<Option<Expression>, SyntaxError> {
-    let mut expression: Option<Expression> = None;
+    let expression: Option<Expression> = None;
 
     while let Some(token) = parser.consume() {
-        match &token.token_type {
-            _ => {
-                return Err(SyntaxError::UnexpectedToken(token.clone()));
-            }
+        {
+            return Err(SyntaxError::UnexpectedToken(token.clone()));
         }
     }
 
