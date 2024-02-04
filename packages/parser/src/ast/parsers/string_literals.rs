@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{Symbol, TokenType},
-    lexer_parser::{Literal, Parser},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    Literal,
 };
 
 pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, SyntaxError> {
@@ -46,11 +47,7 @@ pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal
 #[cfg(test)]
 mod tests {
     use super::parse_string_literal;
-    use crate::ast::{
-        lexer::Lexer,
-        lexer_parser::{Literal, Parser},
-        testing::Test,
-    };
+    use crate::ast::{lexer::Lexer, lexer_parser::Parser, testing::Test, Literal};
     use pretty_assertions::assert_eq;
 
     #[test]

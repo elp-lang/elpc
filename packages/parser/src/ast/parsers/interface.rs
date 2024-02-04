@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{self, Symbol, TokenType},
-    lexer_parser::{Identifier, InterfaceDeclaration, InterfaceProperty, Parser, Type},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    Identifier, InterfaceDeclaration, InterfaceProperty, Type,
 };
 
 pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty, SyntaxError> {
@@ -144,9 +145,8 @@ pub fn parse_interface_declaration(
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{
-            AstNode, Identifier, InterfaceDeclaration, InterfaceProperty, Parser, Trie, Type,
-        },
+        lexer_parser::Parser,
+        AstNode, Identifier, InterfaceDeclaration, InterfaceProperty, Trie, Type,
     };
     use pretty_assertions::assert_eq;
 

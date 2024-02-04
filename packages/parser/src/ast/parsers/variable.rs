@@ -1,7 +1,6 @@
 use crate::ast::{
-    lexer::AccessModifier,
-    lexer_parser::{Identifier, Parser, VariableDeclaration},
-    syntax_error::SyntaxError,
+    lexer::AccessModifier, lexer_parser::Parser, syntax_error::SyntaxError, Identifier, Type,
+    VariableDeclaration,
 };
 
 pub fn parse_expression(parser: &mut Parser) -> Result<VariableDeclaration, SyntaxError> {
@@ -11,7 +10,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<VariableDeclaration, Synt
             immutable: true,
             access_modifier: AccessModifier::Pub,
         },
-        r#type: crate::ast::lexer_parser::Type::Void,
+        r#type: Type::Void,
         value: None,
     };
 

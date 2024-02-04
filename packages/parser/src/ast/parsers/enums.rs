@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{AccessModifier, Symbol, TokenType},
-    lexer_parser::{EnumDeclaration, EnumVariant, EnumVariantType, Identifier, Parameter, Parser},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    EnumDeclaration, EnumVariant, EnumVariantType, Identifier, Parameter,
 };
 
 use super::type_expression::parse_type_expression;
@@ -137,11 +138,10 @@ mod tests {
 
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{
-            EnumDeclaration, EnumVariant, EnumVariantType, Identifier, Parameter, Parser, Type,
-        },
+        lexer_parser::Parser,
         parsers::enums::parse_enum_declaration,
         testing::Test,
+        EnumDeclaration, EnumVariant, EnumVariantType, Identifier, Parameter, Type,
     };
 
     #[test]
