@@ -1,10 +1,10 @@
-use parser;
+use parser::{self, ast};
 
 pub trait CompilerTargetTriplet {
     fn from_system();
 }
 
 pub trait Compiler {
-    fn compile(ast: parser::ast::Trie);
+    fn compile(ast: ast::Trie);
     fn link();
 }

@@ -1,0 +1,149 @@
+use bindgen::Builder;
+
+enum TargetArch {
+    X86_64,
+    ARMV8a,
+    ARMV7,
+    ARMV7s,
+}
+
+enum TargetPlatform {
+    IphoneOS,
+    IphoneOSSim,
+    MacOS,
+}
+
+struct BuildInformation {
+    pub arch: TargetArch,
+    pub platform: TargetPlatform,
+}
+
+impl BuildInformation {
+    pub fn get_triplet(&self) -> &'static str {
+        match self.arch {
+            TargetArch::X86_64 => match self.platform {
+                TargetPlatform::IphoneOS => "x86_64-apple-ios",
+            },
+        }
+    }
+}
+
+fn sdk_path(target: &str) -> Result<String, std::io::Error> {
+    use std::process::Command;
+    let sdk = if vec![
+        "x86_64-apple-ios",
+        "i386-apple-ios",
+        "aarch64-apple-ios-sim",
+    ]
+    .contains(&target)
+    {
+        "iphonesimulator"
+    } else if target == "aarch64-apple-ios"
+        || target == "armv7-apple-ios"
+        || target == "armv7s-apple-ios"
+    {
+        "iphoneos"
+    } else {
+        unreachable!();
+    };
+
+    let output = Command::new("xcrun")
+        .args(&["--sdk", sdk, "--show-sdk-path"])
+        .output()?
+        .stdout;
+    let prefix_str = std::str::from_utf8(&output).expect("invalid output from `xcrun`");
+    Ok(prefix_str.trim_end().to_string())
+}
+
+pub fn generate_uikit(sdk_path: Option<&str>, target: &str) {
+    let target_arg = format!("--target={}", target);
+    let mut clang_args = vec!["-x", "objective-c", "-fblocks", &target_arg];
+    if let Some(sdk_path) = sdk_path {
+        clang_args.extend(&["-isysroot", sdk_path]);
+    }
+
+    let mut uikit_builder = Builder::default();
+    uikit_builder = uikit_builder
+        .clang_args(&clang_args)
+        .objc_extern_crate(true)
+        .layout_tests(false)
+        //.block_extern_crate(true)
+        //.generate_block(true)
+        // time.h as has a variable called timezone that conflicts with some of the objective-c
+        // calls from NSCalendar.h in the Foundation framework. This removes that one variable.
+        .blocklist_item("timezone")
+        // https://github.com/rust-lang/rust-bindgen/issues/1705
+        .blocklist_item("IUIStepper")
+        .blocklist_function("dividerImageForLeftSegmentState_rightSegmentState_")
+        .blocklist_item("objc_object")
+        .header_contents("UIKit.h", "#include<UIKit/UIKit.h>");
+
+    // Generate the bindings.
+    let uikit_bindings = uikit_builder
+        .generate()
+        .expect("unable to generate bindings");
+
+    // Write them to the crate root.
+    uikit_bindings
+        .write_to_file("uikit.rs")
+        .expect("could not write bindings");
+}
+
+pub fn generate_appkit(sdk_path: Option<&str>, target: &str) {
+    let target_arg = format!("--target={}", target);
+    let mut clang_args = vec!["-x", "objective-c", "-fblocks", &target_arg];
+    if let Some(sdk_path) = sdk_path {
+        clang_args.extend(&["-isysroot", sdk_path]);
+    }
+
+    let mut appkit_builder = Builder::default();
+    appkit_builder = appkit_builder
+        .clang_args(&clang_args)
+        .objc_extern_crate(true)
+        .layout_tests(false)
+        //.block_extern_crate(true)
+        //.generate_block(true)
+        // time.h as has a variable called timezone that conflicts with some of the objective-c
+        // calls from NSCalendar.h in the Foundation framework. This removes that one variable.
+        .blocklist_item("timezone")
+        // https://github.com/rust-lang/rust-bindgen/issues/1705
+        .blocklist_item("IUIStepper")
+        .blocklist_function("dividerImageForLeftSegmentState_rightSegmentState_")
+        .blocklist_item("objc_object")
+        .header_contents("AppKit.h", "#import <AppKit/AppKit.h>");
+
+    // Generate the bindings.
+    let appkit_bindings = appkit_builder
+        .generate()
+        .expect("unable to generate bindings");
+
+    // Write them to the crate root.
+    appkit_bindings
+        .write_to_file("appkit.rs")
+        .expect("could not write bindings");
+}
+
+fn build(sdk_path: Option<&str>, target: &str) {
+    println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
+    println!("cargo:rustc-link-lib=framework=UIKit");
+
+    // See https://github.com/rust-lang/rust-bindgen/issues/1211
+    // Technically according to the llvm mailing list, the argument to clang here should be
+    // -arch arm64 but it looks cleaner to just change the target.
+    let target = if target == "aarch64-apple-ios" {
+        "arm64-apple-ios"
+    } else {
+        target
+    };
+}
+
+fn main() {
+    let target = "aarch64-apple-ios-sim";
+    println!("TARGET: {}", target);
+    if !target.contains("apple-ios") {
+        panic!("uikit-sys requires the ios target");
+    }
+
+    let directory = sdk_path(&target).ok();
+    build(directory.as_ref().map(String::as_ref), &target);
+}
