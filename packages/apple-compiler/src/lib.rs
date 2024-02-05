@@ -1,6 +1,7 @@
 use compiler::Compiler;
 use parser::ast;
 
+pub mod bindings;
 pub mod platform_build;
 pub struct AppleElpCompiler {}
 
