@@ -2,7 +2,7 @@ import re
 import json
 
 
-callback_pattern = re.compile(r"\((\(.*\)*)\s*->(.*)\)", re.MULTILINE | re.DOTALL)
+callback_pattern = re.compile(r"\(?(\(.*\)*)\s*->(.*)\)?", re.MULTILINE | re.DOTALL)
 
 
 def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_output_file, kotlin_output_file):
@@ -27,7 +27,6 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
 
         # Generate Kotlin function body
         kotlin_function_body = " : @Composable {\n"
-        kotlin_function_body += f"\t// Your Jetpack Compose code for {composable_name} goes here\n"
         kotlin_function_body += "}\n"
 
         # Combine signature and body for Kotlin function
@@ -38,13 +37,17 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
         rust_binding = "#[no_mangle]\n"
         rust_binding += f"pub extern \"system\" fn Java_{package_name.replace('.', '_')}_{composable_name}_nativeMethod<'local>("
         rust_binding += "env: JNIEnv<'local>, _class: JClass<'local>, "
+
+        jni_args = []
         for arg in arguments:
             arg_name = arg['name']
             arg_type = arg['type']
-            if arg_type.startswith("@Composable"):
-                # If the argument is a Composable, construct a Composable struct
-                rust_binding += f"{arg_name}_name: JString<'local>, "
-                rust_binding += f"{arg_name}_args: JString<'local>, "
+
+            jni_args.append(f"{arg_name}.to_jni_value()")
+            if arg_type.strip().startswith("@Composable"):
+                arg_type = "Composable"
+                rust_binding += f"{arg_name}: {arg_type}, "
+                continue
             else:
                 if callback_pattern.match(arg_type) is not None:
                     out_types = []
@@ -53,23 +56,21 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
                         cb_args, return_type = found_type
                         types = re.compile(r"(\s*\w+)", re.DOTALL).findall(cb_args)
                         for type_raw in types:
-                            out_types.append('"' + type_raw.strip() + '"')
-
-                    arg_type = "KotlinCallback::new(vec![" + ", ".join(out_types) + f"], \"{return_type.strip()}\")"
-                rust_binding += f"{arg_name}: {arg_type}, "
+                            out_types.append(type_raw.strip())
+                    arg_type = "fn(" + ", ".join(out_types) + ") -> " + return_type.strip().rstrip(")?")
+                    rust_binding += f"{arg_name}: {arg_type}, "
+                else:
+                    rust_binding += f"{arg_name}: {arg_type}, "
 
         rust_binding = rust_binding.rstrip(', ')
         rust_binding += ") -> jobject {\n"
-        rust_binding += "\tlet jvm = get_jvm(env);\n"
-        rust_binding += f"\tlet {composable_name}_composable = if {composable_name}_args.is_null() {{\n"
-        rust_binding += f"\t\tComposable::new(env.get_string({composable_name}_name).expect(\"Couldn't get Java string\").to_str().unwrap(), vec![])\n"
-        rust_binding += "\t} else {\n"
-        rust_binding += f"\t\tlet args_str = env.get_string({composable_name}_args).expect(\"Couldn't get Java string\").to_str().unwrap();\n"
-        rust_binding += "\t\tlet args_json: Vec<Composable> = serde_json::from_str(args_str).expect(\"Couldn't parse JSON\");\n"
-        rust_binding += "\t\targs_json[0].clone()\n"
-        rust_binding += "\t};\n"
-        rust_binding += "\t// Call JNI function with the Composable instance\n"
-        rust_binding += f"\tcall_jni_function(&jvm, &{composable_name}_composable);\n"
+        rust_binding += "\tlet args = vec![\n\t\t"+",\n\t\t".join(jni_args)+"\n\t];\n\n"
+        rust_binding += "\treturn call_composable_function(\n"
+        rust_binding += "\t\tenv,\n"
+        rust_binding += "\t\t_class,\n"
+        rust_binding += "\t\tcomposable_name,\n"
+        rust_binding += "\t\targs,\n"
+        rust_binding += "\t);\n"
         rust_binding += "}\n\n"
         rust_bindings.append(rust_binding)
 
@@ -81,10 +82,8 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
 
     # Write Rust JNI bindings to file
     with open(rust_output_file, 'w') as rust_file:
-        rust_file.write("use jni::*;\n")  # Add jni crate import
-        rust_file.write("use serde_json;\n")  # Add serde_json crate import
-        rust_file.write("use std::ptr;\n\n")  # Add std::ptr import
-        rust_file.write("use crate::types::{self, get_jvm, Unit};\n\n")  # Add std::ptr import
+        rust_file.write("use jni::{objects::JClass,sys::jobject,JavaVM,JNIEnv};\n\n")  # Add std::ptr import
+        rust_file.write("use crate::types::{self, call_composable_function, Unit, Composable};\n\n")  # Add std::ptr import
         rust_file.write("\n".join(rust_bindings))
 
     print(f"Rust JNI bindings and Kotlin functions returning Jetpack Compose composables have been generated and written to '{rust_output_file}' and '{kotlin_output_file}'.")
