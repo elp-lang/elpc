@@ -9,33 +9,38 @@ paths = [
     "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3"
 ]
 
-pattern = re.compile(r"@Composable\s*fun\s+(\w+)\s*\(\s*([^{]*)", re.MULTILINE)
+# Capture the function header.
+pattern = re.compile(r"@Composable\s*fun\s*(\w+)\s*\(((\s*(\w+):(.*))*)\s*\)")
+
+# Capture each argument.
+arg_pattern = re.compile(r"^\s*(\w+):\s*(.*)$", re.MULTILINE)
 
 
-def extract_arguments(args):
+def extract_arguments(args: str):
     arguments = []
-    for arg in args.split(","):
-        # Split the argument into name and type
-        arg_parts = arg.strip().split(":")
-        arg_name = arg_parts[0].strip()
-        if len(arg_parts) > 1:
-            # Join the parts after the first one to capture the full type
-            arg_type = ":".join(arg_parts[1:]).strip()
-        else:
-            arg_type = None
+    params = arg_pattern.findall(args)
+    for arg in params:
+        arg_name, arg_type = arg
+        arg_default = arg_type.split("=")
+        arg_type = arg_default[0].strip()
 
         if arg_name is not None:
-            arguments.append({"name": arg_name, "type": arg_type})
+            arguments.append({
+                "name": arg_name,
+                "type": arg_type.rstrip("?").rstrip(","),
+                "optional": arg_type.endswith("?") or len(arg_default) > 1,
+            })
     return arguments
 
 
 def extract_composables_from_file(file_path):
+    print(f"reading '{file_path}'")
     result = {}
     with open(file_path, "r") as file:
         content = file.read()
-        matches = pattern.findall(content)
+        matches = pattern.finditer(content)
         for match in matches:
-            name, args = match
+            name, args, *_ = match.groups()
             args = extract_arguments(args)
             result[name] = {"arguments": args}
     return result
@@ -50,7 +55,7 @@ def extract_composables_from_directories(paths):
                     file_path = os.path.join(root, file_name)
                     result = extract_composables_from_file(file_path)
                     for name, props in result.items():
-                        combined_result.setdefault(name, []).append(props)
+                        combined_result = {**combined_result, name: props}
     return combined_result
 
 
@@ -58,4 +63,7 @@ def extract_composables_from_directories(paths):
 composables = extract_composables_from_directories(paths)
 
 # Output the result as JSON
-print(json.dumps(composables, indent=4))
+as_json = json.dumps(composables, indent=4)
+
+with open('composables.json', 'w') as f:
+    f.write(as_json)
