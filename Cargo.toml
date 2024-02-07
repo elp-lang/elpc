@@ -4,4 +4,5 @@ resolver = "2"
 members = [
     "packages/parser",
     "packages/elpc",
+	"packages/android-compiler/rust"
 ]

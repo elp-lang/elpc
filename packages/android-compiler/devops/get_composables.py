@@ -35,27 +35,26 @@ def extract_arguments(args: str):
 
 def extract_composables_from_file(file_path):
     print(f"reading '{file_path}'")
-    result = {}
+    results = []
     with open(file_path, "r") as file:
         content = file.read()
         matches = pattern.finditer(content)
         for match in matches:
             name, args, *_ = match.groups()
             args = extract_arguments(args)
-            result[name] = {"arguments": args}
-    return result
+            results.append({"name": name, "arguments": args})
+    return results
 
 
 def extract_composables_from_directories(paths):
-    combined_result = {}
+    combined_result = []
     for path in paths:
         for root, _, files in os.walk(path):
             for file_name in files:
                 if file_name.endswith(".kt"):
                     file_path = os.path.join(root, file_name)
-                    result = extract_composables_from_file(file_path)
-                    for name, props in result.items():
-                        combined_result = {**combined_result, name: props}
+                    results = extract_composables_from_file(file_path)
+                    combined_result.extend(results)
     return combined_result
 
 
