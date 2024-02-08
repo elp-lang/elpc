@@ -5,7 +5,12 @@ import json
 callback_pattern = re.compile(r"\(?(\(.*\)*)\s*->(.*)\)?", re.MULTILINE | re.DOTALL)
 
 
-def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_output_file, kotlin_output_file):
+def generate_jni_bindings_and_kotlin_composables(
+    json_file,
+    package_name,
+    rust_output_file,
+    kotlin_output_file
+):
     with open(json_file, 'r') as f:
         composables = json.load(f)
 
@@ -13,7 +18,7 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
     kotlin_functions = []
 
     for composable in composables:
-        composable_name = composable['name']
+        composable_name = composable['function_name']
         arguments = composable.get('arguments', [])
 
         # Generate Kotlin function signature
@@ -34,7 +39,8 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
         kotlin_functions.append(kotlin_function)
 
         # Generate Rust JNI binding
-        rust_binding = "#[no_mangle]\n"
+        rust_binding = f"// Source {composable.get('file')}\n"
+        rust_binding += "#[no_mangle]\n"
         rust_binding += f"pub extern \"system\" fn Java_{package_name.replace('.', '_')}_{composable_name}_nativeMethod<'local>("
         rust_binding += "env: JNIEnv<'local>, _class: JClass<'local>, "
 
@@ -42,6 +48,7 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
         for arg in arguments:
             arg_name = arg['name']
             arg_type = arg['type']
+            print(f"Arg type: {arg_type}")
 
             jni_args.append(f"{arg_name}.to_jni_value()")
             if arg_type.strip().startswith("@Composable"):
@@ -89,7 +96,7 @@ def generate_jni_bindings_and_kotlin_composables(json_file, package_name, rust_o
     print(f"Rust JNI bindings and Kotlin functions returning Jetpack Compose composables have been generated and written to '{rust_output_file}' and '{kotlin_output_file}'.")
 
 
-json_file = 'composables.json'
+json_file = 'composable_functions.json'
 package_name = 'com.elp'
 rust_output_file = '../rust/src/composables.rs'
 kotlin_output_file = 'kotlin_composables.kt'

@@ -13,7 +13,7 @@ paths = [
 pattern = re.compile(r"@Composable\s*fun\s*(\w+)\s*\(((\s*(\w+):(.*))*)\s*\)")
 
 # Capture each argument.
-arg_pattern = re.compile(r"^\s*(\w+):\s*(.*)$", re.MULTILINE)
+arg_pattern = re.compile(r"\s*(\w+)\s*:(.+?)(?:,|$)", re.MULTILINE | re.DOTALL)
 
 
 def extract_arguments(args: str):
@@ -41,6 +41,7 @@ def extract_composables_from_file(file_path):
         matches = pattern.finditer(content)
         for match in matches:
             name, args, *_ = match.groups()
+            print(args)
             args = extract_arguments(args)
             results.append({"name": name, "arguments": args})
     return results
