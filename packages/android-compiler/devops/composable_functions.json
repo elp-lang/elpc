@@ -454,6 +454,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "containerColor",
@@ -744,6 +749,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TimePicker.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TimePicker.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "clockDialColor",
@@ -814,11 +824,6 @@
                 "name": "timeSelectorUnselectedContentColor",
                 "type": "Color",
                 "optional": true
-            },
-            {
-                "name": "defaultTimePickerColors",
-                "type": "TimePickerColors\n        get(",
-                "optional": false
             }
         ]
     },
@@ -897,6 +902,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Menu.kt",
+        "function_name": "itemColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Menu.kt",
@@ -1035,6 +1045,11 @@
                 "optional": true
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Slider.kt",
+        "function_name": "colors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Slider.kt",
@@ -1268,23 +1283,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
                 "optional": false
-            },
-            {
-                "name": "also",
-                "type": "* [Surface]",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "ElevatedCard",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -1323,16 +1329,17 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "OutlinedCard",
+        "arguments": [
             {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "also",
-                "type": "* [Surface]",
+                "name": "modifier",
+                "type": "Modifier",
                 "optional": true
             },
             {
@@ -1358,23 +1365,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
                 "optional": false
-            },
-            {
-                "name": "also",
-                "type": "* [Surface]",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "OutlinedCard",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -1418,38 +1416,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "shape",
-                "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "pressedElevation",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "focusedElevation",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "hoveredElevation",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "draggedElevation",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "disabledElevation",
-                "type": "Dp",
-                "optional": true
-            },
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "cardElevation",
+        "arguments": [
             {
                 "name": "defaultElevation",
                 "type": "Dp",
@@ -1510,6 +1484,42 @@
                 "type": "Dp",
                 "optional": true
             },
+            {
+                "name": "defaultElevation",
+                "type": "Dp",
+                "optional": true
+            },
+            {
+                "name": "pressedElevation",
+                "type": "Dp",
+                "optional": true
+            },
+            {
+                "name": "focusedElevation",
+                "type": "Dp",
+                "optional": true
+            },
+            {
+                "name": "hoveredElevation",
+                "type": "Dp",
+                "optional": true
+            },
+            {
+                "name": "draggedElevation",
+                "type": "Dp",
+                "optional": true
+            },
+            {
+                "name": "disabledElevation",
+                "type": "Dp",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "cardColors",
+        "arguments": [
             {
                 "name": "containerColor",
                 "type": "Color",
@@ -1536,6 +1546,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "elevatedCardColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
@@ -1567,6 +1582,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
+        "function_name": "outlinedCardColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Card.kt",
@@ -1718,18 +1738,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
                 "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "FilledTonalButton",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -1778,18 +1794,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
                 "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "OutlinedButton",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -1838,18 +1850,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
                 "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "TextButton",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -1898,11 +1906,22 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "buttonColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "buttonColors",
+        "arguments": [
             {
-                "name": "shape",
-                "type": "Composable",
+                "name": "containerColor",
+                "type": "Color",
                 "optional": true
             },
             {
@@ -1926,6 +1945,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "elevatedButtonColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
@@ -1961,6 +1985,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
         "function_name": "filledTonalButtonColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "filledTonalButtonColors",
         "arguments": [
             {
                 "name": "containerColor",
@@ -1992,6 +2021,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
         "function_name": "outlinedButtonColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "outlinedButtonColors",
         "arguments": [
             {
                 "name": "containerColor",
@@ -2019,6 +2053,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
+        "function_name": "textButtonColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Button.kt",
@@ -2133,31 +2172,6 @@
             {
                 "name": "outlinedButtonBorder",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "defaultElevation",
-                "type": "Dp",
-                "optional": false
-            },
-            {
-                "name": "pressedElevation",
-                "type": "Dp",
-                "optional": false
-            },
-            {
-                "name": "focusedElevation",
-                "type": "Dp",
-                "optional": false
-            },
-            {
-                "name": "hoveredElevation",
-                "type": "Dp",
-                "optional": false
-            },
-            {
-                "name": "disabledElevation",
-                "type": "Dp",
                 "optional": false
             }
         ]
@@ -2197,6 +2211,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/NavigationBar.kt",
+        "function_name": "colors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/NavigationBar.kt",
@@ -2407,6 +2426,11 @@
                 "optional": true
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Checkbox.kt",
+        "function_name": "colors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Checkbox.kt",
@@ -2947,6 +2971,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "focusedTextColor",
@@ -3198,7 +3227,13 @@
                 "name": "shape",
                 "type": "Shape",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
+        "function_name": "OutlinedBorderContainerBox",
+        "arguments": [
             {
                 "name": "enabled",
                 "type": "Boolean",
@@ -3233,67 +3268,13 @@
                 "name": "unfocusedBorderThickness",
                 "type": "Dp",
                 "optional": true
-            },
-            {
-                "name": "start",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "end",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "top",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "bottom",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "start",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "top",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "end",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "bottom",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "start",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "top",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "end",
-                "type": "Dp",
-                "optional": true
-            },
-            {
-                "name": "bottom",
-                "type": "Dp",
-                "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
+        "function_name": "textFieldColors",
+        "arguments": [
             {
                 "name": "focusedTextColor",
                 "type": "Color",
@@ -4276,6 +4257,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/TextFieldDefaults.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "focusedTextColor",
@@ -5087,7 +5073,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5128,7 +5114,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5174,7 +5160,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5220,7 +5206,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5266,7 +5252,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5317,7 +5303,7 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
+                "optional": false
             }
         ]
     },
@@ -5650,6 +5636,11 @@
                 "optional": true
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/NavigationRail.kt",
+        "function_name": "colors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/NavigationRail.kt",
@@ -6147,27 +6138,7 @@
             },
             {
                 "name": "pos",
-                "type": "Float)",
-                "optional": true
-            },
-            {
-                "name": "open",
-                "type": "Boolean",
-                "optional": false
-            },
-            {
-                "name": "onClose",
-                "type": "fn() -> Unit",
-                "optional": false
-            },
-            {
-                "name": "fraction",
-                "type": "fn() -> Float",
-                "optional": false
-            },
-            {
-                "name": "color",
-                "type": "Color",
+                "type": "Float",
                 "optional": false
             }
         ]
@@ -6478,6 +6449,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "activeContainerColor",
@@ -6729,17 +6705,13 @@
                 "name": "scrollBehavior",
                 "type": "TopAppBarScrollBehavior",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "like",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "CenterAlignedTopAppBar",
+        "arguments": [
             {
                 "name": "title",
                 "type": "Composable",
@@ -6902,15 +6874,16 @@
                 "name": "windowInsets",
                 "type": "WindowInsets",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "BottomAppBar",
+        "arguments": [
             {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "also",
-                "type": "[Surface]",
+                "name": "actions",
+                "type": "Composable",
                 "optional": false
             },
             {
@@ -6992,18 +6965,14 @@
             {
                 "name": "content",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "also",
-                "type": "[Surface]",
                 "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "BottomAppBar",
+        "arguments": [
             {
                 "name": "modifier",
                 "type": "Modifier",
@@ -7045,6 +7014,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "topAppBarColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
@@ -7114,6 +7088,22 @@
             {
                 "name": "windowInsets",
                 "type": "Composable",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "centerAlignedTopAppBarColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "centerAlignedTopAppBarColors",
+        "arguments": [
+            {
+                "name": "containerColor",
+                "type": "Color",
                 "optional": true
             },
             {
@@ -7142,6 +7132,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "mediumTopAppBarColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
@@ -7178,6 +7173,11 @@
                 "optional": false
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
+        "function_name": "largeTopAppBarColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/AppBar.kt",
@@ -8079,6 +8079,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Switch.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Switch.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "checkedThumbColor",
@@ -8206,6 +8211,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/RadioButton.kt",
         "function_name": "colors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/RadioButton.kt",
+        "function_name": "colors",
         "arguments": [
             {
                 "name": "selectedColor",
@@ -8280,6 +8290,11 @@
                 "optional": true
             }
         ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Tooltip.kt",
+        "function_name": "richTooltipColors",
+        "arguments": []
     },
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Tooltip.kt",
@@ -8392,22 +8407,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "AssistChip",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "AssistChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -8462,22 +8468,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "ElevatedAssistChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -8532,22 +8529,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "ElevatedAssistChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -8602,22 +8590,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "FilterChip",
+        "arguments": [
             {
                 "name": "selected",
                 "type": "Boolean",
@@ -8677,22 +8656,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "ElevatedFilterChip",
+        "arguments": [
             {
                 "name": "selected",
                 "type": "Boolean",
@@ -8752,22 +8722,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "InputChip",
+        "arguments": [
             {
                 "name": "selected",
                 "type": "Boolean",
@@ -8888,22 +8849,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "SuggestionChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -8953,22 +8905,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "ElevatedSuggestionChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -9018,22 +8961,13 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//m3",
-                "optional": true
-            },
-            {
-                "name": "https",
-                "type": "//developer",
-                "optional": false
-            },
-            {
-                "name": "icon",
-                "type": "* @sample androidx",
-                "optional": false
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "ElevatedSuggestionChip",
+        "arguments": [
             {
                 "name": "onClick",
                 "type": "fn() -> Unit",
@@ -9083,7 +9017,18 @@
                 "name": "interactionSource",
                 "type": "MutableInteractionSource",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "assistChipColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "assistChipColors",
+        "arguments": [
             {
                 "name": "containerColor",
                 "type": "Color",
@@ -9199,7 +9144,13 @@
                 "name": "borderWidth",
                 "type": "Dp",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "elevatedAssistChipColors",
+        "arguments": [
             {
                 "name": "containerColor",
                 "type": "Color",
@@ -9284,6 +9235,22 @@
             {
                 "name": "shape",
                 "type": "Composable",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "filterChipColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "filterChipColors",
+        "arguments": [
+            {
+                "name": "containerColor",
+                "type": "Color",
                 "optional": true
             },
             {
@@ -9427,6 +9394,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
         "function_name": "elevatedFilterChipColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "elevatedFilterChipColors",
         "arguments": [
             {
                 "name": "containerColor",
@@ -9532,8 +9504,19 @@
             {
                 "name": "shape",
                 "type": "Composable",
-                "optional": true
-            },
+                "optional": false
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "inputChipColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "inputChipColors",
+        "arguments": [
             {
                 "name": "containerColor",
                 "type": "Color",
@@ -9685,6 +9668,11 @@
     {
         "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
         "function_name": "suggestionChipColors",
+        "arguments": []
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "suggestionChipColors",
         "arguments": [
             {
                 "name": "containerColor",
@@ -9780,7 +9768,13 @@
                 "name": "borderWidth",
                 "type": "Dp",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Chip.kt",
+        "function_name": "elevatedSuggestionChipColors",
+        "arguments": [
             {
                 "name": "containerColor",
                 "type": "Color",
@@ -9855,77 +9849,7 @@
             {
                 "name": "shape",
                 "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "onClick",
-                "type": "fn() -> Unit",
                 "optional": false
-            },
-            {
-                "name": "enabled",
-                "type": "Boolean",
-                "optional": false
-            },
-            {
-                "name": "label",
-                "type": "Composable",
-                "optional": false
-            },
-            {
-                "name": "labelTextStyle",
-                "type": "TextStyle",
-                "optional": false
-            },
-            {
-                "name": "labelColor",
-                "type": "Color",
-                "optional": false
-            },
-            {
-                "name": "leadingIcon",
-                "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "trailingIcon",
-                "type": "Composable",
-                "optional": true
-            },
-            {
-                "name": "shape",
-                "type": "Shape",
-                "optional": false
-            },
-            {
-                "name": "colors",
-                "type": "ChipColors",
-                "optional": false
-            },
-            {
-                "name": "elevation",
-                "type": "ChipElevation",
-                "optional": true
-            },
-            {
-                "name": "border",
-                "type": "BorderStroke",
-                "optional": true
-            },
-            {
-                "name": "minHeight",
-                "type": "Dp",
-                "optional": false
-            },
-            {
-                "name": "paddingValues",
-                "type": "PaddingValues",
-                "optional": false
-            },
-            {
-                "name": "interactionSource",
-                "type": "MutableInteractionSource",
-                "optional": true
             }
         ]
     },
@@ -10195,7 +10119,13 @@
                 "name": "strokeCap",
                 "type": "StrokeCap",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ProgressIndicator.kt",
+        "function_name": "LinearProgressIndicator",
+        "arguments": [
             {
                 "name": "progress",
                 "type": "Float",
@@ -10215,7 +10145,13 @@
                 "name": "trackColor",
                 "type": "Color",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ProgressIndicator.kt",
+        "function_name": "LinearProgressIndicator",
+        "arguments": [
             {
                 "name": "modifier",
                 "type": "Modifier",
@@ -10230,31 +10166,6 @@
                 "name": "trackColor",
                 "type": "Color",
                 "optional": true
-            },
-            {
-                "name": "startFraction",
-                "type": "Float",
-                "optional": false
-            },
-            {
-                "name": "endFraction",
-                "type": "Float",
-                "optional": false
-            },
-            {
-                "name": "color",
-                "type": "Color",
-                "optional": false
-            },
-            {
-                "name": "strokeWidth",
-                "type": "Float",
-                "optional": false
-            },
-            {
-                "name": "strokeCap",
-                "type": "StrokeCap",
-                "optional": false
             }
         ]
     },
@@ -10399,7 +10310,13 @@
                 "name": "strokeCap",
                 "type": "StrokeCap",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ProgressIndicator.kt",
+        "function_name": "CircularProgressIndicator",
+        "arguments": [
             {
                 "name": "progress",
                 "type": "Float",
@@ -10419,7 +10336,13 @@
                 "name": "strokeWidth",
                 "type": "Dp",
                 "optional": true
-            },
+            }
+        ]
+    },
+    {
+        "file": "/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/ProgressIndicator.kt",
+        "function_name": "CircularProgressIndicator",
+        "arguments": [
             {
                 "name": "modifier",
                 "type": "Modifier",
@@ -10434,26 +10357,6 @@
                 "name": "strokeWidth",
                 "type": "Dp",
                 "optional": true
-            },
-            {
-                "name": "startAngle",
-                "type": "Float",
-                "optional": false
-            },
-            {
-                "name": "sweep",
-                "type": "Float",
-                "optional": false
-            },
-            {
-                "name": "color",
-                "type": "Color",
-                "optional": false
-            },
-            {
-                "name": "stroke",
-                "type": "Stroke",
-                "optional": false
             }
         ]
     },

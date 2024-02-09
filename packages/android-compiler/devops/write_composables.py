@@ -3,6 +3,7 @@ import re
 import json
 
 def parse_kotlin_arguments(arguments):
+    print(f"FUCK YOU {arguments}")
     arg_pattern = r'(?P<arg_name>\w+)\s*:\s*(?P<arg_type>[^,]+)(?:\s*=\s*(?P<default_value>[^,]+))?(?:,|$)'
     matches = re.finditer(arg_pattern, arguments)
     parsed_arguments = []
@@ -55,7 +56,7 @@ def parse_kotlin_file(filename):
         content = file.read()
 
     composable_functions = []
-    function_declaration_pattern = r'@Composable\s+fun\s+(?P<function_name>\w+)\((?P<arguments>.*?)\)\s*\{'
+    function_declaration_pattern = r'@Composable\s+fun\s+(?P<function_name>\w+)\((?P<arguments>.*?)\)\s*[{=]'
     matches = re.finditer(function_declaration_pattern, content, re.DOTALL)
     for match in matches:
         function_name = match.group('function_name')
@@ -64,21 +65,20 @@ def parse_kotlin_file(filename):
         arguments = re.sub(r'<[^<>]*>', lambda x: x.group(0).replace(',', '__comma__'), arguments)
         parsed_arguments = parse_kotlin_arguments(arguments)
         for i, arg in enumerate(parsed_arguments):
-            # Check if the argument is a function type with optional parentheses
             if re.match(r'^\(\s*[^)]*\)?\s*->', arg['type']):
-                # Transform the function signature
                 arg['type'] = convert_function_callback(arg['type'])
         composable_functions.append({
             "file": filename,
             "function_name": function_name,
             "arguments": [{
-                "name": arg['name'], 
+                "name": arg['name'],
                 "type": convert_to_generic_composable(arg['type']).replace("__comma__", ","),
                 "optional": arg['optional']
             } for arg in parsed_arguments]
         })
 
     return composable_functions
+
 
 def process_folders(folders):
     all_composable_functions = []
@@ -87,9 +87,11 @@ def process_folders(folders):
             for file in files:
                 if file.endswith(".kt"):
                     file_path = os.path.join(root, file)
+                    print(f"reading: '{file_path}'")
                     composable_functions = parse_kotlin_file(file_path)
                     all_composable_functions.extend(composable_functions)
     return all_composable_functions
+
 
 def main():
     folders_to_walk = ["/Users/dave/www/junk/androidx/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3"]  # List of folders to walk
