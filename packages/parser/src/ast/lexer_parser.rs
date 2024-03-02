@@ -113,6 +113,7 @@ pub enum Expression {
     FunctionCall(Identifier, Vec<Argument>),
     IfStatement(Box<IfStatement>),
     Block(Vec<Expression>),
+    VariableDeclaration(Box<VariableDeclaration>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -131,7 +132,7 @@ pub struct Argument {
 
 #[derive(Debug, PartialEq)]
 pub struct Block {
-    pub statements: Vec<AstNode>,
+    pub expressions: Vec<Expression>,
 }
 
 #[derive(Debug, PartialEq)]

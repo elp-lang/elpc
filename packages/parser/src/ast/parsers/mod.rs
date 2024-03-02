@@ -1,3 +1,4 @@
+pub mod block;
 pub mod enums;
 pub mod expression;
 pub mod funcs;
@@ -6,4 +7,3 @@ pub mod interface;
 pub mod string_literals;
 pub mod type_expression;
 pub mod variable;
-
