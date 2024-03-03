@@ -1,11 +1,13 @@
 use crate::ast::{
-    lexer::{AccessModifier, TokenType},
+    lexer::{AccessModifier, Keyword, Symbol, TokenType},
     lexer_parser::{Identifier, Parser, VariableDeclaration},
     syntax_error::SyntaxError,
 };
 
+use super::{expression::parse_expression, type_expression::parse_type_expression};
+
 pub fn parse_variable(parser: &mut Parser) -> Result<VariableDeclaration, SyntaxError> {
-    let declaration = VariableDeclaration {
+    let mut declaration = VariableDeclaration {
         ident: Identifier {
             name: "".into(),
             immutable: true,
@@ -17,7 +19,33 @@ pub fn parse_variable(parser: &mut Parser) -> Result<VariableDeclaration, Syntax
 
     while let Some(token) = parser.consume() {
         match &token.token_type {
-            TokenType::Keyword(Keyword::Const) => {}
+            TokenType::Keyword(Keyword::Const) => {
+                declaration.ident.immutable = true;
+            }
+            TokenType::Keyword(Keyword::Var) => {
+                declaration.ident.immutable = false;
+            }
+            TokenType::Ident(val) => {
+                declaration.ident.name = val.to_string();
+            }
+            TokenType::Symbol(Symbol::Colon) => match parse_type_expression(parser) {
+                Ok(type_info_token) => {
+                    declaration.r#type = type_info_token;
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            },
+            TokenType::Symbol(Symbol::SingleEqual) => match parse_expression(parser) {
+                Ok(expression) => {
+                    declaration.value = Some(expression);
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            },
+            TokenType::Whitespace(_) => continue,
+            TokenType::EOF => continue,
             _ => {
                 return Err(SyntaxError::UnexpectedToken(token));
             }
@@ -31,7 +59,7 @@ pub fn parse_variable(parser: &mut Parser) -> Result<VariableDeclaration, Syntax
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{Identifier, Parser, Type, VariableDeclaration},
+        lexer_parser::{Expression, Identifier, Literal, Parser, Type, VariableDeclaration},
         testing::Test,
     };
     use pretty_assertions::assert_eq;
@@ -42,15 +70,13 @@ mod tests {
     fn test_variable_declarations() {
         let tests: Vec<Test<&'static str, VariableDeclaration>> = vec![
             Test {
-                name: "basic",
-                input: "{
-                const NAME: string
-            }",
+                name: "const declaration",
+                input: "const constant: string",
                 expected: VariableDeclaration {
                     ident: Identifier {
                         immutable: true,
                         access_modifier: AccessModifier::Pub,
-                        name: "NAME".to_string(),
+                        name: "constant".to_string(),
                     },
                     r#type: Type::TypeName(Identifier {
                         immutable: true,
@@ -61,15 +87,13 @@ mod tests {
                 },
             },
             Test {
-                name: "basic",
-                input: "{
-                let NAME: string
-            }",
+                name: "mutable declaration",
+                input: "var mutable: string",
                 expected: VariableDeclaration {
                     ident: Identifier {
                         immutable: false,
                         access_modifier: AccessModifier::Pub,
-                        name: "NAME".to_string(),
+                        name: "mutable".to_string(),
                     },
                     r#type: Type::TypeName(Identifier {
                         immutable: true,
@@ -80,22 +104,41 @@ mod tests {
                 },
             },
             Test {
-                name: "basic",
-                input: "{
-                let NAME = \"hello world\"
-            }",
+                name: "constant binding",
+                input: "const immutable_binding = \"hello world\"",
                 expected: VariableDeclaration {
                     ident: Identifier {
-                        immutable: false,
+                        immutable: true,
                         access_modifier: AccessModifier::Pub,
-                        name: "NAME".to_string(),
+                        name: "mutable_binding".to_string(),
                     },
                     r#type: Type::TypeName(Identifier {
                         immutable: true,
                         access_modifier: AccessModifier::Pub,
                         name: "string".to_string(),
                     }),
-                    value: None,
+                    value: Some(Expression::Literal(Literal::String(
+                        "hello world".to_string(),
+                    ))),
+                },
+            },
+            Test {
+                name: "mutable binding",
+                input: "var mutable_binding = \"hello world\"",
+                expected: VariableDeclaration {
+                    ident: Identifier {
+                        immutable: false,
+                        access_modifier: AccessModifier::Pub,
+                        name: "mutable_binding".to_string(),
+                    },
+                    r#type: Type::TypeName(Identifier {
+                        immutable: true,
+                        access_modifier: AccessModifier::Pub,
+                        name: "string".to_string(),
+                    }),
+                    value: Some(Expression::Literal(Literal::String(
+                        "hello world".to_string(),
+                    ))),
                 },
             },
         ];
@@ -104,7 +147,6 @@ mod tests {
             let mut lexer = Lexer::new(test.input.to_string());
             let tokens = lexer.consume_all_tokens();
             let mut parser = Parser::new(tokens);
-            parser.consume();
 
             assert_eq!(parse_variable(&mut parser).unwrap(), test.expected);
         }

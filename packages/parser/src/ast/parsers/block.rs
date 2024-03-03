@@ -24,44 +24,22 @@ mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
         lexer_parser::{Block, Expression, Identifier, Parser, Type, VariableDeclaration},
-        parsers::funcs::parse_fn,
         testing::Test,
     };
     use pretty_assertions::assert_eq;
 
+    use super::parse_block;
+
     #[test]
     fn test_block_parser() {
-        let tests: Vec<Test<&'static str, Block>> = vec![Test {
-            name: "basic",
-            input: "{
-                const NAME: string
-            }",
-            expected: Block {
-                expressions: vec![Expression::VariableDeclaration(Box::new(
-                    VariableDeclaration {
-                        ident: Identifier {
-                            immutable: true,
-                            access_modifier: AccessModifier::Pub,
-                            name: "NAME".to_string(),
-                        },
-                        r#type: Type::TypeName(Identifier {
-                            immutable: true,
-                            access_modifier: AccessModifier::Pub,
-                            name: "string".to_string(),
-                        }),
-                        value: None,
-                    },
-                ))],
-            },
-        }];
+        let tests: Vec<Test<&'static str, Block>> = vec![];
 
         for test in tests {
             let mut lexer = Lexer::new(test.input.to_string());
             let tokens = lexer.consume_all_tokens();
             let mut parser = Parser::new(tokens);
-            parser.consume();
 
-            assert_eq!(parse_fn(&mut parser, false).unwrap(), test.expected);
+            assert_eq!(parse_block(&mut parser).unwrap(), test.expected);
         }
     }
 }

@@ -1,16 +1,91 @@
 use crate::ast::{
-    lexer_parser::{Expression, Parser},
+    lexer::{Keyword, Symbol, TokenType},
+    lexer_parser::{Expression, Literal, Parser},
     syntax_error::SyntaxError,
 };
 
-pub fn parse_expression(parser: &mut Parser) -> Result<Option<Expression>, SyntaxError> {
-    let expression: Option<Expression> = None;
+use super::{
+    funcs::parse_fn, interface::parse_interface_declaration, literals::parse_literal,
+    variable::parse_variable,
+};
 
+// An Expression can be any of the following types of code:
+//   * FunctionCall
+//   * Function
+//   * Literal
+//   * Interface
+//   * Enum
+//   * Import
+//   * Variable
+pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> {
     while let Some(token) = parser.consume() {
-        {
-            return Err(SyntaxError::UnexpectedToken(token.clone()));
+        match &token.token_type {
+            TokenType::Keyword(Keyword::Interface) => {
+                parser.unconsume();
+                match parse_interface_declaration(parser) {
+                    Ok(interface) => return Ok(Expression::Interface(interface)),
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            TokenType::Keyword(Keyword::Fn) => {
+                parser.unconsume();
+                match parse_fn(parser) {
+                    Ok(r#fn) => return Ok(Expression::Function(r#fn)),
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            TokenType::Keyword(Keyword::Const) | TokenType::Keyword(Keyword::Var) => {
+                match parse_variable(parser) {
+                    Ok(var) => {
+                        return Ok(Expression::VariableDeclaration(Box::new(var)));
+                    }
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            TokenType::Symbol(Symbol::DoubleSpeechMark) => {
+                match parse_literal(parser, Symbol::DoubleSpeechMark) {
+                    Ok(literal) => {
+                        return Ok(Expression::Literal(literal));
+                    }
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            TokenType::Symbol(Symbol::SingleSpeechMark) => {
+                match parse_literal(parser, Symbol::SingleSpeechMark) {
+                    Ok(literal) => {
+                        return Ok(Expression::Literal(literal));
+                    }
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
+            TokenType::BooleanLiteral(b) => {
+                return Ok(Expression::Literal(Literal::Boolean(*b)));
+            }
+            TokenType::FloatLiteral(f) => {
+                return Ok(Expression::Literal(Literal::Float(*f)));
+            }
+            TokenType::IntegerLiteral(i) => {
+                return Ok(Expression::Literal(Literal::Number(*i)));
+            }
+            TokenType::StringLiteral(str) => {
+                return Ok(Expression::Literal(Literal::String(str.to_string())));
+            }
+            TokenType::Whitespace(_) => continue,
+            _ => {
+                return Err(SyntaxError::UnexpectedToken(token));
+            }
         }
     }
 
-    Ok(expression)
+    Err(SyntaxError::MissingToken("Expression"))
 }

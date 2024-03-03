@@ -4,50 +4,33 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-pub fn parse_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, SyntaxError> {
-    match hint {
-        Symbol::DoubleSpeechMark => {
-            let mut escaped = false;
-            let mut value: String = "".into();
+pub struct LiteralHints {
+    pub starts: Symbol,
+    pub ends: Symbol,
+}
 
-            while let Some(token) = parser.consume() {
-                println!("{:#?}", token);
-                match token.token_type {
-                    TokenType::Symbol(Symbol::DoubleSpeechMark) => {
-                        if escaped {
-                            value += token.value.as_str();
-                            println!("{}", value);
-                            escaped = false;
-                            continue;
-                        } else {
-                            break;
-                        }
-                    }
-                    _ => {
-                        value += token.value.as_str();
-                    }
-                }
-            }
+pub fn parse_literal(parser: &mut Parser, hint: LiteralHints) -> Result<Literal, SyntaxError> {
+    let mut escaped = false;
+    let mut value: String = "".into();
 
-            return Ok(Literal::String(value));
+    while let Some(token) = parser.consume() {
+        if escaped {
+            value += token.value.as_str();
+            escaped = false;
+            continue;
+        } else {
+            break;
         }
-        Symbol::SingleSpeechMark => todo!(),
-        Symbol::OpenParen => todo!(),
-        Symbol::CloseParen => todo!(),
-        Symbol::Colon => todo!(),
-        Symbol::OpenBlock => todo!(),
-        Symbol::CloseBlock => todo!(),
-        Symbol::Period => todo!(),
-        Symbol::Comma => todo!(),
-        Symbol::Other(_) => todo!(),
-    };
+    }
+
+    Ok(Literal::String(value))
 }
 
 #[cfg(test)]
 mod tests {
     use super::parse_literal;
     use crate::ast::{
-        lexer::Lexer,
+        lexer::{Lexer, Symbol},
         lexer_parser::{Literal, Parser},
     };
     use pretty_assertions::assert_eq;
@@ -59,7 +42,7 @@ mod tests {
         let tokens = lexer.consume_all_tokens();
         let mut parser = Parser::new(tokens);
         assert_eq!(
-            parse_literal(&mut parser, crate::ast::lexer::Symbol::DoubleSpeechMark).unwrap(),
+            parse_literal(&mut parser, Symbol::DoubleSpeechMark).unwrap(),
             Literal::String("test".into())
         );
     }

@@ -35,6 +35,7 @@ pub struct Fn {
     pub name: Option<Identifier>,
     pub params: Vec<Parameter>,
     pub returns: Box<Type>,
+    pub block: Option<Box<Block>>,
 }
 
 #[derive(Default, Debug, PartialEq)]
@@ -108,9 +109,9 @@ pub enum Type {
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {
-    Identifier(Identifier),
+    Interface(InterfaceDeclaration),
     Literal(Literal),
-    FunctionCall(Identifier, Vec<Argument>),
+    Function(Fn),
     IfStatement(Box<IfStatement>),
     Block(Vec<Expression>),
     VariableDeclaration(Box<VariableDeclaration>),
@@ -263,7 +264,7 @@ impl Parser {
                         Err(error) => Err(error),
                     }
                 }
-                TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self, false) {
+                TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self) {
                     Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
                     Err(error) => Err(error),
                 },
