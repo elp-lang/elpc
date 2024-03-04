@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{AccessModifier::Pub, Keyword, TokenType},
-    lexer_parser::{Identifier, Parser, Type},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    Identifier, Type,
 };
 
 use super::{enums::parse_enum_declaration, interface::parse_interface_declaration};

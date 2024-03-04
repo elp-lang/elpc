@@ -4,4 +4,6 @@ resolver = "2"
 members = [
     "packages/parser",
     "packages/elpc",
+	"packages/compiler",
+	"packages/apple-compiler"
 ]

@@ -13,7 +13,7 @@ pub fn parse_variable(parser: &mut Parser) -> Result<VariableDeclaration, Syntax
             immutable: true,
             access_modifier: AccessModifier::Pub,
         },
-        r#type: crate::ast::lexer_parser::Type::Void,
+        r#type: Type::Void,
         value: None,
     };
 

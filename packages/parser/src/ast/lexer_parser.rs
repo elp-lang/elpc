@@ -165,6 +165,7 @@ pub struct Identifier {
     pub name: String,
 }
 
+
 pub struct Parser {
     position: usize,
     tokens: Vec<lexer::Token>,

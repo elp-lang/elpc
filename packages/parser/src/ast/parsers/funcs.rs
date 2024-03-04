@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{AccessModifier::Pub, Symbol, TokenType},
-    lexer_parser::{Fn, Identifier, Parameter, Parser, Type},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    Fn, Identifier, Parameter, Type,
 };
 
 use super::{block::parse_block, type_expression::parse_type_expression};
@@ -137,9 +138,10 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{Fn, Identifier, InterfaceProperty, Parser, Type},
+        lexer_parser::Parser,
         parsers::funcs::parse_fn,
         testing::Test,
+        Fn, Identifier, InterfaceDeclaration, InterfaceProperty, Type,
     };
     use pretty_assertions::assert_eq;
 
@@ -182,24 +184,17 @@ mod tests {
                     returns: Box::new(Type::InterfaceType(
                         crate::ast::lexer_parser::InterfaceDeclaration {
                             name: Identifier {
-                                name: "".into(),
+                                name: "first".into(),
                                 immutable: true,
                                 access_modifier: AccessModifier::Pub,
                             },
-                            members: vec![InterfaceProperty {
-                                name: Identifier {
-                                    name: "first".into(),
-                                    immutable: true,
-                                    access_modifier: AccessModifier::Pub,
-                                },
-                                r#type: Type::TypeName(Identifier {
-                                    immutable: true,
-                                    access_modifier: AccessModifier::Pub,
-                                    name: "thing".into(),
-                                }),
-                            }],
-                        },
-                    )),
+                            r#type: Type::TypeName(Identifier {
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                                name: "thing".into(),
+                            }),
+                        }],
+                    })),
                 },
             },
         ];

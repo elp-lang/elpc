@@ -1,7 +1,8 @@
 use crate::ast::{
     lexer::{self, AccessModifier, TokenType},
-    lexer_parser::{Identifier, ImportStatement, ImportStatementMember, Parser},
+    lexer_parser::Parser,
     syntax_error::SyntaxError,
+    Identifier, ImportStatement, ImportStatementMember,
 };
 
 fn parse_import_ident(
