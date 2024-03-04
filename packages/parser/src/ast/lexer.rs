@@ -64,9 +64,10 @@ pub enum TokenType {
     Unknown,
     SOI,
     EOF,
-    LiteralBoolean(bool),
+    BooleanLiteral(bool),
     IntegerLiteral(i64),
     FloatLiteral(f64),
+    StringLiteral(String),
     Keyword(Keyword),
     ReturnType,
     Ident(String),
@@ -81,7 +82,6 @@ impl ToString for TokenType {
             TokenType::Void => "void".into(),
             TokenType::SOI => "SOI (Start Of Input)".into(),
             TokenType::EOF => "EOF (End Of File)".into(),
-            TokenType::LiteralBoolean(_) => "boolean".into(),
             TokenType::Keyword(Keyword::As) => "as".into(),
             TokenType::Keyword(Keyword::Interface) => "interface".into(),
             TokenType::Keyword(Keyword::Enum) => "enum".into(),
@@ -122,6 +122,8 @@ impl ToString for TokenType {
             TokenType::Whitespace(Whitespace::NewLine) => "new line \\n".into(),
             TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
             TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
+            TokenType::BooleanLiteral(_) => "boolean".into(),
+            TokenType::StringLiteral(_) => "string literal".into(),
             TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
             TokenType::FloatLiteral(f) => format!("float '{:e}'", f),
             TokenType::AccessModifier(AccessModifier::Private) => "private".into(),
@@ -203,8 +205,8 @@ impl Lexer {
             value: value.clone(),
             span: (starting_cursor, self.position - 1),
             token_type: match value.clone() {
-                s if s == "true" => TokenType::LiteralBoolean(true),
-                s if s == "false" => TokenType::LiteralBoolean(false),
+                s if s == "true" => TokenType::BooleanLiteral(true),
+                s if s == "false" => TokenType::BooleanLiteral(false),
                 s if s == "pub" => TokenType::AccessModifier(AccessModifier::Pub),
                 s if s == "private" => TokenType::AccessModifier(AccessModifier::Private),
                 s if s == "fn" => TokenType::Keyword(Keyword::Fn),
@@ -232,6 +234,10 @@ impl Lexer {
         while let Some(ch) = self.is_whitespace(self.next()) {
             value.push(ch);
             self.consume();
+
+            if ch == '\n' || ch == '\r' || ch == '\t' {
+                break;
+            }
         }
 
         Token {
