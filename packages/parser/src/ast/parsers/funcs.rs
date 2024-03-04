@@ -9,6 +9,7 @@ use super::{block::parse_block, type_expression::parse_type_expression};
 pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError> {
     let mut param = Parameter {
         name: None,
+        value: None,
         r#type: Type::TypeName(Identifier {
             ..Default::default()
         }),
@@ -157,7 +158,7 @@ mod tests {
                     }),
                     block: None,
                     is_call: false,
-                    is_callable: false,
+                    is_callable: true,
                     params: vec![],
                     returns: Box::new(Type::TypeName(Identifier {
                         immutable: true,
@@ -178,7 +179,7 @@ mod tests {
                     params: vec![],
                     block: None,
                     is_call: false,
-                    is_callable: false,
+                    is_callable: true,
                     returns: Box::new(Type::InterfaceType(
                         crate::ast::lexer_parser::InterfaceDeclaration {
                             name: Identifier {
@@ -228,6 +229,29 @@ pub fn parse_fn_call(parser: &mut Parser) -> Result<Fn, SyntaxError> {
         params: vec![],
         returns: Box::new(Type::Undefined),
     };
+
+    while let Some(token) = parser.consume() {
+        match &token.token_type {
+            TokenType::Ident(name) => {
+                fn_declaration.name = Some(Identifier {
+                    name: name.into(),
+                    access_modifier: Pub,
+                    immutable: true,
+                })
+            }
+            TokenType::Symbol(Symbol::OpenParen) => {}
+            TokenType::Symbol(Symbol::CloseParen) => break,
+            _ => {
+                return Err(SyntaxError::UnexpectedTokenButGotL(
+                    vec![
+                        TokenType::Ident("".into()),
+                        TokenType::Symbol(Symbol::OpenParen),
+                    ],
+                    token.clone(),
+                ));
+            }
+        }
+    }
 
     Ok(fn_declaration)
 }

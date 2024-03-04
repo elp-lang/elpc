@@ -94,6 +94,7 @@ pub enum EnumVariantType {
 #[derive(Default, Debug, PartialEq)]
 pub struct Parameter {
     pub name: Option<Identifier>,
+    pub value: Option<Expression>,
     pub r#type: Type,
 }
 

@@ -83,11 +83,13 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                     }
                 }
             }
-            TokenType::Ident(val) => match parse_ident(parser) {
-                Ok(result) => {}
+            TokenType::Ident(_) => match parse_ident(parser) {
+                Ok(result) => {
+                    return Ok(result);
+                }
                 Err(err) => {
                     return Err(SyntaxError::WrappedWithContextMessage(
-                        "string literal parsing".into(),
+                        "ident parsing".into(),
                         Box::new(err),
                     ));
                 }
