@@ -5,8 +5,8 @@ use crate::ast::{
 };
 
 use super::{
-    funcs::parse_fn, interface::parse_interface_declaration, string_literals::parse_string_literal,
-    variable::parse_variable,
+    funcs::parse_fn, ident::parse_ident, interface::parse_interface_declaration,
+    string_literals::parse_string_literal, variable::parse_variable,
 };
 
 // An Expression can be any of the following types of code:
@@ -38,7 +38,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                     Ok(r#fn) => return Ok(Expression::Function(r#fn)),
                     Err(err) => {
                         return Err(SyntaxError::WrappedWithContextMessage(
-                            "interface parsing".into(),
+                            "function parsing".into(),
                             Box::new(err),
                         ));
                     }
@@ -50,7 +50,10 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                         return Ok(Expression::VariableDeclaration(Box::new(var)));
                     }
                     Err(err) => {
-                        return Err(err);
+                        return Err(SyntaxError::WrappedWithContextMessage(
+                            "variable parsing".into(),
+                            Box::new(err),
+                        ));
                     }
                 }
             }
@@ -60,7 +63,10 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                         return Ok(Expression::Literal(literal));
                     }
                     Err(err) => {
-                        return Err(err);
+                        return Err(SyntaxError::WrappedWithContextMessage(
+                            "string literal parsing".into(),
+                            Box::new(err),
+                        ));
                     }
                 }
             }
@@ -70,10 +76,22 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                         return Ok(Expression::Literal(literal));
                     }
                     Err(err) => {
-                        return Err(err);
+                        return Err(SyntaxError::WrappedWithContextMessage(
+                            "string literal parsing".into(),
+                            Box::new(err),
+                        ));
                     }
                 }
             }
+            TokenType::Ident(val) => match parse_ident(parser) {
+                Ok(result) => {}
+                Err(err) => {
+                    return Err(SyntaxError::WrappedWithContextMessage(
+                        "string literal parsing".into(),
+                        Box::new(err),
+                    ));
+                }
+            },
             TokenType::BooleanLiteral(b) => {
                 return Ok(Expression::Literal(Literal::Boolean(*b)));
             }

@@ -13,7 +13,9 @@ pub fn parse_block(parser: &mut Parser) -> Result<Block, SyntaxError> {
 
     while let Some(token) = parser.consume() {
         match &token.token_type {
+            // When the block closes, we're done.
             TokenType::Symbol(Symbol::CloseBlock) => break,
+            // Try to parse everything as an expression.
             _ => match parse_expression(parser) {
                 Ok(expr) => block_declaration.expressions.push(expr),
                 Err(err) => return Err(err),

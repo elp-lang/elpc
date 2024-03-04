@@ -35,6 +35,7 @@ pub struct Trie {
 pub struct Fn {
     pub name: Option<Identifier>,
     pub is_call: bool,
+    pub is_callable: bool,
     pub params: Vec<Parameter>,
     pub returns: Box<Type>,
     pub block: Option<Box<Block>>,

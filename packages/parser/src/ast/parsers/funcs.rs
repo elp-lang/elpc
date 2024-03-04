@@ -66,6 +66,7 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
             access_modifier: Pub,
         }),
         is_call: false,
+        is_callable: true,
         block: None,
         params: vec![],
         returns: Box::new(Type::Undefined),
@@ -156,6 +157,7 @@ mod tests {
                     }),
                     block: None,
                     is_call: false,
+                    is_callable: false,
                     params: vec![],
                     returns: Box::new(Type::TypeName(Identifier {
                         immutable: true,
@@ -176,6 +178,7 @@ mod tests {
                     params: vec![],
                     block: None,
                     is_call: false,
+                    is_callable: false,
                     returns: Box::new(Type::InterfaceType(
                         crate::ast::lexer_parser::InterfaceDeclaration {
                             name: Identifier {
@@ -210,4 +213,21 @@ mod tests {
             assert_eq!(parse_fn(&mut parser).unwrap(), test.expected);
         }
     }
+}
+
+pub fn parse_fn_call(parser: &mut Parser) -> Result<Fn, SyntaxError> {
+    let mut fn_declaration = Fn {
+        name: Some(Identifier {
+            name: "".into(),
+            immutable: true,
+            access_modifier: Pub,
+        }),
+        is_call: true,
+        is_callable: false,
+        block: None,
+        params: vec![],
+        returns: Box::new(Type::Undefined),
+    };
+
+    Ok(fn_declaration)
 }

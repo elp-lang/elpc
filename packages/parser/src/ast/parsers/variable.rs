@@ -1,5 +1,5 @@
 use crate::ast::{
-    lexer::{AccessModifier, Keyword, Symbol, TokenType},
+    lexer::{AccessModifier, Keyword, Symbol, TokenType, Whitespace},
     lexer_parser::{Identifier, Parser, VariableDeclaration},
     syntax_error::SyntaxError,
 };
@@ -44,7 +44,8 @@ pub fn parse_variable(parser: &mut Parser) -> Result<VariableDeclaration, Syntax
                     return Err(err);
                 }
             },
-            TokenType::Whitespace(_) => continue,
+            TokenType::Whitespace(Whitespace::NewLine) => break,
+            TokenType::Whitespace(..) => continue,
             TokenType::EOF => continue,
             _ => {
                 return Err(SyntaxError::UnexpectedToken(token));

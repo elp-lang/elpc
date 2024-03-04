@@ -234,6 +234,10 @@ impl Lexer {
         while let Some(ch) = self.is_whitespace(self.next()) {
             value.push(ch);
             self.consume();
+
+            if ch == '\n' || ch == '\r' || ch == '\t' {
+                break;
+            }
         }
 
         Token {
