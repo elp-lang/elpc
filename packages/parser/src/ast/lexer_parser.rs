@@ -2,6 +2,7 @@ use crate::ast::lexer::{self, TokenType};
 
 use super::parsers::{
     self, enums::parse_enum_declaration, funcs::parse_fn, string_literals::parse_string_literal,
+    variable::parse_variable,
 };
 
 #[derive(Debug, PartialEq)]
@@ -33,8 +34,11 @@ pub struct Trie {
 #[derive(Debug, PartialEq)]
 pub struct Fn {
     pub name: Option<Identifier>,
+    pub is_call: bool,
+    pub is_callable: bool,
     pub params: Vec<Parameter>,
     pub returns: Box<Type>,
+    pub block: Option<Box<Block>>,
 }
 
 #[derive(Default, Debug, PartialEq)]
@@ -108,11 +112,12 @@ pub enum Type {
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {
-    Identifier(Identifier),
+    Interface(InterfaceDeclaration),
     Literal(Literal),
-    FunctionCall(Identifier, Vec<Argument>),
+    Function(Fn),
     IfStatement(Box<IfStatement>),
     Block(Vec<Expression>),
+    VariableDeclaration(Box<VariableDeclaration>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -131,7 +136,7 @@ pub struct Argument {
 
 #[derive(Debug, PartialEq)]
 pub struct Block {
-    pub statements: Vec<AstNode>,
+    pub expressions: Vec<Expression>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -262,11 +267,18 @@ impl Parser {
                         Err(error) => Err(error),
                     }
                 }
-                TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self, false) {
+                TokenType::Keyword(lexer::Keyword::Fn) => match parse_fn(self) {
                     Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
                     Err(error) => Err(error),
                 },
-                TokenType::Keyword(lexer::Keyword::Var) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Var) => match parse_variable(self) {
+                    Ok(var) => Ok(AstNode::VariableDeclaration(var)),
+                    Err(error) => Err(error),
+                },
+                TokenType::Keyword(lexer::Keyword::Const) => match parse_variable(self) {
+                    Ok(var) => Ok(AstNode::VariableDeclaration(var)),
+                    Err(error) => Err(error),
+                },
                 TokenType::Keyword(lexer::Keyword::Enum) => match parse_enum_declaration(self) {
                     Ok(new_enum) => Ok(AstNode::EnumDeclaration(new_enum)),
                     Err(error) => Err(error),
