@@ -181,6 +181,7 @@ mod tests {
                                 immutable: true,
                                 access_modifier: AccessModifier::Pub,
                             }),
+                            value: None,
                         }])),
                     },
                     EnumVariant {
@@ -197,6 +198,7 @@ mod tests {
                                     immutable: true,
                                     access_modifier: AccessModifier::Pub,
                                 }),
+                                value: None,
                             },
                             Parameter {
                                 name: None,
@@ -205,6 +207,7 @@ mod tests {
                                     immutable: true,
                                     access_modifier: AccessModifier::Pub,
                                 }),
+                                value: None,
                             },
                             Parameter {
                                 name: None,
@@ -213,6 +216,7 @@ mod tests {
                                     immutable: true,
                                     access_modifier: AccessModifier::Pub,
                                 }),
+                                value: None,
                             },
                         ])),
                     },
