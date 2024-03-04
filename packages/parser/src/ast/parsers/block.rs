@@ -1,7 +1,10 @@
 use crate::ast::{
+    lexer::{Symbol, TokenType},
     lexer_parser::{Block, Parser},
     syntax_error::SyntaxError,
 };
+
+use super::expression::parse_expression;
 
 pub fn parse_block(parser: &mut Parser) -> Result<Block, SyntaxError> {
     let mut block_declaration = Block {
@@ -10,9 +13,11 @@ pub fn parse_block(parser: &mut Parser) -> Result<Block, SyntaxError> {
 
     while let Some(token) = parser.consume() {
         match &token.token_type {
-            _ => {
-                return Err(SyntaxError::UnexpectedToken(token));
-            }
+            TokenType::Symbol(Symbol::CloseBlock) => break,
+            _ => match parse_expression(parser) {
+                Ok(expr) => block_declaration.expressions.push(expr),
+                Err(err) => return Err(err),
+            },
         }
     }
 
@@ -23,7 +28,7 @@ pub fn parse_block(parser: &mut Parser) -> Result<Block, SyntaxError> {
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{Block, Expression, Identifier, Parser, Type, VariableDeclaration},
+        lexer_parser::{Block, Expression, Identifier, Literal, Parser, Type, VariableDeclaration},
         testing::Test,
     };
     use pretty_assertions::assert_eq;
@@ -32,12 +37,43 @@ mod tests {
 
     #[test]
     fn test_block_parser() {
-        let tests: Vec<Test<&'static str, Block>> = vec![];
+        let tests: Vec<Test<&'static str, Block>> = vec![
+            Test {
+                name: "empty block has no expressions",
+                input: "{}",
+                expected: Block {
+                    expressions: vec![],
+                },
+            },
+            Test {
+                name: "parses some expressions that print hello world",
+                input: "{
+                    const target = \"world\"
+                    print(\"hello {target}\")
+                }",
+                expected: Block {
+                    expressions: vec![Expression::VariableDeclaration(Box::new(
+                        VariableDeclaration {
+                            ident: Identifier {
+                                immutable: true,
+                                access_modifier: AccessModifier::Pub,
+                                name: "target".into(),
+                            },
+                            r#type: Type::Void,
+                            value: Some(Expression::Literal(Literal::String("world".into()))),
+                        },
+                    ))],
+                },
+            },
+        ];
 
         for test in tests {
             let mut lexer = Lexer::new(test.input.to_string());
             let tokens = lexer.consume_all_tokens();
             let mut parser = Parser::new(tokens);
+            // It's assumed we have already consumed the { to reach this point so consume the first
+            // character of the test input which should be the opening { of the block.
+            parser.consume();
 
             assert_eq!(parse_block(&mut parser).unwrap(), test.expected);
         }

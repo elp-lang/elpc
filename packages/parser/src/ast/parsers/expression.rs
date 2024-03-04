@@ -25,7 +25,10 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                 match parse_interface_declaration(parser) {
                     Ok(interface) => return Ok(Expression::Interface(interface)),
                     Err(err) => {
-                        return Err(err);
+                        return Err(SyntaxError::WrappedWithContextMessage(
+                            "interface parsing".into(),
+                            Box::new(err),
+                        ));
                     }
                 }
             }
@@ -34,7 +37,10 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                 match parse_fn(parser) {
                     Ok(r#fn) => return Ok(Expression::Function(r#fn)),
                     Err(err) => {
-                        return Err(err);
+                        return Err(SyntaxError::WrappedWithContextMessage(
+                            "interface parsing".into(),
+                            Box::new(err),
+                        ));
                     }
                 }
             }

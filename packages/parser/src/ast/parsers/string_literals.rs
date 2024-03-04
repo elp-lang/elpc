@@ -9,30 +9,27 @@ pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal
     let mut value: String = "".into();
 
     while let Some(token) = parser.consume() {
-        match token.token_type {
-            TokenType::Symbol(Symbol::BackSlash) => {
-                if escaped {
-                    value += token.value.as_str();
-                    escaped = false;
-                } else {
-                    escaped = true;
-                }
+        if token.token_type == TokenType::Symbol(Symbol::BackSlash) {
+            if escaped {
+                value += token.value.as_str();
+                escaped = false;
+            } else {
+                escaped = true;
+            }
+            continue;
+        }
+
+        if token.token_type == TokenType::Symbol(hint.clone()) {
+            if escaped {
+                value += token.value.as_str();
+                escaped = false;
                 continue;
             }
-            TokenType::Symbol(_hint) => {
-                if escaped {
-                    value += token.value.as_str();
-                    escaped = false;
-                    continue;
-                }
 
-                value += token.value.as_str();
-                break;
-            }
-            _ => {
-                value += token.value.as_str();
-            }
+            break;
         }
+
+        value += token.value.as_str();
     }
 
     Ok(Literal::String(value))
