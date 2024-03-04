@@ -196,9 +196,10 @@ mod tests {
             let mut lexer = Lexer::new(test.input.to_string());
             let tokens = lexer.consume_all_tokens();
             let mut parser = Parser::new(tokens);
+            // We assume you've consumed the import token already to know you need to parse an
+            // import expression so consume the "import" keyword and call the parser..
             parser.consume();
 
-            println!("{}", test.name);
             assert_eq!(parse_import(&mut parser).unwrap(), test.expected);
         }
     }

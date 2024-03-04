@@ -5,7 +5,7 @@ use crate::ast::{
     Fn, Identifier, Parameter, Type,
 };
 
-use super::type_expression::parse_type_expression;
+use super::{block::parse_block, type_expression::parse_type_expression};
 
 pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError> {
     let mut param = Parameter {
@@ -59,13 +59,16 @@ pub fn parse_fn_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, Syntax
     Ok(params)
 }
 
-pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError> {
+pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
     let mut fn_declaration = Fn {
         name: Some(Identifier {
             name: "".into(),
             immutable: true,
             access_modifier: Pub,
         }),
+        is_call: false,
+        is_callable: true,
+        block: None,
         params: vec![],
         returns: Box::new(Type::Undefined),
     };
@@ -108,12 +111,12 @@ pub fn parse_fn(parser: &mut Parser, with_body: bool) -> Result<Fn, SyntaxError>
                 }
             },
             TokenType::Symbol(Symbol::CloseParen) => continue,
-            TokenType::Symbol(Symbol::OpenBlock) => {
-                if !with_body {
-                    return Err(SyntaxError::UnexpectedToken(token.clone()));
+            TokenType::Symbol(Symbol::OpenBlock) => match parse_block(parser) {
+                Ok(block) => {
+                    fn_declaration.block = Some(Box::new(block));
                 }
-                todo!("body parsing")
-            }
+                Err(err) => return Err(err),
+            },
             TokenType::Whitespace(_) => continue,
             TokenType::EOF => break,
             _ => {
@@ -154,6 +157,9 @@ mod tests {
                         immutable: true,
                         access_modifier: AccessModifier::Pub,
                     }),
+                    block: None,
+                    is_call: false,
+                    is_callable: false,
                     params: vec![],
                     returns: Box::new(Type::TypeName(Identifier {
                         immutable: true,
@@ -172,13 +178,11 @@ mod tests {
                         access_modifier: AccessModifier::Pub,
                     }),
                     params: vec![],
-                    returns: Box::new(Type::InterfaceType(InterfaceDeclaration {
-                        name: Identifier {
-                            name: "".into(),
-                            immutable: true,
-                            access_modifier: AccessModifier::Pub,
-                        },
-                        members: vec![InterfaceProperty {
+                    block: None,
+                    is_call: false,
+                    is_callable: false,
+                    returns: Box::new(Type::InterfaceType(
+                        crate::ast::lexer_parser::InterfaceDeclaration {
                             name: Identifier {
                                 name: "first".into(),
                                 immutable: true,
@@ -201,7 +205,24 @@ mod tests {
             let mut parser = Parser::new(tokens);
             parser.consume();
 
-            assert_eq!(parse_fn(&mut parser, false).unwrap(), test.expected);
+            assert_eq!(parse_fn(&mut parser).unwrap(), test.expected);
         }
     }
+}
+
+pub fn parse_fn_call(parser: &mut Parser) -> Result<Fn, SyntaxError> {
+    let mut fn_declaration = Fn {
+        name: Some(Identifier {
+            name: "".into(),
+            immutable: true,
+            access_modifier: Pub,
+        }),
+        is_call: true,
+        is_callable: false,
+        block: None,
+        params: vec![],
+        returns: Box::new(Type::Undefined),
+    };
+
+    Ok(fn_declaration)
 }

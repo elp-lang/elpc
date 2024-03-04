@@ -9,6 +9,7 @@ pub enum SyntaxError {
     UnexpectedTokenButGot(TokenType, Token),
     UnexpectedTokenButGotL(Vec<TokenType>, Token),
     MissingToken(&'static str),
+    WrappedWithContextMessage(String, Box<SyntaxError>),
 }
 
 impl fmt::Display for SyntaxError {
@@ -29,6 +30,9 @@ impl fmt::Display for SyntaxError {
                     .collect::<Vec<_>>()
                     .join(" or ");
                 write!(f, "Expected {} but got {:#?}", joined, got)
+            }
+            SyntaxError::WrappedWithContextMessage(ctx_message, err) => {
+                write!(f, "syntax error: {}\n{:#?}", ctx_message, err)
             }
         }
     }

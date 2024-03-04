@@ -1,5 +1,7 @@
 # elpc
 
+[![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
+
 GNU Licensed compiler for the Ellipsis ('elp) language, very much a work in progress programming language inspired by the likes of modern UI languages and tools such as Swift UI and Jetpack compose. Compiles to native binaries for Android, iOS, Mac, Windows and Linux.
 
 example apps can be found in the examples folder.
