@@ -5,7 +5,7 @@ use crate::ast::{
 };
 
 use super::{
-    funcs::parse_fn, interface::parse_interface_declaration, literals::parse_literal,
+    funcs::parse_fn, interface::parse_interface_declaration, string_literals::parse_string_literal,
     variable::parse_variable,
 };
 
@@ -49,7 +49,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                 }
             }
             TokenType::Symbol(Symbol::DoubleSpeechMark) => {
-                match parse_literal(parser, Symbol::DoubleSpeechMark) {
+                match parse_string_literal(parser, Symbol::DoubleSpeechMark) {
                     Ok(literal) => {
                         return Ok(Expression::Literal(literal));
                     }
@@ -59,7 +59,7 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
                 }
             }
             TokenType::Symbol(Symbol::SingleSpeechMark) => {
-                match parse_literal(parser, Symbol::SingleSpeechMark) {
+                match parse_string_literal(parser, Symbol::SingleSpeechMark) {
                     Ok(literal) => {
                         return Ok(Expression::Literal(literal));
                     }

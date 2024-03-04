@@ -5,49 +5,44 @@ use crate::ast::{
 };
 
 pub fn parse_string_literal(parser: &mut Parser, hint: Symbol) -> Result<Literal, SyntaxError> {
-    match hint {
-        Symbol::DoubleSpeechMark => {
-            let mut escaped = false;
-            let mut value: String = "".into();
+    let mut escaped = false;
+    let mut value: String = "".into();
 
-            while let Some(token) = parser.consume() {
-                match token.token_type {
-                    TokenType::Symbol(Symbol::BackSlash) => {
-                        if escaped {
-                            value += token.value.as_str();
-                            escaped = false;
-                        } else {
-                            escaped = true;
-                        }
-                        continue;
-                    }
-                    TokenType::Symbol(Symbol::DoubleSpeechMark) => {
-                        if escaped {
-                            value += token.value.as_str();
-                            escaped = false;
-                            continue;
-                        } else {
-                            break;
-                        }
-                    }
-                    _ => {
-                        value += token.value.as_str();
-                    }
+    while let Some(token) = parser.consume() {
+        match token.token_type {
+            TokenType::Symbol(Symbol::BackSlash) => {
+                if escaped {
+                    value += token.value.as_str();
+                    escaped = false;
+                } else {
+                    escaped = true;
                 }
+                continue;
             }
+            TokenType::Symbol(_hint) => {
+                if escaped {
+                    value += token.value.as_str();
+                    escaped = false;
+                    continue;
+                }
 
-            Ok(Literal::String(value))
+                value += token.value.as_str();
+                break;
+            }
+            _ => {
+                value += token.value.as_str();
+            }
         }
-        Symbol::SingleSpeechMark => todo!(),
-        _ => Err(SyntaxError::UnexpectedTokenType(TokenType::Symbol(hint))),
     }
+
+    Ok(Literal::String(value))
 }
 
 #[cfg(test)]
 mod tests {
     use super::parse_string_literal;
     use crate::ast::{
-        lexer::Lexer,
+        lexer::{Lexer, Symbol},
         lexer_parser::{Literal, Parser},
         testing::Test,
     };
@@ -66,8 +61,7 @@ mod tests {
             let tokens = lexer.consume_all_tokens();
             let mut parser = Parser::new(tokens);
             assert_eq!(
-                parse_string_literal(&mut parser, crate::ast::lexer::Symbol::DoubleSpeechMark)
-                    .unwrap(),
+                parse_string_literal(&mut parser, Symbol::DoubleSpeechMark).unwrap(),
                 test.expected,
             );
         }

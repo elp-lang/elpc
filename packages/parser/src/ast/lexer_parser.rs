@@ -2,6 +2,7 @@ use crate::ast::lexer::{self, TokenType};
 
 use super::parsers::{
     self, enums::parse_enum_declaration, funcs::parse_fn, string_literals::parse_string_literal,
+    variable::parse_variable,
 };
 
 #[derive(Debug, PartialEq)]
@@ -33,6 +34,7 @@ pub struct Trie {
 #[derive(Debug, PartialEq)]
 pub struct Fn {
     pub name: Option<Identifier>,
+    pub is_call: bool,
     pub params: Vec<Parameter>,
     pub returns: Box<Type>,
     pub block: Option<Box<Block>>,
@@ -268,7 +270,14 @@ impl Parser {
                     Ok(new_fn) => Ok(AstNode::FunctionDeclaration(new_fn)),
                     Err(error) => Err(error),
                 },
-                TokenType::Keyword(lexer::Keyword::Var) => todo!(),
+                TokenType::Keyword(lexer::Keyword::Var) => match parse_variable(self) {
+                    Ok(var) => Ok(AstNode::VariableDeclaration(var)),
+                    Err(error) => Err(error),
+                },
+                TokenType::Keyword(lexer::Keyword::Const) => match parse_variable(self) {
+                    Ok(var) => Ok(AstNode::VariableDeclaration(var)),
+                    Err(error) => Err(error),
+                },
                 TokenType::Keyword(lexer::Keyword::Enum) => match parse_enum_declaration(self) {
                     Ok(new_enum) => Ok(AstNode::EnumDeclaration(new_enum)),
                     Err(error) => Err(error),

@@ -110,13 +110,10 @@ mod tests {
                     ident: Identifier {
                         immutable: true,
                         access_modifier: AccessModifier::Pub,
-                        name: "mutable_binding".to_string(),
+                        name: "immutable_binding".to_string(),
                     },
-                    r#type: Type::TypeName(Identifier {
-                        immutable: true,
-                        access_modifier: AccessModifier::Pub,
-                        name: "string".to_string(),
-                    }),
+                    // We won't know the type until the next stage of analysis.
+                    r#type: Type::Void,
                     value: Some(Expression::Literal(Literal::String(
                         "hello world".to_string(),
                     ))),
@@ -131,11 +128,8 @@ mod tests {
                         access_modifier: AccessModifier::Pub,
                         name: "mutable_binding".to_string(),
                     },
-                    r#type: Type::TypeName(Identifier {
-                        immutable: true,
-                        access_modifier: AccessModifier::Pub,
-                        name: "string".to_string(),
-                    }),
+                    // We won't know the type until the next stage of analysis.
+                    r#type: Type::Void,
                     value: Some(Expression::Literal(Literal::String(
                         "hello world".to_string(),
                     ))),

@@ -65,6 +65,7 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
             immutable: true,
             access_modifier: Pub,
         }),
+        is_call: false,
         block: None,
         params: vec![],
         returns: Box::new(Type::Undefined),
@@ -154,6 +155,7 @@ mod tests {
                         access_modifier: AccessModifier::Pub,
                     }),
                     block: None,
+                    is_call: false,
                     params: vec![],
                     returns: Box::new(Type::TypeName(Identifier {
                         immutable: true,
@@ -173,6 +175,7 @@ mod tests {
                     }),
                     params: vec![],
                     block: None,
+                    is_call: false,
                     returns: Box::new(Type::InterfaceType(
                         crate::ast::lexer_parser::InterfaceDeclaration {
                             name: Identifier {
