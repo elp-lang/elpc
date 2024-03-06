@@ -10,11 +10,13 @@ fn parse_enum_variant_action_parameters(
     parser: &mut Parser,
 ) -> Result<Vec<Parameter>, SyntaxError> {
     let mut params: Vec<Parameter> = vec![];
+    let mut position = 0;
 
     while let Some(token) = parser.consume() {
         match &token.token_type {
             TokenType::Ident(_) => {
                 let mut param = Parameter {
+                    position,
                     ..Default::default()
                 };
                 parser.unconsume();
@@ -35,6 +37,7 @@ fn parse_enum_variant_action_parameters(
                 return Err(SyntaxError::UnexpectedToken(token));
             }
         }
+        position += 1;
     }
 
     Ok(params)
@@ -93,7 +96,7 @@ pub fn parse_enum_declaration(parser: &mut Parser) -> Result<EnumDeclaration, Sy
         match &token.token_type {
             TokenType::Ident(val) => {
                 if found_open_brace {
-                    return Err(SyntaxError::UnexpectedTokenButGot(
+                    return Err(SyntaxError::ExpectedTokenButGot(
                         TokenType::Symbol(Symbol::Period),
                         token,
                     ));
@@ -176,6 +179,7 @@ mod tests {
                         },
                         r#type: Some(EnumVariantType::Action(vec![Parameter {
                             name: None,
+                            position: 0,
                             r#type: Type::TypeName(Identifier {
                                 name: "String".into(),
                                 immutable: true,
@@ -193,6 +197,7 @@ mod tests {
                         r#type: Some(EnumVariantType::Action(vec![
                             Parameter {
                                 name: None,
+                                position: 0,
                                 r#type: Type::TypeName(Identifier {
                                     name: "String".into(),
                                     immutable: true,
@@ -202,6 +207,7 @@ mod tests {
                             },
                             Parameter {
                                 name: None,
+                                position: 1,
                                 r#type: Type::TypeName(Identifier {
                                     name: "Int".into(),
                                     immutable: true,
@@ -211,6 +217,7 @@ mod tests {
                             },
                             Parameter {
                                 name: None,
+                                position: 2,
                                 r#type: Type::TypeName(Identifier {
                                     name: "Float".into(),
                                     immutable: true,

@@ -61,7 +61,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
         None => Err(SyntaxError::MissingToken("import")),
         Some(token) => {
             if token.token_type != lexer::TokenType::Keyword(lexer::Keyword::Import) {
-                Err(SyntaxError::UnexpectedTokenButGot(
+                Err(SyntaxError::ExpectedTokenButGot(
                     lexer::TokenType::Keyword(lexer::Keyword::Import),
                     token.clone(),
                 ))
@@ -90,7 +90,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                             }
                             lexer::TokenType::Symbol(lexer::Symbol::CloseBlock) => {
                                 if !found_opening_brace {
-                                    return Err(SyntaxError::UnexpectedTokenButGot(
+                                    return Err(SyntaxError::ExpectedTokenButGot(
                                         TokenType::Symbol(lexer::Symbol::OpenBlock),
                                         token.clone(),
                                     ));
@@ -103,7 +103,7 @@ pub fn parse_import(parser: &mut Parser) -> Result<ImportStatement, SyntaxError>
                             }
                             lexer::TokenType::Keyword(lexer::Keyword::From) => {
                                 if !found_closing_brace {
-                                    let ast_node = Err(SyntaxError::UnexpectedTokenButGot(
+                                    let ast_node = Err(SyntaxError::ExpectedTokenButGot(
                                         TokenType::Symbol(lexer::Symbol::CloseBlock),
                                         token.clone(),
                                     ));

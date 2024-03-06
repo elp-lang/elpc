@@ -35,7 +35,7 @@ pub fn parse_type_expression(parser: &mut Parser) -> Result<Type, SyntaxError> {
             },
             TokenType::Whitespace(_) => continue,
             _ => {
-                return Err(SyntaxError::UnexpectedTokenButGotL(
+                return Err(SyntaxError::ExpectedTokenButGotL(
                     vec![
                         TokenType::Keyword(Keyword::Interface),
                         TokenType::Ident("ident".into()),

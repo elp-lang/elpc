@@ -4,10 +4,13 @@ use crate::ast::{
     syntax_error::SyntaxError,
 };
 
-use super::{block::parse_block, type_expression::parse_type_expression};
+use super::{
+    block::parse_block, expression::parse_expression, type_expression::parse_type_expression,
+};
 
-pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError> {
+pub fn parse_fn_parameter(parser: &mut Parser, position: i32) -> Result<Parameter, SyntaxError> {
     let mut param = Parameter {
+        position,
         name: None,
         value: None,
         r#type: Type::TypeName(Identifier {
@@ -39,9 +42,24 @@ pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError>
                 found_colon = true;
                 continue;
             }
+            TokenType::Symbol(Symbol::SingleEqual) => match parse_expression(parser) {
+                Ok(expr) => {
+                    print!("VALUE {:#?}", expr);
+                    param.value = Some(expr);
+                }
+                Err(err) => {
+                    return Err(SyntaxError::WrappedWithContextMessage(
+                        "parsing parameter".into(),
+                        Box::new(err),
+                    ));
+                }
+            },
             TokenType::Symbol(Symbol::Comma) => break,
             _ => {
-                return Err(SyntaxError::UnexpectedToken(token.clone()));
+                return Err(SyntaxError::ExpectedTokenButGot(
+                    TokenType::Ident("param name".into()),
+                    token.clone(),
+                ));
             }
         }
     }
@@ -51,9 +69,11 @@ pub fn parse_fn_parameter(parser: &mut Parser) -> Result<Parameter, SyntaxError>
 
 pub fn parse_fn_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, SyntaxError> {
     let mut params: Vec<Parameter> = vec![];
+    let mut position = 0;
 
-    while let Ok(param) = parse_fn_parameter(parser) {
+    while let Ok(param) = parse_fn_parameter(parser, position) {
         params.push(param);
+        position += 1;
     }
 
     Ok(params)
@@ -120,13 +140,7 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
             TokenType::Whitespace(_) => continue,
             TokenType::EOF => break,
             _ => {
-                return Err(SyntaxError::UnexpectedTokenButGotL(
-                    vec![
-                        TokenType::Ident("".into()),
-                        TokenType::Symbol(Symbol::OpenParen),
-                    ],
-                    token.clone(),
-                ));
+                return Err(SyntaxError::UnexpectedToken(token.clone()));
             }
         }
     }
@@ -138,7 +152,9 @@ pub fn parse_fn(parser: &mut Parser) -> Result<Fn, SyntaxError> {
 mod tests {
     use crate::ast::{
         lexer::{AccessModifier, Lexer},
-        lexer_parser::{Fn, Identifier, InterfaceProperty, Parser, Type},
+        lexer_parser::{
+            Expression, Fn, Identifier, InterfaceProperty, Literal, Parameter, Parser, Type,
+        },
         parsers::funcs::parse_fn,
         testing::Test,
     };
@@ -214,44 +230,4 @@ mod tests {
             assert_eq!(parse_fn(&mut parser).unwrap(), test.expected);
         }
     }
-}
-
-pub fn parse_fn_call(parser: &mut Parser) -> Result<Fn, SyntaxError> {
-    let mut fn_declaration = Fn {
-        name: Some(Identifier {
-            name: "".into(),
-            immutable: true,
-            access_modifier: Pub,
-        }),
-        is_call: true,
-        is_callable: false,
-        block: None,
-        params: vec![],
-        returns: Box::new(Type::Undefined),
-    };
-
-    while let Some(token) = parser.consume() {
-        match &token.token_type {
-            TokenType::Ident(name) => {
-                fn_declaration.name = Some(Identifier {
-                    name: name.into(),
-                    access_modifier: Pub,
-                    immutable: true,
-                })
-            }
-            TokenType::Symbol(Symbol::OpenParen) => {}
-            TokenType::Symbol(Symbol::CloseParen) => break,
-            _ => {
-                return Err(SyntaxError::UnexpectedTokenButGotL(
-                    vec![
-                        TokenType::Ident("".into()),
-                        TokenType::Symbol(Symbol::OpenParen),
-                    ],
-                    token.clone(),
-                ));
-            }
-        }
-    }
-
-    Ok(fn_declaration)
 }

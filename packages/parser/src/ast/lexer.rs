@@ -347,11 +347,11 @@ impl Lexer {
                 value: value.to_string(),
                 span: (starting_cursor, self.position - 1),
             });
-        } else {
-            match value.parse::<f64>() {
-                Ok(f) => token_type = TokenType::FloatLiteral(f),
-                Err(err) => return Err(ParsingError::InvalidFloat(err)),
-            }
+        }
+
+        match value.parse::<f64>() {
+            Ok(f) => token_type = TokenType::FloatLiteral(f),
+            Err(err) => return Err(ParsingError::InvalidFloat(err)),
         }
 
         Ok(Token {

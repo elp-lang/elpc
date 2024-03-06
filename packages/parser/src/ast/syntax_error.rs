@@ -6,10 +6,11 @@ use super::lexer::{Token, TokenType};
 pub enum SyntaxError {
     UnexpectedToken(Token),
     UnexpectedTokenType(TokenType),
-    UnexpectedTokenButGot(TokenType, Token),
-    UnexpectedTokenButGotL(Vec<TokenType>, Token),
+    ExpectedTokenButGot(TokenType, Token),
+    ExpectedTokenButGotL(Vec<TokenType>, Token),
     MissingToken(&'static str),
     WrappedWithContextMessage(String, Box<SyntaxError>),
+    Unknown(&'static str),
 }
 
 impl fmt::Display for SyntaxError {
@@ -20,10 +21,10 @@ impl fmt::Display for SyntaxError {
                 write!(f, "Unexpected token type: {:#?}", token)
             }
             SyntaxError::MissingToken(token) => write!(f, "Missing token: {:#?}", token),
-            SyntaxError::UnexpectedTokenButGot(expected, got) => {
+            SyntaxError::ExpectedTokenButGot(expected, got) => {
                 write!(f, "Expected {:#?} but got {:#?}", expected, got)
             }
-            SyntaxError::UnexpectedTokenButGotL(expected, got) => {
+            SyntaxError::ExpectedTokenButGotL(expected, got) => {
                 let joined: String = expected
                     .iter()
                     .map(|t| t.to_string())
@@ -34,6 +35,7 @@ impl fmt::Display for SyntaxError {
             SyntaxError::WrappedWithContextMessage(ctx_message, err) => {
                 write!(f, "syntax error: {}\n{:#?}", ctx_message, err)
             }
+            SyntaxError::Unknown(str) => write!(f, "syntax error: {}\n", str),
         }
     }
 }

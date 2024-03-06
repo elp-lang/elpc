@@ -1,6 +1,7 @@
 pub mod block;
 pub mod enums;
 pub mod expression;
+pub mod func_calls;
 pub mod funcs;
 pub mod ident;
 pub mod import;

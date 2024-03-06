@@ -62,7 +62,7 @@ pub fn parse_interface_property(parser: &mut Parser) -> Result<InterfaceProperty
                             })
                         }
                         _ => {
-                            return Err(SyntaxError::UnexpectedTokenButGot(
+                            return Err(SyntaxError::ExpectedTokenButGot(
                                 TokenType::Keyword(lexer::Keyword::Interface),
                                 type_hint.clone(),
                             ))
@@ -109,14 +109,14 @@ pub fn parse_interface_declaration(
             lexer::TokenType::EOF => break,
             TokenType::Symbol(Symbol::Colon) => {
                 if !found_opening_brace {
-                    return Err(SyntaxError::UnexpectedTokenButGot(
+                    return Err(SyntaxError::ExpectedTokenButGot(
                         TokenType::Symbol(Symbol::OpenBlock),
                         token.clone(),
                     ));
                 }
 
                 if !found_interface_name {
-                    return Err(SyntaxError::UnexpectedTokenButGot(
+                    return Err(SyntaxError::ExpectedTokenButGot(
                         TokenType::Ident("interface".to_string()),
                         token.clone(),
                     ));
@@ -132,7 +132,10 @@ pub fn parse_interface_declaration(
                 }
             }
             _ => {
-                return Err(SyntaxError::UnexpectedToken(token.clone()));
+                return Err(SyntaxError::WrappedWithContextMessage(
+                    "interface parsing".into(),
+                    Box::new(SyntaxError::UnexpectedToken(token.clone())),
+                ));
             }
         }
     }

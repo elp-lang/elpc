@@ -108,7 +108,10 @@ pub fn parse_expression(parser: &mut Parser) -> Result<Expression, SyntaxError> 
             }
             TokenType::Whitespace(_) => continue,
             _ => {
-                return Err(SyntaxError::UnexpectedToken(token));
+                return Err(SyntaxError::WrappedWithContextMessage(
+                    "parsing expression".to_string(),
+                    Box::new(SyntaxError::UnexpectedToken(token)),
+                ));
             }
         }
     }

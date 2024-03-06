@@ -1,8 +1,11 @@
 use crate::ast::lexer::{self, TokenType};
 
-use super::parsers::{
-    self, enums::parse_enum_declaration, funcs::parse_fn, string_literals::parse_string_literal,
-    variable::parse_variable,
+use super::{
+    parsers::{
+        self, enums::parse_enum_declaration, funcs::parse_fn,
+        string_literals::parse_string_literal, variable::parse_variable,
+    },
+    syntax_error::SyntaxError,
 };
 
 #[derive(Debug, PartialEq)]
@@ -93,6 +96,7 @@ pub enum EnumVariantType {
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Parameter {
+    pub position: i32,
     pub name: Option<Identifier>,
     pub value: Option<Expression>,
     pub r#type: Type,
@@ -308,8 +312,9 @@ impl Parser {
                 TokenType::Symbol(lexer::Symbol::CloseBlock) => todo!(),
                 TokenType::Whitespace(_) => continue,
                 TokenType::Void => continue,
-                _ => Err(super::syntax_error::SyntaxError::UnexpectedToken(
-                    token.clone(),
+                _ => Err(super::syntax_error::SyntaxError::WrappedWithContextMessage(
+                    "parsing".into(),
+                    Box::new(SyntaxError::UnexpectedToken(token.clone())),
                 )),
             };
 
