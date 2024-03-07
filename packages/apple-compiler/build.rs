@@ -1,85 +1,140 @@
-//
-// Copyright © 2020 Haim Gelfenbeyn
-// This code is licensed under MIT license (see LICENSE.txt for details)
-//
-
-use serde::Deserialize;
-use std::env;
+use std::path::PathBuf;
 use std::process::Command;
 
-/// This should match whatever is defined in mac_ddc/Package.swift
-/// Anything below 10.15 would require shipping Swift libraries.
-const MACOS_TARGET_VERSION: &str = "14.3";
+fn sdk_path(target: &str) -> Result<String, std::io::Error> {
+    let sdk = if vec![
+        "x86_64-apple-ios",
+        "i386-apple-ios",
+        "aarch64-apple-ios-sim",
+    ]
+    .contains(&target)
+    {
+        "iphonesimulator"
+    } else if target == "aarch64-apple-ios"
+        || target == "armv7-apple-ios"
+        || target == "armv7s-apple-ios"
+    {
+        "iphoneos"
+    } else {
+        unreachable!();
+    };
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct SwiftTargetInfo {
-    unversioned_triple: String,
-    #[serde(rename = "librariesRequireRPath")]
-    libraries_require_rpath: bool,
+    let output = Command::new("xcrun")
+        .args(&["--sdk", sdk, "--show-sdk-path"])
+        .output()?
+        .stdout;
+    let prefix_str = std::str::from_utf8(&output).expect("invalid output from `xcrun`");
+    Ok(prefix_str.trim_end().to_string())
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct SwiftPaths {
-    runtime_library_paths: Vec<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct SwiftTarget {
-    target: SwiftTargetInfo,
-    paths: SwiftPaths,
-}
-
-/// Builds mac_ddc library Swift project, sets the library search options right so we link
-/// against Swift run-time correctly.
-fn build_swift() {
-    let profile = env::var("PROFILE").unwrap();
-    let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
-    let target = format!("{}-apple-macosx{}", arch, MACOS_TARGET_VERSION);
-
-    let swift_target_info_str = Command::new("swift")
-        .args(&["-target", &target, "-print-target-info"])
+fn build_appkit() {
+    let output = Command::new("xcrun")
+        .args(&["--show-sdk-path"])
         .output()
         .unwrap()
         .stdout;
-    let swift_target_info: SwiftTarget = serde_json::from_slice(&swift_target_info_str).unwrap();
-    if swift_target_info.target.libraries_require_rpath {
-        panic!("Libraries require RPath! Change minimum MacOS value to fix.")
+
+    let sdk_path = std::str::from_utf8(&output)
+        .expect("invalid output from `xcrun`")
+        .trim();
+
+    println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
+    println!("cargo:rustc-link-lib=framework=AppKit");
+
+    // Begin building the bindgen params.
+    let mut builder = bindgen::Builder::default();
+
+    let clang_args = vec!["-x", "objective-c", "-fblocks", "-isysroot", sdk_path];
+
+    builder = builder
+        .clang_args(&clang_args)
+        .objc_extern_crate(true)
+        .layout_tests(false)
+        //.block_extern_crate(true)
+        //.generate_block(true)
+        // time.h as has a variable called timezone that conflicts with some of the objective-c
+        // calls from NSCalendar.h in the Foundation framework. This removes that one variable.
+        .blocklist_item("timezone")
+        // https://github.com/rust-lang/rust-bindgen/issues/1705
+        .blocklist_item("IUIStepper")
+        .blocklist_function("dividerImageForLeftSegmentState_rightSegmentState_")
+        .blocklist_item("objc_object")
+        .header_contents("AppKit.h", "#include<AppKit/AppKit.h>");
+
+    // Generate the bindings.
+    let bindings = builder.generate().expect("unable to generate bindings");
+
+    // Get the cargo out directory.
+    let out_dir = PathBuf::from("bindings");
+
+    // Write them to the crate root.
+    bindings
+        .write_to_file(out_dir.join("appkit.rs"))
+        .expect("could not write bindings");
+}
+
+fn build(sdk_path: Option<&str>, target: &str) {
+    // Generate one large set of bindings for all frameworks.
+    //
+    // We do this rather than generating a module per framework as some frameworks depend on other
+    // frameworks and in turn share types. To ensure all types are compatible across each
+    // framework, we feed all headers to bindgen at once.
+    //
+    // Only link to each framework and include their headers if their features are enabled and they
+    // are available on the target os.
+    println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
+    println!("cargo:rustc-link-lib=framework=UIKit");
+
+    // See https://github.com/rust-lang/rust-bindgen/issues/1211
+    // Technically according to the llvm mailing list, the argument to clang here should be
+    // -arch arm64 but it looks cleaner to just change the target.
+    let target = if target == "aarch64-apple-ios" {
+        "arm64-apple-ios"
+    } else {
+        target
+    };
+    // Begin building the bindgen params.
+    let mut builder = bindgen::Builder::default();
+
+    let target_arg = format!("--target={}", target);
+    let mut clang_args = vec!["-x", "objective-c", "-fblocks", &target_arg];
+    if let Some(sdk_path) = sdk_path {
+        clang_args.extend(&["-isysroot", sdk_path]);
     }
 
-    if !Command::new("swift")
-        .args(&["build", "-c", &profile])
-        .current_dir("./swift/rust-lib/")
-        .status()
-        .unwrap()
-        .success()
-    {
-        panic!("Swift library compilation failed")
-    }
+    builder = builder
+        .clang_args(&clang_args)
+        .objc_extern_crate(true)
+        .layout_tests(false)
+        //.block_extern_crate(true)
+        //.generate_block(true)
+        // time.h as has a variable called timezone that conflicts with some of the objective-c
+        // calls from NSCalendar.h in the Foundation framework. This removes that one variable.
+        .blocklist_item("timezone")
+        // https://github.com/rust-lang/rust-bindgen/issues/1705
+        .blocklist_item("IUIStepper")
+        .blocklist_function("dividerImageForLeftSegmentState_rightSegmentState_")
+        .blocklist_item("objc_object")
+        .header_contents("UIKit.h", "#include<UIKit/UIKit.h>");
 
-    swift_target_info
-        .paths
-        .runtime_library_paths
-        .iter()
-        .for_each(|path| {
-            println!("cargo:rustc-link-search=native={}", path);
-        });
-    println!(
-        "cargo:rustc-link-search=native=packages/apple-compiler/swift/rust-lib/.build/arm64-apple-macosx/{}/",
-        &profile,
-    );
-    println!("cargo:rustc-link-lib=dylib=rust-lib");
-    println!("cargo:rerun-if-changed=swift/**/*.swift");
-    println!(
-        "cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET={}",
-        MACOS_TARGET_VERSION
-    )
+    // Generate the bindings.
+    let bindings = builder.generate().expect("unable to generate bindings");
+
+    // Get the cargo out directory.
+    let out_dir = PathBuf::from("bindings");
+
+    // Write them to the crate root.
+    bindings
+        .write_to_file(out_dir.join("uikit.rs"))
+        .expect("could not write bindings");
 }
 
 fn main() {
-    let target = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    if target == "macos" {
-        build_swift();
+    let target = std::env::var("TARGET").unwrap();
+    if !target.contains("apple-ios") {
+        build_appkit();
+    } else {
+        let directory = sdk_path(&target).ok();
+        build(directory.as_ref().map(String::as_ref), &target);
     }
 }
