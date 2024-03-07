@@ -50,7 +50,7 @@ fn build_swift() {
 
     if !Command::new("swift")
         .args(&["build", "-c", &profile])
-        .current_dir("./swift")
+        .current_dir("./swift/rust-lib/")
         .status()
         .unwrap()
         .success()
@@ -66,11 +66,11 @@ fn build_swift() {
             println!("cargo:rustc-link-search=native={}", path);
         });
     println!(
-        "cargo:rustc-link-search=native=./swift/.build/{}/{}",
-        swift_target_info.target.unversioned_triple, profile
+        "cargo:rustc-link-search=native=packages/apple-compiler/swift/rust-lib/.build/arm64-apple-macosx/{}/",
+        &profile,
     );
-    println!("cargo:rustc-link-lib=static=swift");
-    println!("cargo:rerun-if-changed=swift/src/*.swift");
+    println!("cargo:rustc-link-lib=dylib=rust-lib");
+    println!("cargo:rerun-if-changed=swift/**/*.swift");
     println!(
         "cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET={}",
         MACOS_TARGET_VERSION
