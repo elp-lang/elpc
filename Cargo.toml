@@ -2,7 +2,8 @@
 resolver = "2"
 
 members = [
-    "packages/parser",
-    "packages/elpc",
-	"packages/apple-compiler"
+	"packages/parser",
+	"packages/elpc",
+	"packages/apple-compiler",
+	"packages/android-compiler/rust",
 ]
