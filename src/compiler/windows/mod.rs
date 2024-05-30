@@ -1,34 +1,38 @@
-use crate::compiler::{AppITM, CompilationError, Compiler, CompilerPlugin};
+use std::sync::{Arc, Mutex};
+
+use async_trait::async_trait;
+
+use crate::compiler::{CompilationError, Compiler};
 use crate::parser::lexer_parser::Trie;
 
-pub struct WindowsITM {
+pub struct WindowsITM {}
 
-}
-
-impl AppITM for WindowsITM {
+impl WindowsITM {
     async fn compile_to_binary(&self) -> Result<(), CompilationError> {
         todo!()
     }
 }
 
 pub struct WindowsCompiler<'a> {
-    ast: &'a mut Trie,
-    plugins: Vec<Box<dyn CompilerPlugin>>,
+    ast: Arc<Mutex<&'a mut Trie>>,
 }
 
-impl<'a> Compiler for WindowsCompiler {
-    async fn new(ast: &mut Trie) -> &dyn Compiler {
-        &Self {
-            ast,
-            plugins: vec![],
-        }
-    }
+unsafe impl<'a> Send for WindowsCompiler<'a> {}
+unsafe impl<'a> Sync for WindowsCompiler<'a> {}
 
-    async fn ast_to_app_itm(&self) -> Result<&mut dyn AppITM, CompilationError> {
-        let mut itm = WindowsITM{};
+impl<'a> WindowsCompiler<'a> {
+    pub(crate) async fn new(ast: &'a mut Trie) -> Result<Self, CompilationError> {
+        Ok(Self {
+            ast: Arc::new(Mutex::new(ast)),
+        })
     }
+}
 
-    async fn add_plugin(&mut self, plugin: &dyn CompilerPlugin) -> Option<CompilationError> {
-        plugin.register(&mut self)
+#[async_trait]
+impl<'a> Compiler for WindowsCompiler<'_> {
+    async fn ast_to_app(&self) -> Result<(), CompilationError> {
+        let mut itm = Box::new(WindowsITM {});
+
+        Ok(())
     }
 }

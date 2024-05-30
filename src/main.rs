@@ -17,7 +17,7 @@ async fn main() {
     let mut ast = parser.parse();
 
     let compiler = compiler::create_target_compiler(&mut ast);
-    let application_itm = compiler.ast_to_app_itm().await?;
+    let application_itm = compiler.ast_to_app().await?;
     let compilation_result = application_itm.compile_to_binary().await?;
 
     print!("BUILT!\n");
