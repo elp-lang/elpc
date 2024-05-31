@@ -3,7 +3,7 @@ import { Form, Label, Input, Button } from "elp/app/elements"
 import { Message, User } from "$types/chat"
 import { Message as MessageView } from "$components/message"
 
-export object ChatAppState implements Reactivity {
+export object ChatAppState is Reactive {
 	.name: *string
 	.messages: [Message]
 	.members: [User]

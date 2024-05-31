@@ -1,24 +1,27 @@
-mod parser;
-mod compiler;
+use crate::lexer::lexer::Lexer;
+use crate::parserv2::Parser;
+use crate::parserv2::visitors::string_literals::StringLiteralsVisitor;
 
-use parser::{lexer::Lexer, lexer_parser::Parser};
-use std::fs;
+mod lexer;
+mod parserv2;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     print!("compilation started");
-    let source = fs::read_to_string("./examples/kitchen-sink.velp")
-        .expect("Couldn't open kitchen-sink.velp");
+    let mut string_visitor = StringLiteralsVisitor::default();
+
+    // let source = fs::read_to_string("./examples/kitchen-sink.velp")
+    //     .expect("Couldn't open kitchen-sink.velp");
+    let source: String = "\"Hello world\"".into();
     let mut lexer = Lexer::new(source);
 
     let tokens = lexer.consume_all_tokens();
     let mut parser = Parser::new(tokens);
+    parser.register_visitor(Box::new(&mut string_visitor));
 
-    let mut ast = parser.parse();
+    let ast = parser.parse().await?;
 
-    let compiler = compiler::create_target_compiler(&mut ast);
-    let application_itm = compiler.ast_to_app().await?;
-    let compilation_result = application_itm.compile_to_binary().await?;
+    dbg!(ast);
 
-    print!("BUILT!\n");
+    Ok(())
 }
