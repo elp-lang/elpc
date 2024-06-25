@@ -6,7 +6,7 @@ export interface State: Stateful {
 	.messages: [Message]
 }
 
-fn ChatState(user: User): State {
+export fn ChatState(user: User): State {
 	.usersInRoom = [user]
 	.messages = []
 }

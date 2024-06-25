@@ -3,7 +3,9 @@ import { Text } from "elp/components"
 import { User, UserMessage } from "$types/chat"
 
 export fn Message(from: User, body: string): Column {
-	Text(from.displayName, class="from")
-	Text(body)
+	Column {
+		Text(from.displayName, class="from")
+		Text(body)
+	}
 }
 

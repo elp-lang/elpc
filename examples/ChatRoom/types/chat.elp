@@ -11,8 +11,8 @@ export object Message {
 }
 
 export enum Actions {
-	.LOGIN(user: User)
-	.SEND_MESSAGE(body: string)
-	.DELETE_MESSAGE(id: UUID)
+	.LOGIN(User)
+	.SEND_MESSAGE(string)
+	.DELETE_MESSAGE(UUID)
 	.LOGOUT
 }
