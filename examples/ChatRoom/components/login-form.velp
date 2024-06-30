@@ -1,16 +1,18 @@
 import { Column } from "elp/layout"
-import { Form, EmailInput, SecureTextInput, Button } from "elp/forms"
-import { Text, Component } from "elp/components"
+import { 
+	Form,
+	EmailInput,
+	SecureTextInput,
+	Button
+} from "elp/forms"
+import { Text } from "elp/components"
 import { User, UserMessage } from "$types/chat"
 
-export object LoginForm implements Component {
-	email Optional<string>
-	onSubmit fn(string, string) -> nil
-}
+export component LoginForm {
+	export email Stateful<Optional<string>>
+	export onSubmit fn(string, string) -> nil
 
-fn LoginForm.render() -> Form {
-	var email Stateful<string>
-	var password Protected<Stateful<string>>
+	var password Stateful<Protected<string>>
 
 	Form(onSubmit=props.onSubmit) {
 		EmailInput(&email, placeholder="Enter your email")

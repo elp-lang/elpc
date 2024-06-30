@@ -4,13 +4,13 @@ import { Message, User } from "$types/chat"
 import { Message as MessageView } from "$components/message"
 
 export object ChatAppState is Reactive {
-	.name: *string
+	.name: string
 	.messages: [Message]
 	.members: [User]
 	.loggedIn: bool = false
 }
 
-export fn Chat(name: *string) -> App {
+export fn Chat(name *string) -> App {
     App {
         Window {
             if .name not Empty or not .loggedIn {
@@ -33,4 +33,4 @@ export fn Chat(name: *string) -> App {
     }
 }
 
-// vim: ft=swift
+// vim: ft=kotlin
