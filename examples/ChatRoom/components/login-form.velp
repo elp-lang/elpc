@@ -1,0 +1,25 @@
+import { Column } from "elp/layout"
+import { Form, EmailInput, SecureTextInput, Button } from "elp/forms"
+import { Text, Component } from "elp/components"
+import { User, UserMessage } from "$types/chat"
+
+export object LoginForm implements Component {
+	email Optional<string>
+	onSubmit fn(string, string) -> nil
+}
+
+fn LoginForm.render() -> Form {
+	var email Stateful<string>
+	var password Protected<Stateful<string>>
+
+	Form(onSubmit=props.onSubmit) {
+		EmailInput(&email, placeholder="Enter your email")
+		SecureTextInput(&password, placeholder="Enter your password")
+
+		Button {
+			Text("Log in")
+		}
+	}
+}
+
+// vim: ft=kotlin

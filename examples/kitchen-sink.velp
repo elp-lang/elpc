@@ -62,3 +62,4 @@ match booleanCheck {
 	false -> expression,
 }
 
+// vim: ft=kotlin

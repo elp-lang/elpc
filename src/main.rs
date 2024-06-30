@@ -1,27 +1,32 @@
-use crate::lexer::lexer::Lexer;
-use crate::parserv2::Parser;
-use crate::parserv2::visitors::string_literals::StringLiteralsVisitor;
+use std::env;
 
-mod lexer;
-mod parserv2;
+use lrlex::lrlex_mod;
+use lrpar::lrpar_mod;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    print!("compilation started");
-    let mut string_visitor = StringLiteralsVisitor::default();
+// Using `lrlex_mod!` brings the lexer for `calc.l` into scope. By default the
+// module name will be `calc_l` (i.e. the file name, minus any extensions,
+// with a suffix of `_l`).
+lrlex_mod!("elp.l");
+// Using `lrpar_mod!` brings the parser for `calc.y` into scope. By default the
+// module name will be `calc_y` (i.e. the file name, minus any extensions,
+// with a suffix of `_y`).
+lrpar_mod!("elp.y");
 
-    // let source = fs::read_to_string("./examples/kitchen-sink.velp")
-    //     .expect("Couldn't open kitchen-sink.velp");
-    let source: String = "\"Hello world\"".into();
-    let mut lexer = Lexer::new(source);
-
-    let tokens = lexer.consume_all_tokens();
-    let mut parser = Parser::new(tokens);
-    parser.register_visitor(Box::new(&mut string_visitor));
-
-    let ast = parser.parse().await?;
-
-    dbg!(ast);
-
-    Ok(())
+fn main() {
+    // Get the `LexerDef` for the `calc` language.
+    let lexerdef = calc_l::lexerdef();
+    let args: Vec<String> = env::args().collect();
+    // Now we create a lexer with the `lexer` method with which we can lex an
+    // input.
+    let lexer = lexerdef.lexer(&args[1]);
+    // Pass the lexer to the parser and lex and parse the input.
+    let (res, errs) = calc_y::parse(&lexer);
+    for e in errs {
+        println!("{}", e.pp(&lexer, &calc_y::token_epp));
+    }
+    match res {
+        Some(r) => println!("Result: {:?}", r),
+        _ => eprintln!("Unable to evaluate expression."),
+    }
 }
+

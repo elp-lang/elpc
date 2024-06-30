@@ -1,11 +1,13 @@
 import { Column } from "elp/layout"
-import { Text } from "elp/components"
+import { Text, Component } from "elp/components"
 import { User, UserMessage } from "$types/chat"
 
-export fn Message(from: User, body: string): Column {
+export fn Message(from User, body string): some Component {
 	Column {
 		Text(from.displayName, class="from")
 		Text(body)
 	}
 }
 
+
+// vim: ft=kotlin
