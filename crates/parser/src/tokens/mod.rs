@@ -125,13 +125,13 @@ pub enum Symbol {
     Other(String),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub source: Source,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Source {
     pub name: String,
     pub path: String,

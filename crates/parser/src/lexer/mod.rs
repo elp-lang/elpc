@@ -139,6 +139,7 @@ impl Lexer {
                 },
             },
             token_type: TokenType::WhiteSpace(match value.clone() {
+                s if s == " " => WhiteSpace::Space,
                 s if s == "\n" => WhiteSpace::NewLine,
                 s if s == "\t" => WhiteSpace::Tab,
                 _ => WhiteSpace::Other(value.clone().to_string()),
@@ -179,6 +180,10 @@ impl Lexer {
             '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
             '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
             '\\' => TokenType::Symbol(Symbol::BackSlash),
+            '/' => match self.is_symbol(self.next()) {
+                Some('=') => TokenType::Symbol(Symbol::SlashAssign),
+                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+            },
             '<' => match self.is_symbol(self.next()) {
                 Some('<') => TokenType::Symbol(Symbol::BitwiseLeftShift),
                 _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
@@ -284,7 +289,7 @@ impl Lexer {
             path: "".to_string(),
             span: Span {
                 start: self.position,
-                end: self.position - 1,
+                end: self.position,
                 lines: vec![],
             },
         };
@@ -326,13 +331,130 @@ impl Lexer {
 
 #[cfg(test)]
 mod tests {
-    use crate::lexer::Lexer;
+    use crate::{
+        lexer::Lexer,
+        span::Span,
+        tokens::{Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
+    };
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn test_consume_all_tokens() {
         let mut lexer = Lexer::new_str("var x = 10");
         let tokens = lexer.consume_all_tokens();
 
-        assert_eq!(tokens, vec![],);
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 0,
+                            end: 0,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Var),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 0,
+                            end: 2,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 3,
+                            end: 3,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("x".to_string()),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 4,
+                            end: 4,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 5,
+                            end: 5,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::SingleEqual),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 6,
+                            end: 6,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 7,
+                            end: 7,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(10),
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 8,
+                            end: 9,
+                            lines: vec![],
+                        },
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        name: "".to_string(),
+                        path: "".to_string(),
+                        span: Span {
+                            start: 10,
+                            end: 10,
+                            lines: vec![],
+                        },
+                    }
+                }
+            ]
+        );
     }
 }
