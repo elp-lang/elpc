@@ -1,16 +1,15 @@
 use core::fmt;
 use std::num::{ParseFloatError, ParseIntError};
-use std::sync::Arc;
 
-use crate::lexer::lexer::SourceFile;
+use crate::tokens::Source;
 
 #[derive(Debug)]
 pub enum ParsingError {
-    InvalidInt(ParseIntError, Arc<SourceFile>),
-    InvalidFloat(ParseFloatError, Arc<SourceFile>),
-    UnknownChar(char, Arc<SourceFile>),
-    Unknown(&'static str, Arc<SourceFile>),
-    SyntaxError(String, Arc<SourceFile>),
+    InvalidInt(ParseIntError, Source),
+    InvalidFloat(ParseFloatError, Source),
+    UnknownChar(char, Source),
+    Unknown(&'static str, Source),
+    SyntaxError(String, Source),
 }
 
 impl fmt::Display for ParsingError {
@@ -19,36 +18,36 @@ impl fmt::Display for ParsingError {
             ParsingError::InvalidInt(err, source) => {
                 write!(
                     f,
-                    "{}\n{}\n {}:{}-{}",
-                    err, source.path, source.line, source.span.0, source.span.1
+                    "{}\n{}\n {:?}:{}-{}",
+                    err, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
             ParsingError::InvalidFloat(err, source) => {
                 write!(
                     f,
-                    "{}\n{}\n {}:{}-{}",
-                    err, source.path, source.line, source.span.0, source.span.1
+                    "{}\n{}\n {:?}:{}-{}",
+                    err, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
             ParsingError::UnknownChar(ch, source) => {
                 write!(
                     f,
-                    "unknown char, can't parse '{}'\n{}\n {}:{}-{}",
-                    ch, source.path, source.line, source.span.0, source.span.1
+                    "unknown char, can't parse '{}'\n{}\n {:?}:{}-{}",
+                    ch, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
             ParsingError::Unknown(str, source) => {
                 write!(
                     f,
-                    "Something unexpected happened '{}'\n{}\n {}:{}-{}",
-                    str, source.path, source.line, source.span.0, source.span.1
+                    "Something unexpected happened '{}'\n{}\n {:?}:{}-{}",
+                    str, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
             ParsingError::SyntaxError(str, source) => {
                 write!(
                     f,
-                    "syntax error: {}\n{}\n {}:{}-{}",
-                    str, source.path, source.line, source.span.0, source.span.1
+                    "syntax error: {}\n{}\n {:?}:{}-{}",
+                    str, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
         }

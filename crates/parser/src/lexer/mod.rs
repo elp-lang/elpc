@@ -1,160 +1,12 @@
 use std::char;
-use std::fmt::Display;
-use std::sync::Arc;
 
-use super::parsing_error::ParsingError;
+pub mod parsing_error;
+use parsing_error::ParsingError;
 
-#[derive(Default, Debug, PartialEq, Eq, Clone)]
-pub enum AccessModifier {
-    #[default]
-    Private,
-    Pub,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Keyword {
-    As,
-    Fn,
-    Var,
-    Const,
-    Import,
-    From,
-    Interface,
-    Object,
-    Enum,
-    Match,
-    If,
-    ElseIf,
-    Else,
-    Nil,
-    Empty,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Whitespace {
-    Return,
-    NewLine,
-    Tab,
-    Other(String),
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Symbol {
-    DoubleSpeechMark,
-    SingleSpeechMark,
-    OpenParen,
-    CloseParen,
-    Colon,
-    OpenBlock,
-    CloseBlock,
-    Period,
-    Comma,
-    BackSlash,
-    SingleEqual,
-    DoubleEqual,
-    BitwiseOr,
-    BitwiseAnd,
-    BitwiseXor,
-    BitwiseLeftShift,
-    BitwiseRightShift,
-    Other(String),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum TokenType {
-    Void,
-    Unknown,
-    SOI,
-    EOF,
-    BooleanLiteral(bool),
-    IntegerLiteral(i64),
-    FloatLiteral(f64),
-    StringLiteral(String),
-    Keyword(Keyword),
-    ReturnType,
-    Ident(String),
-    Symbol(Symbol),
-    Whitespace(Whitespace),
-    AccessModifier(AccessModifier),
-}
-
-impl Display for TokenType {
-    fn fmt(&self, f1: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            TokenType::Void => "void".into(),
-            TokenType::SOI => "SOI (Start Of Input)".into(),
-            TokenType::EOF => "EOF (End Of File)".into(),
-            TokenType::Keyword(Keyword::As) => "as".into(),
-            TokenType::Keyword(Keyword::Interface) => "interface".into(),
-            TokenType::Keyword(Keyword::Enum) => "enum".into(),
-            TokenType::Keyword(Keyword::Fn) => "fn".into(),
-            TokenType::Keyword(Keyword::Var) => "var".into(),
-            TokenType::Keyword(Keyword::Const) => "const".into(),
-            TokenType::Keyword(Keyword::Import) => "import".into(),
-            TokenType::Keyword(Keyword::From) => "from".into(),
-            TokenType::Keyword(Keyword::Object) => "object".into(),
-            TokenType::Keyword(Keyword::Match) => "match".into(),
-            TokenType::Keyword(Keyword::If) => "if".into(),
-            TokenType::Keyword(Keyword::ElseIf) => "elseif".into(),
-            TokenType::Keyword(Keyword::Else) => "else".into(),
-            TokenType::Keyword(Keyword::Nil) => "nil".into(),
-            TokenType::Keyword(Keyword::Empty) => "empty".into(),
-            TokenType::ReturnType => "return type".into(),
-            TokenType::Ident(s) => format!("ident({})", s),
-            TokenType::Symbol(Symbol::CloseParen) => ")".into(),
-            TokenType::Symbol(Symbol::DoubleSpeechMark) => "\"".into(),
-            TokenType::Symbol(Symbol::SingleSpeechMark) => "'".into(),
-            TokenType::Symbol(Symbol::SingleEqual) => "=".into(),
-            TokenType::Symbol(Symbol::DoubleEqual) => "==".into(),
-            TokenType::Symbol(Symbol::OpenParen) => "(".into(),
-            TokenType::Symbol(Symbol::Colon) => ":".into(),
-            TokenType::Symbol(Symbol::OpenBlock) => "{".into(),
-            TokenType::Symbol(Symbol::CloseBlock) => "}".into(),
-            TokenType::Symbol(Symbol::Period) => ".".into(),
-            TokenType::Symbol(Symbol::Comma) => ",".into(),
-            TokenType::Symbol(Symbol::BackSlash) => "\\".into(),
-            TokenType::Symbol(Symbol::BitwiseOr) => "|".into(),
-            TokenType::Symbol(Symbol::BitwiseAnd) => "&".into(),
-            TokenType::Symbol(Symbol::BitwiseXor) => "^".into(),
-            TokenType::Symbol(Symbol::BitwiseLeftShift) => "<<".into(),
-            TokenType::Symbol(Symbol::BitwiseRightShift) => ">>".into(),
-            TokenType::Symbol(Symbol::Other(s)) => s.to_string(),
-            TokenType::Whitespace(Whitespace::Tab) => "tab \\t".into(),
-            TokenType::Whitespace(Whitespace::Return) => "return \\r".into(),
-            TokenType::Whitespace(Whitespace::NewLine) => "new line \\n".into(),
-            TokenType::Whitespace(Whitespace::Other(w)) => w.to_string(),
-            TokenType::AccessModifier(AccessModifier::Pub) => "pub".into(),
-            TokenType::BooleanLiteral(_) => "boolean".into(),
-            TokenType::StringLiteral(_) => "string literal".into(),
-            TokenType::IntegerLiteral(n) => format!("integer '{}'", n),
-            TokenType::FloatLiteral(f) => format!("float '{:e}'", f),
-            TokenType::AccessModifier(AccessModifier::Private) => "private".into(),
-            TokenType::Unknown => "unknown".into(),
-        };
-        write!(f1, "{}", str)
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct SourceFile {
-    pub name: String,
-    pub path: String,
-    pub line: usize,
-    pub span: (usize, usize),
-}
-
-impl Display for SourceFile {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}:{}", self.name, self.path, self.line)
-    }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Token {
-    pub token_type: TokenType,
-    pub source: Arc<SourceFile>,
-    pub value: String,
-}
+use crate::{
+    span::Span,
+    tokens::{AccessModifier, Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
+};
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -170,15 +22,21 @@ impl Lexer {
             input,
             tokens: vec![Token {
                 token_type: TokenType::SOI,
-                value: "".to_string(),
-                source: Arc::new(SourceFile {
+                source: Source {
                     name: "".to_string(),
                     path: "".to_string(),
-                    line: 0,
-                    span: (0, 0),
-                }),
+                    span: Span {
+                        start: 0,
+                        end: 0,
+                        lines: vec![],
+                    },
+                },
             }],
         }
+    }
+
+    pub fn new_str(input: &str) -> Self {
+        Lexer::new(input.to_string())
     }
 
     fn next(&self) -> Option<char> {
@@ -224,23 +82,26 @@ impl Lexer {
         }
 
         Token {
-            value: value.clone(),
-            source: Arc::new(SourceFile {
+            source: Source {
                 name: "".to_string(),
                 path: "".to_string(),
-                line: 0,
-                span: (starting_cursor, self.position - 1),
-            }),
+                span: Span {
+                    start: starting_cursor,
+                    end: self.position - 1,
+                    lines: vec![],
+                },
+            },
             token_type: match value.clone() {
                 s if s == "true" => TokenType::BooleanLiteral(true),
                 s if s == "false" => TokenType::BooleanLiteral(false),
-                s if s == "pub" => TokenType::AccessModifier(AccessModifier::Pub),
+                s if s == "public" => TokenType::AccessModifier(AccessModifier::Public),
                 s if s == "private" => TokenType::AccessModifier(AccessModifier::Private),
                 s if s == "fn" => TokenType::Keyword(Keyword::Fn),
                 s if s == "var" => TokenType::Keyword(Keyword::Var),
                 s if s == "const" => TokenType::Keyword(Keyword::Const),
                 s if s == "import" => TokenType::Keyword(Keyword::Import),
                 s if s == "from" => TokenType::Keyword(Keyword::From),
+                s if s == "as" => TokenType::Keyword(Keyword::As),
                 s if s == "interface" => TokenType::Keyword(Keyword::Interface),
                 s if s == "object" => TokenType::Keyword(Keyword::Object),
                 s if s == "enum" => TokenType::Keyword(Keyword::Enum),
@@ -248,7 +109,7 @@ impl Lexer {
                 s if s == "if" => TokenType::Keyword(Keyword::If),
                 s if s == "elseif" => TokenType::Keyword(Keyword::ElseIf),
                 s if s == "else" => TokenType::Keyword(Keyword::Else),
-                s if s == "void" => TokenType::Void,
+                s if s == "nil" => TokenType::Nil,
                 _ => TokenType::Ident(value.clone()),
             },
         }
@@ -268,36 +129,40 @@ impl Lexer {
         }
 
         Token {
-            value: value.clone(),
-            source: Arc::new(SourceFile {
+            source: Source {
                 name: "".to_string(),
                 path: "".to_string(),
-                line: 0,
-                span: (starting_cursor, self.position - 1),
-            }),
-            token_type: TokenType::Whitespace(match value.clone() {
-                s if s == "\r" => Whitespace::Return,
-                s if s == "\n" => Whitespace::NewLine,
-                s if s == "\t" => Whitespace::Tab,
-                _ => Whitespace::Other(value.clone().to_string()),
+                span: Span {
+                    start: starting_cursor,
+                    end: self.position - 1,
+                    lines: vec![],
+                },
+            },
+            token_type: TokenType::WhiteSpace(match value.clone() {
+                s if s == "\n" => WhiteSpace::NewLine,
+                s if s == "\t" => WhiteSpace::Tab,
+                _ => WhiteSpace::Other(value.clone().to_string()),
             }),
         }
     }
 
     fn consume_symbol_into_token(&mut self) -> Token {
         let starting_cursor = self.position;
-
         let ch = self.is_symbol(self.next()).unwrap();
+
         self.consume();
+
         let mut token = Token {
-            value: ch.into(),
-            source: Arc::new(SourceFile {
+            source: Source {
                 name: "".to_string(),
                 path: "".to_string(),
-                line: 0,
-                span: (starting_cursor, self.position - 1),
-            }),
-            token_type: TokenType::Unknown,
+                span: Span {
+                    start: starting_cursor,
+                    end: self.position - 1,
+                    lines: vec![],
+                },
+            },
+            token_type: TokenType::Nil,
         };
 
         token.token_type = match ch {
@@ -306,7 +171,7 @@ impl Lexer {
             '}' => TokenType::Symbol(Symbol::CloseBlock),
             '(' => TokenType::Symbol(Symbol::OpenParen),
             ')' => TokenType::Symbol(Symbol::CloseParen),
-            '.' => TokenType::Symbol(Symbol::Period),
+            '.' => TokenType::Symbol(Symbol::Dot),
             ',' => TokenType::Symbol(Symbol::Comma),
             '&' => TokenType::Symbol(Symbol::BitwiseAnd),
             '|' => TokenType::Symbol(Symbol::BitwiseOr),
@@ -325,13 +190,15 @@ impl Lexer {
             '=' => match self.is_symbol(self.next()) {
                 Some('=') => {
                     self.consume();
-                    token.value = "==".into();
-                    token.source = Arc::new(SourceFile {
+                    token.source = Source {
                         name: "".to_string(),
                         path: "".to_string(),
-                        line: 0,
-                        span: (starting_cursor, token.source.span.1 + 1),
-                    });
+                        span: Span {
+                            start: starting_cursor,
+                            end: token.source.span.end + 1,
+                            lines: vec![],
+                        },
+                    };
                     TokenType::Symbol(Symbol::DoubleEqual)
                 }
                 _ => TokenType::Symbol(Symbol::SingleEqual),
@@ -339,14 +206,16 @@ impl Lexer {
             '-' => match self.is_symbol(self.next()) {
                 Some('>') => {
                     self.consume();
-                    token.value = "->".into();
-                    token.source = Arc::new(SourceFile {
+                    token.source = Source {
                         name: "".to_string(),
                         path: "".to_string(),
-                        line: 0,
-                        span: (starting_cursor, token.source.span.1 + 1),
-                    });
-                    TokenType::ReturnType
+                        span: Span {
+                            start: starting_cursor,
+                            end: token.source.span.end + 1,
+                            lines: vec![],
+                        },
+                    };
+                    TokenType::Symbol(Symbol::Arrow)
                 }
                 _ => TokenType::Symbol(Symbol::Other(ch.into())),
             },
@@ -380,12 +249,15 @@ impl Lexer {
         }
 
         let token_type: TokenType;
-        let source = Arc::new(SourceFile {
+        let source = Source {
             name: "".to_string(),
             path: "".to_string(),
-            line: 0,
-            span: (starting_cursor, self.position - 1),
-        });
+            span: Span {
+                start: starting_cursor,
+                end: self.position - 1,
+                lines: vec![],
+            },
+        };
 
         if probably_int {
             match value.parse::<i64>() {
@@ -395,11 +267,7 @@ impl Lexer {
                 Err(err) => return Err(ParsingError::InvalidInt(err, source)),
             }
 
-            return Ok(Token {
-                token_type,
-                value: value.to_string(),
-                source,
-            });
+            return Ok(Token { token_type, source });
         }
 
         match value.parse::<f64>() {
@@ -407,26 +275,24 @@ impl Lexer {
             Err(err) => return Err(ParsingError::InvalidFloat(err, source)),
         }
 
-        Ok(Token {
-            token_type,
-            value: value.to_string(),
-            source,
-        })
+        Ok(Token { token_type, source })
     }
 
     fn consume_next_token(&mut self) -> Result<Token, ParsingError> {
-        let source = Arc::new(SourceFile {
+        let source = Source {
             name: "".to_string(),
             path: "".to_string(),
-            line: 0,
-            span: (self.position, self.position),
-        });
+            span: Span {
+                start: self.position,
+                end: self.position - 1,
+                lines: vec![],
+            },
+        };
 
         if self.next().is_none() {
             return Ok(Token {
                 token_type: TokenType::EOF,
                 source,
-                value: "".to_string(),
             });
         }
 
@@ -455,5 +321,18 @@ impl Lexer {
         }
 
         self.tokens.to_owned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::lexer::Lexer;
+
+    #[test]
+    fn test_consume_all_tokens() {
+        let mut lexer = Lexer::new_str("var x = 10");
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(tokens, vec![],);
     }
 }

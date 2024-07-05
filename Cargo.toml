@@ -1,42 +1,5 @@
-[package]
-name = "elp"
-version = "0.1.0"
-edition = "2021"
-
-[target.'cfg(windows)'.dependencies]
-windows = { version = "0.56.0", features = ["Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging"]}
-
-[target.'cfg(apple)'.dependencies]
-block = "0.1.6"
-objc = { version = "0.2.7", features = ["exception", "objc_exception", "verify_message"] }
-
-[target.'cfg(android)'.dependencies]
-jni = "0.21.1"
-
-[build-dependencies]
-cfgrammar = "0.13.7"
-lrtable = "0.13.7"
-lrlex = "0.13.7"
-lrpar = "0.13.7"
-serde = { version = "1.0.203", features = ["derive"] }
-serde_yaml = "0.9.34"
-[target.'cfg(apple)'.build-dependencies]
-regex = "1.10.3"
-toml = "0.8.10"
-glob = "0.3.1"
-bindgen = "0.69.4"
-
-[features]
-default = ["parser", "elpc"]
-parser = []
-elpc = []
-apple-compiler = ["parser", "elpc"]
-android-compiler = ["parser", "elpc"]
-windows-compiler = ["parser", "elpc"]
-
-[dependencies]
-pretty_assertions = "1.4.0"
-async-trait = "0.1.80"
-tokio = { version = "1.37.0", features = ["rt", "rt-multi-thread", "macros"] }
-lrlex = "0.13.7"
-lrpar = "0.13.7"
+[workspace]
+resolver = "2"
+members = [
+	"crates/parser"
+]
