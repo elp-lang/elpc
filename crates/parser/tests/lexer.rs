@@ -4,6 +4,8 @@
 
 #[cfg(test)]
 mod tests {
+    use std::default;
+
     use elp_parser::{
         lexer::Lexer,
         span::Span,
@@ -905,6 +907,73 @@ mod tests {
                 }
             ]
         );
+
+        lexer = Lexer::new_str("isEven(1)");
+        tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default()
+                },
+                Token {
+                    token_type: TokenType::Ident("isEven".into()),
+                    source: Source {
+                        span: Span {
+                            end: 5,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenParen),
+                    source: Source {
+                        span: Span {
+                            start: 6,
+                            end: 6,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(1),
+                    source: Source {
+                        span: Span {
+                            start: 7,
+                            end: 7,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseParen),
+                    source: Source {
+                        span: Span {
+                            start: 8,
+                            end: 8,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 9,
+                            end: 9,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
     }
 
     #[test]
@@ -1388,6 +1457,44 @@ mod tests {
                         span: Span {
                             start: 39,
                             end: 39,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_macro() {
+        let mut lexer = Lexer::new_str("@myMacro");
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default()
+                },
+                Token {
+                    token_type: TokenType::MacroCall("myMacro".into()),
+                    source: Source {
+                        span: Span {
+                            start: 0,
+                            end: 7,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 8,
+                            end: 8,
                             ..Default::default()
                         },
                         ..Default::default()

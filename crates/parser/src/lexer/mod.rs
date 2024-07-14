@@ -22,15 +22,7 @@ impl Lexer {
             input,
             tokens: vec![Token {
                 token_type: TokenType::SOI,
-                source: Source {
-                    name: "".to_string(),
-                    path: "".to_string(),
-                    span: Span {
-                        start: 0,
-                        end: 0,
-                        lines: vec![],
-                    },
-                },
+                source: Source::default(),
             }],
         }
     }
@@ -61,8 +53,7 @@ impl Lexer {
         })
     }
 
-    fn consume_ident_into_token(&mut self) -> Token {
-        let starting_cursor = self.position;
+    fn consume_ident_to_string(&mut self) -> String {
         let mut value: String = "".to_string();
 
         while let Some(ch) = self.next() {
@@ -81,15 +72,21 @@ impl Lexer {
             }
         }
 
+        value
+    }
+
+    fn consume_ident_into_token(&mut self) -> Token {
+        let starting_cursor = self.position;
+        let value = self.consume_ident_to_string();
+
         Token {
             source: Source {
-                name: "".to_string(),
-                path: "".to_string(),
                 span: Span {
                     start: starting_cursor,
                     end: self.position - 1,
-                    lines: vec![],
+                    ..Default::default()
                 },
+                ..Default::default()
             },
             token_type: match value.clone() {
                 s if s == "true" => TokenType::BooleanLiteral(true),
@@ -131,13 +128,12 @@ impl Lexer {
 
         Token {
             source: Source {
-                name: "".to_string(),
-                path: "".to_string(),
                 span: Span {
                     start: starting_cursor,
                     end: self.position - 1,
-                    lines: vec![],
+                    ..Default::default()
                 },
+                ..Default::default()
             },
             token_type: TokenType::WhiteSpace(match value.clone() {
                 s if s == " " => WhiteSpace::Space,
@@ -156,13 +152,12 @@ impl Lexer {
 
         let mut token = Token {
             source: Source {
-                name: "".to_string(),
-                path: "".to_string(),
                 span: Span {
                     start: starting_cursor,
                     end: self.position - 1,
-                    lines: vec![],
+                    ..Default::default()
                 },
+                ..Default::default()
             },
             token_type: TokenType::Nil,
         };
@@ -182,6 +177,19 @@ impl Lexer {
             '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
             '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
             '\\' => TokenType::Symbol(Symbol::BackSlash),
+            '@' => match self.next() {
+                Some(ch) => {
+                    if ch.is_alphabetic() {
+                        let ident = self.consume_ident_to_string();
+
+                        token.source.span.end = token.source.span.start + ident.len();
+                        TokenType::MacroCall(ident)
+                    } else {
+                        TokenType::Symbol(Symbol::Other(ch.into()))
+                    }
+                }
+                None => TokenType::Symbol(Symbol::Other(ch.into())),
+            },
             '/' => match self.is_symbol(self.next()) {
                 Some('=') => TokenType::Symbol(Symbol::SlashAssign),
                 _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
@@ -198,13 +206,12 @@ impl Lexer {
                 Some('=') => {
                     self.consume();
                     token.source = Source {
-                        name: "".to_string(),
-                        path: "".to_string(),
                         span: Span {
                             start: starting_cursor,
                             end: token.source.span.end + 1,
-                            lines: vec![],
+                            ..Default::default()
                         },
+                        ..Default::default()
                     };
                     TokenType::Symbol(Symbol::DoubleEqual)
                 }
@@ -214,13 +221,12 @@ impl Lexer {
                 Some('>') => {
                     self.consume();
                     token.source = Source {
-                        name: "".to_string(),
-                        path: "".to_string(),
                         span: Span {
                             start: starting_cursor,
                             end: token.source.span.end + 1,
-                            lines: vec![],
+                            ..Default::default()
                         },
+                        ..Default::default()
                     };
                     TokenType::Symbol(Symbol::Arrow)
                 }
@@ -257,13 +263,12 @@ impl Lexer {
 
         let token_type: TokenType;
         let source = Source {
-            name: "".to_string(),
-            path: "".to_string(),
             span: Span {
                 start: starting_cursor,
                 end: self.position - 1,
-                lines: vec![],
+                ..Default::default()
             },
+            ..Default::default()
         };
 
         if probably_int {
@@ -287,13 +292,12 @@ impl Lexer {
 
     fn consume_next_token(&mut self) -> Result<Token, ParsingError> {
         let source = Source {
-            name: "".to_string(),
-            path: "".to_string(),
             span: Span {
                 start: self.position,
                 end: self.position,
-                lines: vec![],
+                ..Default::default()
             },
+            ..Default::default()
         };
 
         if self.next().is_none() {
