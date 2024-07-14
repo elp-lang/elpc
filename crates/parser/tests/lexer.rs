@@ -1115,4 +1115,281 @@ mod tests {
             ]
         );
     }
+
+    #[test]
+    fn test_objects() {
+        let mut lexer = Lexer::new_str("export object {}");
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default()
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Export),
+                    source: Source {
+                        span: Span {
+                            end: 5,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 6,
+                            end: 6,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Object),
+                    source: Source {
+                        span: Span {
+                            start: 7,
+                            end: 12,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 13,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 15,
+                            end: 15,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_enums() {
+        let mut lexer = Lexer::new_str(
+            "enum HttpStatus {
+    OKAY,
+    ERROR
+}",
+        );
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Enum),
+                    source: Source {
+                        span: Span {
+                            end: 3,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 4,
+                            end: 4,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Ident("HttpStatus".into()),
+                    source: Source {
+                        span: Span {
+                            start: 5,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 15,
+                            end: 15,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 17,
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
+                    source: Source {
+                        span: Span {
+                            start: 18,
+                            end: 21,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Ident("OKAY".into()),
+                    source: Source {
+                        span: Span {
+                            start: 22,
+                            end: 25,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::Comma),
+                    source: Source {
+                        span: Span {
+                            start: 26,
+                            end: 26,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 27,
+                            end: 27,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
+                    source: Source {
+                        span: Span {
+                            start: 28,
+                            end: 31,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Ident("ERROR".into()),
+                    source: Source {
+                        span: Span {
+                            start: 32,
+                            end: 36,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 37,
+                            end: 37,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 38,
+                            end: 38,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 39,
+                            end: 39,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+    }
 }

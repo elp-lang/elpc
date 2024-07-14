@@ -100,6 +100,7 @@ impl Lexer {
                 s if s == "var" => TokenType::Keyword(Keyword::Var),
                 s if s == "const" => TokenType::Keyword(Keyword::Const),
                 s if s == "import" => TokenType::Keyword(Keyword::Import),
+                s if s == "export" => TokenType::Keyword(Keyword::Export),
                 s if s == "from" => TokenType::Keyword(Keyword::From),
                 s if s == "as" => TokenType::Keyword(Keyword::As),
                 s if s == "interface" => TokenType::Keyword(Keyword::Interface),
