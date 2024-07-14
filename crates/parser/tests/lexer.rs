@@ -905,7 +905,7 @@ mod tests {
 
     #[test]
     fn test_imports() {
-        let mut lexer = Lexer::new_str("import { Thing } from \"myThing\"");
+        let mut lexer = Lexer::new_str("import { Thing as Alias } from \"myThing\"");
         let tokens = lexer.consume_all_tokens();
 
         assert_eq!(
@@ -981,11 +981,11 @@ mod tests {
                     }
                 },
                 Token {
-                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    token_type: TokenType::Keyword(Keyword::As),
                     source: Source {
                         span: Span {
                             start: 15,
-                            end: 15,
+                            end: 16,
                             ..Default::default()
                         },
                         ..Default::default()
@@ -995,8 +995,52 @@ mod tests {
                     token_type: TokenType::WhiteSpace(WhiteSpace::Space),
                     source: Source {
                         span: Span {
-                            start: 16,
-                            end: 16,
+                            start: 17,
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("Alias".into()),
+                    source: Source {
+                        span: Span {
+                            start: 18,
+                            end: 22,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 23,
+                            end: 23,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 24,
+                            end: 24,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 25,
+                            end: 25,
                             ..Default::default()
                         },
                         ..Default::default()
@@ -1006,40 +1050,7 @@ mod tests {
                     token_type: TokenType::Keyword(Keyword::From),
                     source: Source {
                         span: Span {
-                            start: 17,
-                            end: 20,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
-                    source: Source {
-                        span: Span {
-                            start: 21,
-                            end: 21,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
-                    source: Source {
-                        span: Span {
-                            start: 22,
-                            end: 22,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::Ident("myThing".into()),
-                    source: Source {
-                        span: Span {
-                            start: 23,
+                            start: 26,
                             end: 29,
                             ..Default::default()
                         },
@@ -1047,7 +1058,7 @@ mod tests {
                     }
                 },
                 Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
                     source: Source {
                         span: Span {
                             start: 30,
@@ -1058,11 +1069,44 @@ mod tests {
                     }
                 },
                 Token {
-                    token_type: TokenType::EOF,
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
                     source: Source {
                         span: Span {
                             start: 31,
                             end: 31,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("myThing".into()),
+                    source: Source {
+                        span: Span {
+                            start: 32,
+                            end: 38,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                    source: Source {
+                        span: Span {
+                            start: 39,
+                            end: 39,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 40,
+                            end: 40,
                             ..Default::default()
                         },
                         ..Default::default()
