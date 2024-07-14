@@ -144,3 +144,20 @@ impl Display for Source {
         write!(f, "{}:{}:{}", self.name, self.path, self.span)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        let source = Source {
+            name: "test".into(),
+            ..Default::default()
+        };
+
+        assert_eq!("test::[]:0-0", format!("{}", source));
+    }
+}

@@ -1,3 +1,7 @@
+// This tests the very first pass of parsing; of which there are multiple,
+// the lexer on it's own produces tokens for further parsing, the output is a
+// very verbose output whereas usual parsing would skip things like whitespace.
+
 #[cfg(test)]
 mod tests {
     use elp_parser::{
