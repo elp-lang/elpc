@@ -12,15 +12,18 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Clippy
       run: cargo clippy
+    - name: Dev tools
+      run: cargo install cargo-llvm-cov --locked
     - name: Run tests
-      run: cargo test --verbose
-    - name: Rust Codecov
-      uses: maboesanman/rust-codecov@v0
+      run: cargo llvm-cov
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
           
