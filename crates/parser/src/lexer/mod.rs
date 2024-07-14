@@ -175,6 +175,7 @@ impl Lexer {
             '.' => TokenType::Symbol(Symbol::Dot),
             ',' => TokenType::Symbol(Symbol::Comma),
             '&' => TokenType::Symbol(Symbol::BitwiseAnd),
+            '%' => TokenType::Symbol(Symbol::Modulo),
             '|' => TokenType::Symbol(Symbol::BitwiseOr),
             '^' => TokenType::Symbol(Symbol::BitwiseXor),
             '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),

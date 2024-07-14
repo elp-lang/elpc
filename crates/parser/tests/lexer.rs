@@ -38,7 +38,7 @@ mod tests {
                         span: Span {
                             start: 3,
                             end: 3,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -49,7 +49,7 @@ mod tests {
                         span: Span {
                             start: 4,
                             end: 4,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -60,7 +60,7 @@ mod tests {
                         span: Span {
                             start: 5,
                             end: 5,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -71,7 +71,7 @@ mod tests {
                         span: Span {
                             start: 6,
                             end: 6,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -82,7 +82,7 @@ mod tests {
                         span: Span {
                             start: 7,
                             end: 7,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -93,7 +93,7 @@ mod tests {
                         span: Span {
                             start: 8,
                             end: 9,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -104,7 +104,7 @@ mod tests {
                         span: Span {
                             start: 10,
                             end: 10,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -131,7 +131,7 @@ mod tests {
                         span: Span {
                             start: 0,
                             end: 4,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -142,7 +142,7 @@ mod tests {
                         span: Span {
                             start: 5,
                             end: 5,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -153,7 +153,7 @@ mod tests {
                         span: Span {
                             start: 6,
                             end: 8,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -164,7 +164,7 @@ mod tests {
                         span: Span {
                             start: 9,
                             end: 9,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -175,7 +175,7 @@ mod tests {
                         span: Span {
                             start: 10,
                             end: 10,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -186,7 +186,7 @@ mod tests {
                         span: Span {
                             start: 11,
                             end: 11,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -197,7 +197,7 @@ mod tests {
                         span: Span {
                             start: 12,
                             end: 13,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -208,7 +208,7 @@ mod tests {
                         span: Span {
                             start: 14,
                             end: 14,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -235,7 +235,7 @@ mod tests {
                         span: Span {
                             start: 0,
                             end: 0,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -246,7 +246,7 @@ mod tests {
                         span: Span {
                             start: 0,
                             end: 8,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -257,7 +257,7 @@ mod tests {
                         span: Span {
                             start: 9,
                             end: 9,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -268,7 +268,7 @@ mod tests {
                         span: Span {
                             start: 10,
                             end: 16,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -279,7 +279,7 @@ mod tests {
                         span: Span {
                             start: 17,
                             end: 17,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -290,7 +290,7 @@ mod tests {
                         span: Span {
                             start: 18,
                             end: 18,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -301,7 +301,7 @@ mod tests {
                         span: Span {
                             start: 19,
                             end: 19,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -312,7 +312,7 @@ mod tests {
                         span: Span {
                             start: 20,
                             end: 23,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -323,7 +323,7 @@ mod tests {
                         span: Span {
                             start: 24,
                             end: 27,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -334,7 +334,7 @@ mod tests {
                         span: Span {
                             start: 28,
                             end: 28,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -345,7 +345,7 @@ mod tests {
                         span: Span {
                             start: 29,
                             end: 34,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -356,7 +356,7 @@ mod tests {
                         span: Span {
                             start: 35,
                             end: 35,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -367,7 +367,7 @@ mod tests {
                         span: Span {
                             start: 36,
                             end: 36,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -378,7 +378,7 @@ mod tests {
                         span: Span {
                             start: 37,
                             end: 37,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     },
@@ -405,7 +405,7 @@ mod tests {
                         span: Span {
                             start: 0,
                             end: 0,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -416,7 +416,7 @@ mod tests {
                         span: Span {
                             start: 0,
                             end: 1,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -427,7 +427,7 @@ mod tests {
                         span: Span {
                             start: 2,
                             end: 2,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -438,7 +438,7 @@ mod tests {
                         span: Span {
                             start: 3,
                             end: 14,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -449,7 +449,7 @@ mod tests {
                         span: Span {
                             start: 15,
                             end: 15,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -460,7 +460,7 @@ mod tests {
                         span: Span {
                             start: 16,
                             end: 17,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -471,7 +471,7 @@ mod tests {
                         span: Span {
                             start: 18,
                             end: 18,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -482,7 +482,7 @@ mod tests {
                         span: Span {
                             start: 19,
                             end: 22,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -493,7 +493,7 @@ mod tests {
                         span: Span {
                             start: 23,
                             end: 23,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -504,7 +504,7 @@ mod tests {
                         span: Span {
                             start: 24,
                             end: 24,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -515,7 +515,7 @@ mod tests {
                         span: Span {
                             start: 25,
                             end: 25,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -526,7 +526,7 @@ mod tests {
                         span: Span {
                             start: 26,
                             end: 29,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -537,7 +537,7 @@ mod tests {
                         span: Span {
                             start: 30,
                             end: 33,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -548,7 +548,7 @@ mod tests {
                         span: Span {
                             start: 34,
                             end: 34,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -559,7 +559,7 @@ mod tests {
                         span: Span {
                             start: 35,
                             end: 35,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -570,7 +570,7 @@ mod tests {
                         span: Span {
                             start: 36,
                             end: 36,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -597,7 +597,6 @@ mod tests {
                     source: Source {
                         span: Span {
                             end: 1,
-                            lines: vec![],
                             ..Default::default()
                         },
                         ..Default::default()
@@ -609,18 +608,40 @@ mod tests {
                         span: Span {
                             start: 2,
                             end: 2,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
                 },
                 Token {
-                    token_type: TokenType::Ident("testFunction".to_string()),
+                    token_type: TokenType::Ident("isEven".to_string()),
                     source: Source {
                         span: Span {
                             start: 3,
-                            end: 14,
-                            lines: vec![],
+                            end: 8,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenParen),
+                    source: Source {
+                        span: Span {
+                            start: 9,
+                            end: 9,
+                            lines: vec![]
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("num".to_string()),
+                    source: Source {
+                        span: Span {
+                            start: 10,
+                            end: 12,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -629,9 +650,42 @@ mod tests {
                     token_type: TokenType::WhiteSpace(WhiteSpace::Space),
                     source: Source {
                         span: Span {
-                            start: 15,
-                            end: 15,
-                            lines: vec![],
+                            start: 13,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("int32".to_string()),
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 18,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseParen),
+                    source: Source {
+                        span: Span {
+                            start: 19,
+                            end: 19,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 20,
+                            end: 20,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -640,31 +694,9 @@ mod tests {
                     token_type: TokenType::Symbol(Symbol::Arrow),
                     source: Source {
                         span: Span {
-                            start: 16,
-                            end: 17,
-                            lines: vec![],
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
-                    source: Source {
-                        span: Span {
-                            start: 18,
-                            end: 18,
-                            lines: vec![],
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::Ident("bool".into()),
-                    source: Source {
-                        span: Span {
-                            start: 19,
+                            start: 21,
                             end: 22,
-                            lines: vec![],
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -675,7 +707,29 @@ mod tests {
                         span: Span {
                             start: 23,
                             end: 23,
-                            lines: vec![],
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("bool".into()),
+                    source: Source {
+                        span: Span {
+                            start: 24,
+                            end: 27,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 28,
+                            end: 28,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -684,9 +738,9 @@ mod tests {
                     token_type: TokenType::Symbol(Symbol::OpenBlock),
                     source: Source {
                         span: Span {
-                            start: 24,
-                            end: 24,
-                            lines: vec![],
+                            start: 29,
+                            end: 29,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -695,9 +749,9 @@ mod tests {
                     token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
                     source: Source {
                         span: Span {
-                            start: 25,
-                            end: 25,
-                            lines: vec![],
+                            start: 30,
+                            end: 30,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -706,20 +760,108 @@ mod tests {
                     token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
                     source: Source {
                         span: Span {
-                            start: 26,
-                            end: 29,
-                            lines: vec![],
+                            start: 31,
+                            end: 34,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
                 },
                 Token {
-                    token_type: TokenType::BooleanLiteral(true),
+                    token_type: TokenType::Ident("num".into()),
                     source: Source {
                         span: Span {
-                            start: 30,
-                            end: 33,
-                            lines: vec![],
+                            start: 35,
+                            end: 37,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 38,
+                            end: 38,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::Modulo),
+                    source: Source {
+                        span: Span {
+                            start: 39,
+                            end: 39,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 40,
+                            end: 40,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(2),
+                    source: Source {
+                        span: Span {
+                            start: 41,
+                            end: 41,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 42,
+                            end: 42,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::DoubleEqual),
+                    source: Source {
+                        span: Span {
+                            start: 43,
+                            end: 44,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 45,
+                            end: 45,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(0),
+                    source: Source {
+                        span: Span {
+                            start: 46,
+                            end: 46,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -728,9 +870,9 @@ mod tests {
                     token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
                     source: Source {
                         span: Span {
-                            start: 34,
-                            end: 34,
-                            lines: vec![],
+                            start: 47,
+                            end: 47,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -739,9 +881,9 @@ mod tests {
                     token_type: TokenType::Symbol(Symbol::CloseBlock),
                     source: Source {
                         span: Span {
-                            start: 35,
-                            end: 35,
-                            lines: vec![],
+                            start: 48,
+                            end: 48,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
@@ -750,9 +892,178 @@ mod tests {
                     token_type: TokenType::EOF,
                     source: Source {
                         span: Span {
-                            start: 36,
-                            end: 36,
-                            lines: vec![],
+                            start: 49,
+                            end: 49,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_imports() {
+        let mut lexer = Lexer::new_str("import { Thing } from \"myThing\"");
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default()
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Import),
+                    source: Source {
+                        span: Span {
+                            end: 5,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 6,
+                            end: 6,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 7,
+                            end: 7,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 8,
+                            end: 8,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("Thing".into()),
+                    source: Source {
+                        span: Span {
+                            start: 9,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 15,
+                            end: 15,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::From),
+                    source: Source {
+                        span: Span {
+                            start: 17,
+                            end: 20,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 21,
+                            end: 21,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                    source: Source {
+                        span: Span {
+                            start: 22,
+                            end: 22,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("myThing".into()),
+                    source: Source {
+                        span: Span {
+                            start: 23,
+                            end: 29,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                    source: Source {
+                        span: Span {
+                            start: 30,
+                            end: 30,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 31,
+                            end: 31,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }
