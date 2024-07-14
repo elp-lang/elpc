@@ -21,3 +21,6 @@ jobs:
       run: cargo clippy
     - name: Run tests
       run: cargo test --verbose
+    - name: Rust Codecov
+      uses: maboesanman/rust-codecov@v0
+          
