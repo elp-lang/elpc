@@ -55,3 +55,85 @@ impl fmt::Display for ParsingError {
 }
 
 impl std::error::Error for ParsingError {}
+
+#[cfg(test)]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    use crate::{lexer::parsing_error::ParsingError, tokens::Source};
+
+    #[test]
+    fn test_parsing_error_display() {
+        let mock_int_err: Result<i32, _> = "not_a_number".parse();
+        assert_eq!(
+            "invalid digit found in string\nnone\n []:0-0",
+            format!(
+                "{}",
+                ParsingError::InvalidInt(
+                    mock_int_err.err().unwrap(),
+                    Source {
+                        path: "none".into(),
+                        ..Default::default()
+                    }
+                )
+            )
+        );
+
+        let mock_float_err: Result<f32, _> = "not_a_number".parse();
+        assert_eq!(
+            "invalid float literal\nnone\n []:0-0",
+            format!(
+                "{}",
+                ParsingError::InvalidFloat(
+                    mock_float_err.err().unwrap(),
+                    Source {
+                        path: "none".into(),
+                        ..Default::default()
+                    }
+                )
+            )
+        );
+
+        assert_eq!(
+            "Something unexpected happened 'test'\nnone\n []:0-0",
+            format!(
+                "{}",
+                ParsingError::Unknown(
+                    "test",
+                    Source {
+                        path: "none".into(),
+                        ..Default::default()
+                    }
+                )
+            )
+        );
+
+        assert_eq!(
+            "unknown char, can't parse 'a'\nnone\n []:0-0",
+            format!(
+                "{}",
+                ParsingError::UnknownChar(
+                    'a',
+                    Source {
+                        path: "none".into(),
+                        ..Default::default()
+                    }
+                )
+            )
+        );
+
+        assert_eq!(
+            "syntax error: test\nnone\n []:0-0",
+            format!(
+                "{}",
+                ParsingError::SyntaxError(
+                    "test".into(),
+                    Source {
+                        path: "none".into(),
+                        ..Default::default()
+                    }
+                )
+            )
+        );
+    }
+}
