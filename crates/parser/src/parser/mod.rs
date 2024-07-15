@@ -19,7 +19,7 @@ impl Parser for ElpParser {
     }
 
     async fn parse(&mut self) -> Vec<&dyn AstNode> {
-        let mut ast_nodes: Vec<&dyn AstNode> = [].into();
+        let ast_nodes: Vec<&dyn AstNode> = [].into();
 
         for t in self.tokens.clone().into_iter() {
             match t.token_type {

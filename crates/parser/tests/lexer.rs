@@ -4,7 +4,6 @@
 
 #[cfg(test)]
 mod tests {
-    use std::default;
 
     use elp_parser::{
         lexer::Lexer,
