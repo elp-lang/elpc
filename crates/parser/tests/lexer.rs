@@ -1787,4 +1787,312 @@ mod tests {
             ]
         );
     }
+
+    #[test]
+    fn test_if_else_elseif() {
+        let mut lexer = Lexer::new_str(
+            "if true {
+    1
+} elseif false {
+    2
+} else 3",
+        );
+        let tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::If),
+                    source: Source {
+                        span: Span {
+                            start: 0,
+                            end: 1,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 2,
+                            end: 2,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::BooleanLiteral(true),
+                    source: Source {
+                        span: Span {
+                            start: 3,
+                            end: 6,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 7,
+                            end: 7,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 8,
+                            end: 8,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 9,
+                            end: 9,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
+                    source: Source {
+                        span: Span {
+                            start: 10,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(1),
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 15,
+                            end: 15,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 17,
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::ElseIf),
+                    source: Source {
+                        span: Span {
+                            start: 18,
+                            end: 23,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 24,
+                            end: 24,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::BooleanLiteral(false),
+                    source: Source {
+                        span: Span {
+                            start: 25,
+                            end: 29,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 30,
+                            end: 30,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 31,
+                            end: 31,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 32,
+                            end: 32,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
+                    source: Source {
+                        span: Span {
+                            start: 33,
+                            end: 36,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(2),
+                    source: Source {
+                        span: Span {
+                            start: 37,
+                            end: 37,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 38,
+                            end: 38,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 39,
+                            end: 39,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 40,
+                            end: 40,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Else),
+                    source: Source {
+                        span: Span {
+                            start: 41,
+                            end: 44,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 45,
+                            end: 45,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(3),
+                    source: Source {
+                        span: Span {
+                            start: 46,
+                            end: 46,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 47,
+                            end: 47,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+    }
 }
