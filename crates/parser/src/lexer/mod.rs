@@ -1,4 +1,4 @@
-use std::char;
+use std::{char, string::ParseError};
 
 pub mod parsing_error;
 use parsing_error::ParsingError;
@@ -144,7 +144,7 @@ impl Lexer {
         }
     }
 
-    fn consume_symbol_into_token(&mut self) -> Token {
+    fn consume_symbol_into_token(&mut self) -> Result<Token, ParsingError> {
         let starting_cursor = self.position;
         let ch = self.is_symbol(self.next()).unwrap();
 
@@ -205,8 +205,43 @@ impl Lexer {
                 }
                 _ => TokenType::Symbol(Symbol::Caret),
             },
-            '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
-            '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
+            '"' | '\'' => {
+                let is_single_quote = ch == '\'';
+                let mut value = String::new();
+                let mut escaped = false;
+                let mut is_open = true;
+
+                while let Some(ch) = self.next() {
+                    self.consume();
+                    if escaped {
+                        match ch {
+                            'n' => value.push('\n'),
+                            't' => value.push('\t'),
+                            'r' => value.push('\r'),
+                            '\\' => value.push('\\'),
+                            '\'' if is_single_quote => value.push('\''),
+                            '"' if !is_single_quote => value.push('"'),
+                            _ => return Err(ParsingError::InvalidEscapeSequence(ch, token.source)),
+                        }
+                        escaped = false;
+                    } else if ch == '\\' {
+                        escaped = true;
+                    } else if ch == (if is_single_quote { '\'' } else { '"' }) {
+                        is_open = false;
+                        break;
+                    } else {
+                        value.push(ch);
+                    }
+                }
+
+                if escaped || is_open {
+                    return Err(ParsingError::UnterminatedStringLiteral(token.source));
+                }
+
+                token.source.span.end = self.position;
+
+                TokenType::StringLiteral(value)
+            }
             '\\' => TokenType::Symbol(Symbol::BackSlash),
             '@' => match self.next() {
                 Some(ch) => {
@@ -274,7 +309,7 @@ impl Lexer {
             _ => TokenType::Symbol(Symbol::Other(ch.into())),
         };
 
-        token
+        Ok(token)
     }
 
     fn consume_numerics_into_token(&mut self) -> Result<Token, ParsingError> {
@@ -353,7 +388,7 @@ impl Lexer {
         } else if self.is_whitespace(ch).is_some() {
             Ok(self.consume_whitespace_into_token())
         } else if self.is_symbol(ch).is_some() {
-            Ok(self.consume_symbol_into_token())
+            self.consume_symbol_into_token()
         } else if ch.unwrap().is_numeric() {
             self.consume_numerics_into_token()
         } else {
@@ -361,15 +396,20 @@ impl Lexer {
         }
     }
 
-    pub fn consume_all_tokens(&mut self) -> Vec<Token> {
-        while let Ok(next_token) = self.consume_next_token() {
-            self.tokens.push(next_token.to_owned());
+    pub fn consume_all_tokens(&mut self) -> Result<Vec<Token>, ParsingError> {
+        while let next_token_result = self.consume_next_token() {
+            match next_token_result {
+                Ok(next_token) => {
+                    self.tokens.push(next_token.to_owned());
 
-            if next_token.token_type == TokenType::EOF {
-                break;
+                    if next_token.token_type == TokenType::EOF {
+                        break;
+                    }
+                }
+                Err(err) => return Err(err),
             }
         }
 
-        self.tokens.to_owned()
+        Ok(self.tokens.to_owned())
     }
 }

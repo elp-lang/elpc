@@ -6,16 +6,16 @@
 mod tests {
 
     use elp_parser::{
-        lexer::Lexer,
+        lexer::{parsing_error::ParsingError, Lexer},
         span::Span,
         tokens::{Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
     };
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn test_var() {
+    fn test_var() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("var x = 10");
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -116,12 +116,14 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_const() {
+    fn test_const() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("const x_1 = 10");
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -220,16 +222,18 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_interface() {
+    fn test_interface() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "interface testing {
     test string
 }",
         );
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -389,17 +393,19 @@ mod tests {
                     },
                 },
             ]
-        )
+        );
+
+        Ok(())
     }
 
     #[test]
-    fn test_functions() {
+    fn test_functions() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "fn testFunction -> bool {
     true
 }",
         );
-        let mut tokens = lexer.consume_all_tokens();
+        let mut tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -588,7 +594,7 @@ mod tests {
     num % 2 == 0
 }",
         );
-        tokens = lexer.consume_all_tokens();
+        tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -908,7 +914,7 @@ mod tests {
         );
 
         lexer = Lexer::new_str("isEven(1)");
-        tokens = lexer.consume_all_tokens();
+        tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -973,12 +979,14 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_imports() {
+    fn test_imports() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("import { Thing as Alias } from \"myThing\"");
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -1141,33 +1149,11 @@ mod tests {
                     }
                 },
                 Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
+                    token_type: TokenType::StringLiteral("myThing".into()),
                     source: Source {
                         span: Span {
                             start: 31,
-                            end: 31,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::Ident("myThing".into()),
-                    source: Source {
-                        span: Span {
-                            start: 32,
-                            end: 38,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
-                },
-                Token {
-                    token_type: TokenType::Symbol(Symbol::DoubleSpeechMark),
-                    source: Source {
-                        span: Span {
-                            start: 39,
-                            end: 39,
+                            end: 40,
                             ..Default::default()
                         },
                         ..Default::default()
@@ -1186,12 +1172,14 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_objects() {
+    fn test_objects() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("export object {}");
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -1278,17 +1266,19 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_enums() {
+    fn test_enums() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "enum HttpStatus {
     OKAY,
     ERROR
 }",
         );
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -1463,12 +1453,14 @@ mod tests {
                 },
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_macro() {
+    fn test_macro() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("@myMacro");
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -1501,17 +1493,19 @@ mod tests {
                 },
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_match() {
+    fn test_match() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "match HttpStatus {
     .OKAY -> 200
     .ERROR -> 500
 }",
         );
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -1786,10 +1780,12 @@ mod tests {
                 },
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_if_else_elseif() {
+    fn test_if_else_elseif() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "if true {
     1
@@ -1797,7 +1793,7 @@ mod tests {
     2
 } else 3",
         );
-        let tokens = lexer.consume_all_tokens();
+        let tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -2094,10 +2090,12 @@ mod tests {
                 },
             ]
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_symbols() {
+    fn test_symbols() -> Result<(), ParsingError> {
         struct Test<'a> {
             input: &'a str,
             expected: TokenType,
@@ -2149,16 +2147,8 @@ mod tests {
                 expected: TokenType::Symbol(Symbol::Caret),
             },
             Test {
-                input: "\"",
-                expected: TokenType::Symbol(Symbol::DoubleSpeechMark),
-            },
-            Test {
                 input: "/",
                 expected: TokenType::Symbol(Symbol::Slash),
-            },
-            Test {
-                input: "'",
-                expected: TokenType::Symbol(Symbol::SingleSpeechMark),
             },
             Test {
                 input: "<",
@@ -2200,7 +2190,7 @@ mod tests {
 
         for test in tests {
             let mut lexer = Lexer::new_str(test.input);
-            let tokens = lexer.consume_all_tokens();
+            let tokens = lexer.consume_all_tokens()?;
 
             assert_eq!(
                 tokens,
@@ -2233,12 +2223,14 @@ mod tests {
                 ]
             );
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_numerical_lexing() {
+    fn test_numerical_lexing() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("1");
-        let mut tokens = lexer.consume_all_tokens();
+        let mut tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -2266,7 +2258,7 @@ mod tests {
         );
 
         lexer = Lexer::new_str("1.0");
-        tokens = lexer.consume_all_tokens();
+        tokens = lexer.consume_all_tokens()?;
 
         assert_eq!(
             tokens,
@@ -2299,5 +2291,216 @@ mod tests {
                 }
             ]
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_strings() -> Result<(), ParsingError> {
+        let mut lexer = Lexer::new_str("\"Hello \\\"world\\\"\"");
+        let mut tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("Hello \"world\"".into()),
+                    source: Source {
+                        span: Span {
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 17,
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("'Hello world'");
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("Hello world".into()),
+                    source: Source {
+                        span: Span {
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 13,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("'Hello\\nworld'");
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("Hello\nworld".into()),
+                    source: Source {
+                        span: Span {
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("'\\tHello\\nworld\\r\\n'");
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("\tHello\nworld\r\n".into()),
+                    source: Source {
+                        span: Span {
+                            end: 20,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 20,
+                            end: 20,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("'Hello \\'${name}\\''");
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("Hello \'${name}\'".into()),
+                    source: Source {
+                        span: Span {
+                            end: 19,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 19,
+                            end: 19,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("'\\\\'");
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::StringLiteral("\\".into()),
+                    source: Source {
+                        span: Span {
+                            end: 4,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 4,
+                            end: 4,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        Ok(())
     }
 }

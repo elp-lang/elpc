@@ -10,6 +10,8 @@ pub enum ParsingError {
     UnknownChar(char, Source),
     Unknown(&'static str, Source),
     SyntaxError(String, Source),
+    InvalidEscapeSequence(char, Source),
+    UnterminatedStringLiteral(Source),
 }
 
 impl fmt::Display for ParsingError {
@@ -48,6 +50,20 @@ impl fmt::Display for ParsingError {
                     f,
                     "syntax error: {}\n{}\n {:?}:{}-{}",
                     str, source.path, source.span.lines, source.span.start, source.span.end
+                )
+            }
+            ParsingError::InvalidEscapeSequence(str, source) => {
+                write!(
+                    f,
+                    "invalid escape sequence: {}\n{}\n {:?}:{}-{}",
+                    str, source.path, source.span.lines, source.span.start, source.span.end
+                )
+            }
+            ParsingError::UnterminatedStringLiteral(source) => {
+                write!(
+                    f,
+                    "unterminated string literal: {}\n {:?}:{}-{}",
+                    source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
         }
