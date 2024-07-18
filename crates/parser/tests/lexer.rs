@@ -2095,4 +2095,67 @@ mod tests {
             ]
         );
     }
+
+    #[test]
+    fn test_mathematical_bitwise_lexing() {
+        struct Test<'a> {
+            input: &'a str,
+            expected: TokenType,
+        }
+
+        let tests: Vec<Test> = vec![
+            Test {
+                input: "/=",
+                expected: TokenType::Symbol(Symbol::SlashAssign),
+            },
+            Test {
+                input: "&=",
+                expected: TokenType::Symbol(Symbol::BitwiseAndAssign),
+            },
+            Test {
+                input: "^=",
+                expected: TokenType::Symbol(Symbol::BitwiseXorAssign),
+            },
+            Test {
+                input: "|=",
+                expected: TokenType::Symbol(Symbol::BitwiseOrAssign),
+            },
+        ];
+
+        for test in tests {
+            let mut lexer = Lexer::new_str(test.input);
+            let tokens = lexer.consume_all_tokens();
+
+            assert_eq!(
+                tokens,
+                vec![
+                    Token {
+                        token_type: TokenType::SOI,
+                        source: Source::default(),
+                    },
+                    Token {
+                        token_type: test.expected,
+                        source: Source {
+                            span: Span {
+                                end: 1,
+                                ..Default::default()
+                            },
+                            ..Default::default()
+                        },
+                    },
+                    Token {
+                        token_type: TokenType::EOF,
+                        source: Source {
+                            span: Span {
+                                start: 2,
+                                end: 2,
+                                ..Default::default()
+                            },
+                            ..Default::default()
+                        },
+                    },
+                ]
+            );
+        }
+    }
 }

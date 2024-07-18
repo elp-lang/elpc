@@ -170,10 +170,41 @@ impl Lexer {
             ')' => TokenType::Symbol(Symbol::CloseParen),
             '.' => TokenType::Symbol(Symbol::Dot),
             ',' => TokenType::Symbol(Symbol::Comma),
-            '&' => TokenType::Symbol(Symbol::BitwiseAnd),
+            '&' => match self.is_symbol(self.next()) {
+                Some('&') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::DoubleAmpersand)
+                }
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::BitwiseAndAssign)
+                }
+                _ => TokenType::Symbol(Symbol::Ampersand),
+            },
             '%' => TokenType::Symbol(Symbol::Modulo),
-            '|' => TokenType::Symbol(Symbol::BitwiseOr),
-            '^' => TokenType::Symbol(Symbol::BitwiseXor),
+            '|' => match self.is_symbol(self.next()) {
+                Some('|') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::DoublePipe)
+                }
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::BitwiseOrAssign)
+                }
+                _ => TokenType::Symbol(Symbol::Pipe),
+            },
+            '^' => match self.is_symbol(self.next()) {
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::BitwiseXorAssign)
+                }
+                _ => TokenType::Symbol(Symbol::Caret),
+            },
             '"' => TokenType::Symbol(Symbol::DoubleSpeechMark),
             '\'' => TokenType::Symbol(Symbol::SingleSpeechMark),
             '\\' => TokenType::Symbol(Symbol::BackSlash),
@@ -191,28 +222,33 @@ impl Lexer {
                 None => TokenType::Symbol(Symbol::Other(ch.into())),
             },
             '/' => match self.is_symbol(self.next()) {
-                Some('=') => TokenType::Symbol(Symbol::SlashAssign),
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::SlashAssign)
+                }
                 _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
             },
             '<' => match self.is_symbol(self.next()) {
-                Some('<') => TokenType::Symbol(Symbol::BitwiseLeftShift),
+                Some('<') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::BitwiseLeftShift)
+                }
                 _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
             },
             '>' => match self.is_symbol(self.next()) {
-                Some('>') => TokenType::Symbol(Symbol::BitwiseRightShift),
+                Some('>') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::BitwiseRightShift)
+                }
                 _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
             },
             '=' => match self.is_symbol(self.next()) {
                 Some('=') => {
                     self.consume();
-                    token.source = Source {
-                        span: Span {
-                            start: starting_cursor,
-                            end: token.source.span.end + 1,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    };
+                    token.source.span.end += 1;
                     TokenType::Symbol(Symbol::DoubleEqual)
                 }
                 _ => TokenType::Symbol(Symbol::SingleEqual),
@@ -220,14 +256,7 @@ impl Lexer {
             '-' => match self.is_symbol(self.next()) {
                 Some('>') => {
                     self.consume();
-                    token.source = Source {
-                        span: Span {
-                            start: starting_cursor,
-                            end: token.source.span.end + 1,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    };
+                    token.source.span.end += 1;
                     TokenType::Symbol(Symbol::Arrow)
                 }
                 _ => TokenType::Symbol(Symbol::Other(ch.into())),
