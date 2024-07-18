@@ -1,4 +1,4 @@
-use std::{char, string::ParseError};
+use std::char;
 
 pub mod parsing_error;
 use parsing_error::ParsingError;
@@ -397,7 +397,9 @@ impl Lexer {
     }
 
     pub fn consume_all_tokens(&mut self) -> Result<Vec<Token>, ParsingError> {
-        while let next_token_result = self.consume_next_token() {
+        loop {
+            let next_token_result = self.consume_next_token();
+
             match next_token_result {
                 Ok(next_token) => {
                     self.tokens.push(next_token.to_owned());
