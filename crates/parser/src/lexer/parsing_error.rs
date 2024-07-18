@@ -55,7 +55,7 @@ impl fmt::Display for ParsingError {
             ParsingError::InvalidEscapeSequence(str, source) => {
                 write!(
                     f,
-                    "invalid escape sequence: {}\n{}\n {:?}:{}-{}",
+                    "unknown escape character: {}\n{}\n {:?}:{}-{}",
                     str, source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
@@ -139,16 +139,18 @@ mod tests {
         );
 
         assert_eq!(
-            "syntax error: test\nnone\n []:0-0",
+            "unknown escape character: t\n\n []:0-0",
             format!(
                 "{}",
-                ParsingError::SyntaxError(
-                    "test".into(),
-                    Source {
-                        path: "none".into(),
-                        ..Default::default()
-                    }
-                )
+                ParsingError::InvalidEscapeSequence('t', Source::default())
+            )
+        );
+
+        assert_eq!(
+            "unterminated string literal: \n []:0-0",
+            format!(
+                "{}",
+                ParsingError::UnterminatedStringLiteral(Source::default())
             )
         );
     }
