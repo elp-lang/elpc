@@ -227,7 +227,7 @@ impl Lexer {
                     token.source.span.end += 1;
                     TokenType::Symbol(Symbol::SlashAssign)
                 }
-                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                _ => TokenType::Symbol(Symbol::Slash),
             },
             '<' => match self.is_symbol(self.next()) {
                 Some('<') => {
@@ -235,7 +235,12 @@ impl Lexer {
                     token.source.span.end += 1;
                     TokenType::Symbol(Symbol::BitwiseLeftShift)
                 }
-                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::LessEqual)
+                }
+                _ => TokenType::Symbol(Symbol::Less),
             },
             '>' => match self.is_symbol(self.next()) {
                 Some('>') => {
@@ -243,7 +248,12 @@ impl Lexer {
                     token.source.span.end += 1;
                     TokenType::Symbol(Symbol::BitwiseRightShift)
                 }
-                _ => TokenType::Symbol(Symbol::Other(ch.to_string())),
+                Some('=') => {
+                    self.consume();
+                    token.source.span.end += 1;
+                    TokenType::Symbol(Symbol::GreaterEqual)
+                }
+                _ => TokenType::Symbol(Symbol::Greater),
             },
             '=' => match self.is_symbol(self.next()) {
                 Some('=') => {
@@ -259,7 +269,7 @@ impl Lexer {
                     token.source.span.end += 1;
                     TokenType::Symbol(Symbol::Arrow)
                 }
-                _ => TokenType::Symbol(Symbol::Other(ch.into())),
+                _ => TokenType::Symbol(Symbol::Hyphen),
             },
             _ => TokenType::Symbol(Symbol::Other(ch.into())),
         };

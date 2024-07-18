@@ -2097,7 +2097,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mathematical_bitwise_lexing() {
+    fn test_symbols() {
         struct Test<'a> {
             input: &'a str,
             expected: TokenType,
@@ -2128,6 +2128,74 @@ mod tests {
                 input: ">>",
                 expected: TokenType::Symbol(Symbol::BitwiseRightShift),
             },
+            Test {
+                input: "&&",
+                expected: TokenType::Symbol(Symbol::DoubleAmpersand),
+            },
+            Test {
+                input: "||",
+                expected: TokenType::Symbol(Symbol::DoublePipe),
+            },
+            Test {
+                input: "|",
+                expected: TokenType::Symbol(Symbol::Pipe),
+            },
+            Test {
+                input: "&",
+                expected: TokenType::Symbol(Symbol::Ampersand),
+            },
+            Test {
+                input: "^",
+                expected: TokenType::Symbol(Symbol::Caret),
+            },
+            Test {
+                input: "\"",
+                expected: TokenType::Symbol(Symbol::DoubleSpeechMark),
+            },
+            Test {
+                input: "/",
+                expected: TokenType::Symbol(Symbol::Slash),
+            },
+            Test {
+                input: "'",
+                expected: TokenType::Symbol(Symbol::SingleSpeechMark),
+            },
+            Test {
+                input: "<",
+                expected: TokenType::Symbol(Symbol::Less),
+            },
+            Test {
+                input: "<=",
+                expected: TokenType::Symbol(Symbol::LessEqual),
+            },
+            Test {
+                input: ">",
+                expected: TokenType::Symbol(Symbol::Greater),
+            },
+            Test {
+                input: ">=",
+                expected: TokenType::Symbol(Symbol::GreaterEqual),
+            },
+            Test {
+                input: "-",
+                expected: TokenType::Symbol(Symbol::Hyphen),
+            },
+            Test {
+                input: "->",
+                expected: TokenType::Symbol(Symbol::Arrow),
+            },
+            Test {
+                input: "\\",
+                expected: TokenType::Symbol(Symbol::BackSlash),
+            },
+            Test {
+                input: ":",
+                expected: TokenType::Symbol(Symbol::Colon),
+            },
+            Test {
+                input: "nil",
+                expected: TokenType::Nil,
+            },
         ];
 
         for test in tests {
@@ -2145,7 +2213,7 @@ mod tests {
                         token_type: test.expected,
                         source: Source {
                             span: Span {
-                                end: 1,
+                                end: test.input.len() - 1,
                                 ..Default::default()
                             },
                             ..Default::default()
@@ -2155,8 +2223,8 @@ mod tests {
                         token_type: TokenType::EOF,
                         source: Source {
                             span: Span {
-                                start: 2,
-                                end: 2,
+                                start: test.input.len(),
+                                end: test.input.len(),
                                 ..Default::default()
                             },
                             ..Default::default()
@@ -2165,5 +2233,71 @@ mod tests {
                 ]
             );
         }
+    }
+
+    #[test]
+    fn test_numerical_lexing() {
+        let mut lexer = Lexer::new_str("1");
+        let mut tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::IntegerLiteral(1),
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 1,
+                            end: 1,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        lexer = Lexer::new_str("1.0");
+        tokens = lexer.consume_all_tokens();
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::FloatLiteral(1.0),
+                    source: Source {
+                        span: Span {
+                            start: 0,
+                            end: 2,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 3,
+                            end: 3,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
     }
 }

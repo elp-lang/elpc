@@ -93,6 +93,7 @@ pub enum Symbol {
     Greater,
     GreaterEqual,
     Hash,
+    Hyphen,
     Less,
     LessEqual,
     Minus,
