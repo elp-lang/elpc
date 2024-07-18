@@ -75,13 +75,10 @@ pub enum Symbol {
     BitwiseAnd,
     BitwiseAndAssign,
     BitwiseLeftShift,
-    BitwiseOr,
     BitwiseOrAssign,
     BitwiseRightShift,
-    BitwiseXor,
     BitwiseXorAssign,
     Caret,
-    CaretAssign,
     CloseBlock,
     CloseParen,
     Colon,
@@ -121,7 +118,6 @@ pub enum Symbol {
     Star,
     StarAssign,
     Tilde,
-    TildeAssign,
     Underscore,
 }
 

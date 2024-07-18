@@ -2120,6 +2120,14 @@ mod tests {
                 input: "|=",
                 expected: TokenType::Symbol(Symbol::BitwiseOrAssign),
             },
+            Test {
+                input: "<<",
+                expected: TokenType::Symbol(Symbol::BitwiseLeftShift),
+            },
+            Test {
+                input: ">>",
+                expected: TokenType::Symbol(Symbol::BitwiseRightShift),
+            },
         ];
 
         for test in tests {
