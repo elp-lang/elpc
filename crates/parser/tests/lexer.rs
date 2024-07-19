@@ -2503,4 +2503,84 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_comments() -> Result<(), ParsingError> {
+        let mut lexer = Lexer::new_str("// Single");
+        let mut tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::CommentLine(" Single".into()),
+                    source: Source {
+                        span: Span {
+                            start: 1,
+                            end: 10,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 10,
+                            end: 10,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+
+        lexer = Lexer::new_str(
+            "/*
+Multi
+Line
+*/",
+        );
+        tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default(),
+                },
+                Token {
+                    token_type: TokenType::CommentBlock("\nMulti\nLine\n".into()),
+                    source: Source {
+                        span: Span {
+                            start: 1,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+
+        Ok(())
+    }
 }

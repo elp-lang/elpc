@@ -144,6 +144,60 @@ impl Lexer {
         }
     }
 
+    fn consume_comment_into_token(&mut self) -> Result<Token, ParsingError> {
+        let mut comment_body = String::new();
+        let cursor_start = self.position;
+        let is_block = match self.next() {
+            Some(ch) => ch == '*',
+            None => false,
+        };
+        self.consume();
+
+        loop {
+            let next_ch = self.next();
+            self.consume();
+
+            match next_ch {
+                Some(ch) => match ch {
+                    '\n' => {
+                        if is_block {
+                            comment_body.push(ch);
+                        } else {
+                            break;
+                        }
+                    }
+                    '*' if is_block => {
+                        if let Some(ch) = self.next() {
+                            if ch == '/' {
+                                self.consume();
+                                break;
+                            }
+                        }
+                    }
+                    _ => {
+                        comment_body.push(ch);
+                    }
+                },
+                None => break,
+            }
+        }
+
+        Ok(Token {
+            token_type: match is_block {
+                false => TokenType::CommentLine(comment_body),
+                true => TokenType::CommentBlock(comment_body),
+            },
+            source: Source {
+                span: Span {
+                    start: cursor_start,
+                    end: self.position,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        })
+    }
+
     fn consume_symbol_into_token(&mut self) -> Result<Token, ParsingError> {
         let starting_cursor = self.position;
         let ch = self.is_symbol(self.next()).unwrap();
@@ -261,6 +315,11 @@ impl Lexer {
                     self.consume();
                     token.source.span.end += 1;
                     TokenType::Symbol(Symbol::SlashAssign)
+                }
+                Some('/') | Some('*') => {
+                    let comment = self.consume_comment_into_token()?;
+                    token.source = comment.source;
+                    comment.token_type
                 }
                 _ => TokenType::Symbol(Symbol::Slash),
             },
