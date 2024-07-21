@@ -8,6 +8,7 @@ pub enum TokenType {
     BooleanLiteral(bool),
     CommentBlock(String),
     CommentLine(String),
+    Component(String),
     FloatLiteral(f64),
     Ident(String),
     Identifier(String),

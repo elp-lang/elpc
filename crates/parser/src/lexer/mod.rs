@@ -101,6 +101,7 @@ impl Lexer {
                 s if s == "from" => TokenType::Keyword(Keyword::From),
                 s if s == "as" => TokenType::Keyword(Keyword::As),
                 s if s == "interface" => TokenType::Keyword(Keyword::Interface),
+                s if s == "component" => TokenType::Keyword(Keyword::Component),
                 s if s == "object" => TokenType::Keyword(Keyword::Object),
                 s if s == "enum" => TokenType::Keyword(Keyword::Enum),
                 s if s == "match" => TokenType::Keyword(Keyword::Match),

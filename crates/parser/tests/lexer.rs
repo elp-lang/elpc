@@ -1177,6 +1177,178 @@ mod tests {
     }
 
     #[test]
+    fn test_components() -> Result<(), ParsingError> {
+        let mut lexer = Lexer::new_str(
+            "export component Nil {
+    nil
+}",
+        );
+        let tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source {
+                        span: Span {
+                            start: 0,
+                            end: 0,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Export),
+                    source: Source {
+                        span: Span {
+                            start: 0,
+                            end: 5,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 6,
+                            end: 6,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Component),
+                    source: Source {
+                        span: Span {
+                            start: 7,
+                            end: 15,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 16,
+                            end: 16,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Ident("Nil".into()),
+                    source: Source {
+                        span: Span {
+                            start: 17,
+                            end: 19,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 20,
+                            end: 20,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::OpenBlock),
+                    source: Source {
+                        span: Span {
+                            start: 21,
+                            end: 21,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 22,
+                            end: 22,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Other("    ".into())),
+                    source: Source {
+                        span: Span {
+                            start: 23,
+                            end: 26,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Nil,
+                    source: Source {
+                        span: Span {
+                            start: 27,
+                            end: 29,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::NewLine),
+                    source: Source {
+                        span: Span {
+                            start: 30,
+                            end: 30,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::CloseBlock),
+                    source: Source {
+                        span: Span {
+                            start: 31,
+                            end: 31,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 32,
+                            end: 32,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                },
+            ]
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn test_objects() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str("export object {}");
         let tokens = lexer.consume_all_tokens()?;

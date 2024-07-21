@@ -30,8 +30,8 @@ export component LoginForm<LoginProps, LoginError> {
 	// Exports in a component are considered the props of the component.
 	// Similarly to the way that React and Svelte have props and SwiftUI has 
 	// struct properties.
-	export email Stateful<Optional<string>>
-	export onSubmit fn(string, Protected<string>) -> nil
+	export var email Stateful<Optional<string>>
+	export var onSubmit fn(string, Protected<string>) -> nil
 
 	// They also have their own private variables as this is a block/lexical scope.
 	// Note that a variable is just that, it's variable in nature so it is mutable.
@@ -44,6 +44,7 @@ export component LoginForm<LoginProps, LoginError> {
 	// root error boundary (at the runtime error boundary.)
 	fn handleSubmit() {
 		attempts += 1
+
 		if onSubmit.notNil() {
 			throw LoginError.NO_HANDLER
 		}
