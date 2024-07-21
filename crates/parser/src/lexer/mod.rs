@@ -1,12 +1,20 @@
 use std::char;
 
 pub mod parsing_error;
+use async_trait::async_trait;
 use parsing_error::ParsingError;
 
 use crate::{
+    ast::ASTNode,
     span::Span,
     tokens::{AccessModifier, Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
 };
+
+#[async_trait]
+pub trait LexerTokensParser {
+    fn new(tokens: Vec<Token>) -> Self;
+    async fn produce_ast() -> dyn ASTNode;
+}
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -475,3 +483,4 @@ impl Lexer {
         Ok(self.tokens.to_owned())
     }
 }
+
