@@ -1,11 +1,12 @@
+pub mod token_stream;
+
 use std::char;
 
-pub mod parsing_error;
 use async_trait::async_trait;
-use parsing_error::ParsingError;
 
 use crate::{
     ast::ASTNode,
+    parsing_error::ParsingError,
     span::Span,
     tokens::{AccessModifier, Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
 };
@@ -483,4 +484,3 @@ impl Lexer {
         Ok(self.tokens.to_owned())
     }
 }
-

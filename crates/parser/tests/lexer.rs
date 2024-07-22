@@ -6,7 +6,8 @@
 mod tests {
 
     use elp_parser::{
-        lexer::{parsing_error::ParsingError, Lexer},
+        lexer::Lexer,
+        parsing_error::ParsingError,
         span::Span,
         tokens::{Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
     };

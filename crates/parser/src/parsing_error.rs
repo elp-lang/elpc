@@ -76,7 +76,7 @@ impl std::error::Error for ParsingError {}
 mod tests {
     use pretty_assertions::assert_eq;
 
-    use crate::{lexer::parsing_error::ParsingError, tokens::Source};
+    use crate::{parsing_error::ParsingError, tokens::Source};
 
     #[test]
     fn test_parsing_error_display() {
