@@ -4,7 +4,6 @@
 
 #[cfg(test)]
 mod tests {
-
     use elp_parser::{
         lexer::Lexer,
         parsing_error::ParsingError,
