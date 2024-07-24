@@ -24,27 +24,36 @@ pub enum ASTType {
     ComponentDeclaration,
 }
 
-pub trait ASTNode {
+pub trait ASTNode<'a> {
     fn get_type(&self) -> ASTType;
+    fn get_children(&self) -> &'a dyn ASTNode;
 }
 
 pub struct ASTTree<'a> {
     token_stream: &'a TokenStream,
+    children: Vec<&'a dyn ASTNode<'a>>,
 }
 
-impl<'a> ASTNode for ASTTree<'a> {
+impl<'a> ASTNode<'a> for ASTTree<'a> {
     fn get_type(&self) -> ASTType {
         ASTType::Root
+    }
+
+    fn get_children(&self) -> &'a dyn ASTNode {
+        todo!()
     }
 }
 
 impl<'a> ASTTree<'a> {
     pub fn new(token_stream: &'a TokenStream) -> Self {
-        ASTTree { token_stream }
+        ASTTree {
+            token_stream,
+            children: vec![],
+        }
     }
 
-    fn parse_tokens(&mut self) -> Result<Vec<&dyn ASTNode>, ParsingError> {
-        let nodes: Vec<&'a dyn ASTNode> = vec![];
+    pub fn parse_tokens(&mut self) -> Result<Vec<&'a dyn ASTNode>, ParsingError> {
+        let nodes: Vec<&'a dyn ASTNode<'a>> = vec![];
 
         while let Some(node) = self.token_stream.next() {
             match node.token_type {

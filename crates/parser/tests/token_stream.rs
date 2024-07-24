@@ -2,7 +2,6 @@
 mod tests {
     use elp_parser::{
         lexer::token_stream::TokenStream,
-        span::Span,
         tokens::{Source, Token, TokenType},
     };
     use pretty_assertions::assert_eq;

@@ -28,14 +28,6 @@ impl TokenStream {
             return None;
         }
 
-        self.tokens.get(self.cursor + 1)
-    }
-
-    pub fn consume_next(&mut self) -> Option<&Token> {
-        if self.is_empty() || self.cursor + 1 > self.len() {
-            return None;
-        }
-
-        self.tokens.get(self.cursor + 1)
+        self.tokens.get(self.cursor)
     }
 }
