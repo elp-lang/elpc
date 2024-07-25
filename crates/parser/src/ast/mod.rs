@@ -1,3 +1,5 @@
+use std::{cell::Ref, ops::Deref};
+
 use crate::{
     lexer::token_stream::TokenStream,
     parsing_error::ParsingError,
@@ -25,23 +27,20 @@ pub enum ASTType {
 }
 
 pub trait ASTNode<'a> {
-    fn new(token_stream: &'a TokenStream) -> Self;
     fn get_type(&self) -> ASTType;
     fn get_children(&'a self) -> &'a Vec<&'a dyn ASTNode<'a>>;
+    fn new(token_stream: &'a TokenStream) -> Self
+    where
+        Self: Sized;
 }
 
+#[derive(Clone)]
 pub struct ASTTree<'a> {
     token_stream: &'a TokenStream,
     children: Vec<&'a dyn ASTNode<'a>>,
 }
 
 impl<'a> ASTNode<'a> for ASTTree<'a> {
-    fn new(token_stream: &'a TokenStream) -> Self {
-        ASTTree {
-            token_stream,
-            children: vec![],
-        }
-    }
     fn get_type(&self) -> ASTType {
         ASTType::Root
     }
@@ -49,34 +48,33 @@ impl<'a> ASTNode<'a> for ASTTree<'a> {
     fn get_children(&'a self) -> &'a Vec<&'a dyn ASTNode<'a>> {
         &self.children
     }
+
+    fn new(token_stream: &'a TokenStream) -> Self
+    where
+        Self: Sized,
+    {
+        ASTTree {
+            token_stream,
+            children: vec![],
+        }
+    }
 }
 
 impl<'a> ASTTree<'a> {
-    pub fn parse_tokens(&mut self) -> Result<Vec<&'a dyn ASTNode>, ParsingError> {
-        let nodes: Vec<&'a dyn ASTNode<'a>> = vec![];
-
+    pub fn parse_tokens(&mut self) -> Result<Self, ParsingError> {
         while let Some(node) = self.token_stream.next() {
             match node.token_type {
                 TokenType::SOI => continue,
-                TokenType::AccessModifier(_) => todo!(),
-                TokenType::BooleanLiteral(_) => todo!(),
-                TokenType::CommentBlock(_) => todo!(),
-                TokenType::CommentLine(_) => todo!(),
-                TokenType::Component(_) => todo!(),
-                TokenType::FloatLiteral(_) => todo!(),
-                TokenType::Ident(_) => todo!(),
-                TokenType::Identifier(_) => todo!(),
-                TokenType::IntegerLiteral(_) => todo!(),
-                TokenType::Keyword(_) => todo!(),
-                TokenType::MacroCall(_) => todo!(),
-                TokenType::Nil => todo!(),
-                TokenType::StringLiteral(_) => todo!(),
-                TokenType::Symbol(_) => todo!(),
-                TokenType::WhiteSpace(_) => todo!(),
                 TokenType::EOF => break,
+                _ => {
+                    return Err(ParsingError::SyntaxError(
+                        "Unexpected token".into(),
+                        node.source.clone(),
+                    ));
+                }
             };
         }
 
-        Ok(nodes)
+        Ok(self.clone())
     }
 }
