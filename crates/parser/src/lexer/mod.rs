@@ -2,20 +2,11 @@ pub mod token_stream;
 
 use std::char;
 
-use async_trait::async_trait;
-
 use crate::{
-    ast::ASTNode,
     parsing_error::ParsingError,
     span::Span,
     tokens::{AccessModifier, Keyword, Source, Symbol, Token, TokenType, WhiteSpace},
 };
-
-#[async_trait]
-pub trait LexerTokensParser {
-    fn new(tokens: Vec<Token>) -> Self;
-    async fn produce_ast() -> dyn ASTNode;
-}
 
 #[derive(Debug)]
 pub struct Lexer {
