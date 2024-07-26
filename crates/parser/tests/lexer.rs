@@ -399,6 +399,111 @@ mod tests {
     }
 
     #[test]
+    fn test_type_alias() -> Result<(), ParsingError> {
+        let mut lexer = Lexer::new_str("type Results = int");
+        let tokens = lexer.consume_all_tokens()?;
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token {
+                    token_type: TokenType::SOI,
+                    source: Source::default()
+                },
+                Token {
+                    token_type: TokenType::Keyword(Keyword::Type),
+                    source: Source {
+                        span: Span {
+                            end: 3,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 4,
+                            end: 4,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("Results".into()),
+                    source: Source {
+                        span: Span {
+                            start: 5,
+                            end: 11,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 12,
+                            end: 12,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Symbol(Symbol::SingleEqual),
+                    source: Source {
+                        span: Span {
+                            start: 13,
+                            end: 13,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::WhiteSpace(WhiteSpace::Space),
+                    source: Source {
+                        span: Span {
+                            start: 14,
+                            end: 14,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::Ident("int".into()),
+                    source: Source {
+                        span: Span {
+                            start: 15,
+                            end: 17,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                },
+                Token {
+                    token_type: TokenType::EOF,
+                    source: Source {
+                        span: Span {
+                            start: 18,
+                            end: 18,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }
+                }
+            ]
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn test_functions() -> Result<(), ParsingError> {
         let mut lexer = Lexer::new_str(
             "fn testFunction -> bool {
@@ -412,14 +517,7 @@ mod tests {
             vec![
                 Token {
                     token_type: TokenType::SOI,
-                    source: Source {
-                        span: Span {
-                            start: 0,
-                            end: 0,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }
+                    source: Source::default()
                 },
                 Token {
                     token_type: TokenType::Keyword(Keyword::Fn),
