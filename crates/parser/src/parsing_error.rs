@@ -1,7 +1,7 @@
 use core::fmt;
 use std::num::{ParseFloatError, ParseIntError};
 
-use crate::tokens::Source;
+use crate::tokens::{Source, Token};
 
 #[derive(Debug)]
 pub enum ParsingError {
@@ -12,6 +12,7 @@ pub enum ParsingError {
     SyntaxError(String, Source),
     InvalidEscapeSequence(char, Source),
     UnterminatedStringLiteral(Source),
+    UnexpectedToken(Token, Source),
 }
 
 impl fmt::Display for ParsingError {
@@ -66,6 +67,11 @@ impl fmt::Display for ParsingError {
                     source.path, source.span.lines, source.span.start, source.span.end
                 )
             }
+            ParsingError::UnexpectedToken(token, source) => write!(
+                f,
+                "unexpected token found: {:?}\n {}\n {:?}:{}-{}",
+                token, source.path, source.span.lines, source.span.start, source.span.end
+            ),
         }
     }
 }

@@ -13,6 +13,7 @@ mod tests {
         assert_eq!(stream.len(), 0);
         assert_eq!(stream.is_empty(), true);
         assert_eq!(stream.next(), None);
+        assert_eq!(stream.prev(), None);
     }
 
     #[test]
