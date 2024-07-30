@@ -146,7 +146,7 @@ impl Lexer {
         }
     }
 
-    fn consume_comment_into_token(&mut self) -> Result<Token, ParsingError> {
+    fn consume_comment_into_token(&mut self) -> Result<Token, Box<ParsingError>> {
         let mut comment_body = String::new();
         let cursor_start = self.position;
         let is_block = match self.next() {
@@ -200,7 +200,7 @@ impl Lexer {
         })
     }
 
-    fn consume_symbol_into_token(&mut self) -> Result<Token, ParsingError> {
+    fn consume_symbol_into_token(&mut self) -> Result<Token, Box<ParsingError>> {
         let starting_cursor = self.position;
         let ch = self.is_symbol(self.next()).unwrap();
 
@@ -277,7 +277,12 @@ impl Lexer {
                             '\\' => value.push('\\'),
                             '\'' if is_single_quote => value.push('\''),
                             '"' if !is_single_quote => value.push('"'),
-                            _ => return Err(ParsingError::InvalidEscapeSequence(ch, token.source)),
+                            _ => {
+                                return Err(Box::new(ParsingError::InvalidEscapeSequence(
+                                    ch,
+                                    token.source,
+                                )))
+                            }
                         }
                         escaped = false;
                     } else if ch == '\\' {
@@ -291,7 +296,9 @@ impl Lexer {
                 }
 
                 if escaped || is_open {
-                    return Err(ParsingError::UnterminatedStringLiteral(token.source));
+                    return Err(Box::new(ParsingError::UnterminatedStringLiteral(
+                        token.source,
+                    )));
                 }
 
                 token.source.span.end = self.position;
@@ -373,7 +380,7 @@ impl Lexer {
         Ok(token)
     }
 
-    fn consume_numerics_into_token(&mut self) -> Result<Token, ParsingError> {
+    fn consume_numerics_into_token(&mut self) -> Result<Token, Box<ParsingError>> {
         let mut value: String = "".into();
         let starting_cursor = self.position;
         let mut probably_int = true;
@@ -411,7 +418,7 @@ impl Lexer {
                 Ok(int) => {
                     token_type = TokenType::IntegerLiteral(int);
                 }
-                Err(err) => return Err(ParsingError::InvalidInt(err, source)),
+                Err(err) => return Err(Box::new(ParsingError::InvalidInt(err, source))),
             }
 
             return Ok(Token { token_type, source });
@@ -419,13 +426,13 @@ impl Lexer {
 
         match value.parse::<f64>() {
             Ok(f) => token_type = TokenType::FloatLiteral(f),
-            Err(err) => return Err(ParsingError::InvalidFloat(err, source)),
+            Err(err) => return Err(Box::new(ParsingError::InvalidFloat(err, source))),
         }
 
         Ok(Token { token_type, source })
     }
 
-    fn consume_next_token(&mut self) -> Result<Token, ParsingError> {
+    fn consume_next_token(&mut self) -> Result<Token, Box<ParsingError>> {
         let source = Source {
             span: Span {
                 start: self.position,
@@ -453,11 +460,11 @@ impl Lexer {
         } else if ch.unwrap().is_numeric() {
             self.consume_numerics_into_token()
         } else {
-            Err(ParsingError::UnknownChar(ch.unwrap(), source))
+            Err(Box::new(ParsingError::UnknownChar(ch.unwrap(), source)))
         }
     }
 
-    pub fn consume_all_tokens(&mut self) -> Result<Vec<Token>, ParsingError> {
+    pub fn consume_all_tokens(&mut self) -> Result<Vec<Token>, Box<ParsingError>> {
         loop {
             let next_token_result = self.consume_next_token();
 

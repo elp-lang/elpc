@@ -13,7 +13,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn test_var() -> Result<(), ParsingError> {
+    fn test_var() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("var x = 10");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -121,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn test_const() -> Result<(), ParsingError> {
+    fn test_const() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("const x_1 = 10");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -227,7 +227,7 @@ mod tests {
     }
 
     #[test]
-    fn test_interface() -> Result<(), ParsingError> {
+    fn test_interface() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "interface testing {
     test string
@@ -399,7 +399,7 @@ mod tests {
     }
 
     #[test]
-    fn test_type_alias() -> Result<(), ParsingError> {
+    fn test_type_alias() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("type Results = int");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -504,7 +504,7 @@ mod tests {
     }
 
     #[test]
-    fn test_functions() -> Result<(), ParsingError> {
+    fn test_functions() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "fn testFunction -> bool {
     true
@@ -1082,7 +1082,7 @@ mod tests {
     }
 
     #[test]
-    fn test_imports() -> Result<(), ParsingError> {
+    fn test_imports() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("import { Thing as Alias } from \"myThing\"");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -1275,7 +1275,7 @@ mod tests {
     }
 
     #[test]
-    fn test_components() -> Result<(), ParsingError> {
+    fn test_components() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "export component Nil {
     nil
@@ -1447,7 +1447,7 @@ mod tests {
     }
 
     #[test]
-    fn test_objects() -> Result<(), ParsingError> {
+    fn test_objects() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("export object {}");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -1541,7 +1541,7 @@ mod tests {
     }
 
     #[test]
-    fn test_enums() -> Result<(), ParsingError> {
+    fn test_enums() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "enum HttpStatus {
     OKAY,
@@ -1728,7 +1728,7 @@ mod tests {
     }
 
     #[test]
-    fn test_macro() -> Result<(), ParsingError> {
+    fn test_macro() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("@myMacro");
         let tokens = lexer.consume_all_tokens()?;
 
@@ -1768,7 +1768,7 @@ mod tests {
     }
 
     #[test]
-    fn test_match() -> Result<(), ParsingError> {
+    fn test_match() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "match HttpStatus {
     .OKAY -> 200
@@ -2055,7 +2055,7 @@ mod tests {
     }
 
     #[test]
-    fn test_if_else_elseif() -> Result<(), ParsingError> {
+    fn test_if_else_elseif() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str(
             "if true {
     1
@@ -2365,7 +2365,7 @@ mod tests {
     }
 
     #[test]
-    fn test_symbols() -> Result<(), ParsingError> {
+    fn test_symbols() -> Result<(), Box<ParsingError>> {
         struct Test<'a> {
             input: &'a str,
             expected: TokenType,
@@ -2498,7 +2498,7 @@ mod tests {
     }
 
     #[test]
-    fn test_numerical_lexing() -> Result<(), ParsingError> {
+    fn test_numerical_lexing() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("1");
         let mut tokens = lexer.consume_all_tokens()?;
 
@@ -2566,7 +2566,7 @@ mod tests {
     }
 
     #[test]
-    fn test_strings() -> Result<(), ParsingError> {
+    fn test_strings() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("\"Hello \\\"world\\\"\"");
         let mut tokens = lexer.consume_all_tokens()?;
 
@@ -2775,7 +2775,7 @@ mod tests {
     }
 
     #[test]
-    fn test_comments() -> Result<(), ParsingError> {
+    fn test_comments() -> Result<(), Box<ParsingError>> {
         let mut lexer = Lexer::new_str("// Single");
         let mut tokens = lexer.consume_all_tokens()?;
 

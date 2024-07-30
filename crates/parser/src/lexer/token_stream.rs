@@ -24,7 +24,7 @@ impl<'a> TokenStream {
     }
 
     pub fn prev(&'a self) -> Option<&Token> {
-        if self.is_empty() || self.cursor - 1 < 0 {
+        if self.is_empty() || self.cursor == 0 {
             return None;
         }
 
