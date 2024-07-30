@@ -3,24 +3,23 @@ import { Stylesheet } from "elp/app/styling"
 import Paragraph from "$components/paragraph"
 import { FontWeight } from "elp/app/components/Text"
 
-export fn Home -> Screen {
+@Screen
+export fn Home -> Component {
     const NAME = "Dave"
 
-    Screen {
-        Column {
-            Row(columns = 2) {
-                Column {
-                    Text("Current date:")
-                }
-                Column {
-                    Text(Date.Now(format="ll"))
-                }
+    Column {
+        Row(columns = 2) {
+            Column {
+                Text("Current date:")
             }
-            Row {
-                Text("hello {name}")
-                Link(to = "about") {
-                    Text("Read about Ellipsis")
-                }
+            Column {
+                Text(Date.Now(format="ll"))
+            }
+        }
+        Row {
+            Text("hello {name}")
+            Link(to = "about") {
+                Text("Read about Ellipsis")
             }
         }
     }
@@ -40,4 +39,4 @@ Stylesheet {
     }
 }
 
-// vim: ft=swift
+// vim: ft=kotlin

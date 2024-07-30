@@ -1,5 +1,4 @@
-import { AsyncQueue, String } from "elp"
-
+import { String } from "elp"
 import { getBlogPost } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
@@ -7,13 +6,12 @@ interface Params {
     id: string
 }
 
-export final fn BlogPost(): Screen<Params> {
+@Screen
+export fn BlogPost -> Component {
     let post: Content
     let error: Error
 
-    AsyncQueue {
-        post, error = await getBlogPost()
-    }
+	post, error = getBlogPost()
 
     Column {
         if error {
@@ -29,5 +27,5 @@ export final fn BlogPost(): Screen<Params> {
     }
 }
 
-// vim: ft=swift
+// vim: ft=kotlin
 

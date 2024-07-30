@@ -1,13 +1,45 @@
+use serde_json::Map;
+
 use crate::{
     ast::ASTNodeMember,
     lexer::token_stream::TokenStream,
     parsing_error::ParsingError,
-    tokens::{Keyword, TokenType},
+    tokens::{Keyword, Symbol, TokenType},
 };
+
+pub struct InterfaceMemberASTNode<'a> {
+    name: String,
+    r#type: &'a dyn ASTNodeMember<'a>,
+}
 
 pub struct InterfaceASTNode<'a> {
     name: Option<String>,
     token_stream: &'a TokenStream,
+
+    pub members: Vec<&'a InterfaceMemberASTNode<'a>>,
+}
+
+impl<'a> InterfaceASTNode<'a> {
+    fn parse_member(&mut self) -> Result<Option<InterfaceMemberASTNode>, Box<ParsingError>> {
+        let mut member = InterfaceMemberASTNode {
+            name: "".to_string(),
+            r#type: TokenType::Keyword(Keyword::Nil),
+        };
+
+        loop {
+            let token_option = self.token_stream.next();
+
+            match token_option {
+                Some(token) => match &token.token_type {
+                    TokenType::EOF => {
+                        return Err(Box::new(ParsingError::UnexpectedToken(token.clone())))
+                    }
+                    _ => return Err(Box::new(ParsingError::UnexpectedToken(token.clone()))),
+                },
+                None => return Ok(None),
+            }
+        }
+    }
 }
 
 impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
@@ -18,6 +50,7 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
         Self {
             name: None,
             token_stream,
+            members: vec![],
         }
     }
 
@@ -29,34 +62,38 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
     where
         Self: Sized,
     {
+        let mut is_open = false;
+
         loop {
             let token_option = self.token_stream.next();
 
             match token_option {
                 Some(token) => match &token.token_type {
                     TokenType::Ident(ident) => {
-                        if self.name.is_none() {
+                        if !is_open && self.name.is_none() {
                             self.name = Some(ident.to_string());
                             continue;
+                        } else if is_open {
                         } else {
-                            return Err(Box::new(ParsingError::UnexpectedToken(
-                                token.clone(),
-                                token.source.clone(),
-                            )));
+                            return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                         }
                     }
+                    TokenType::Symbol(Symbol::OpenBlock) => {
+                        is_open = true;
+
+                        continue;
+                    }
+                    TokenType::Symbol(Symbol::CloseBlock) => {
+                        if !is_open {
+                            return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
+                        }
+
+                        break;
+                    }
                     TokenType::EOF => {
-                        return Err(Box::new(ParsingError::UnexpectedToken(
-                            token.clone(),
-                            token.source.clone(),
-                        )))
+                        return Err(Box::new(ParsingError::UnexpectedToken(token.clone())))
                     }
-                    _ => {
-                        return Err(Box::new(ParsingError::UnexpectedToken(
-                            token.clone(),
-                            token.source.clone(),
-                        )))
-                    }
+                    _ => return Err(Box::new(ParsingError::UnexpectedToken(token.clone()))),
                 },
                 None => break,
             }

@@ -1,24 +1,23 @@
-import { AsyncQueue, Screen } from "elp/app"
+import { Screen } from "elp/app"
 import { getAboutContent } from "$app/internal/api"
 import { Paragraph } from "$components/paragraph"
 
-export fn About() -> Screen {
+@Screen
+export fn About() -> Component {
     var aboutContent, err = getAboutContent()
 
-    Screen {
-        Column {
-            if err not None {
-                Row(class = "error-row") {
-                    Text(error.atString())
-                }
-            } else {
-                Row {
-                    Text(aboutContent.title, class = "title")
-                    Paragraph(aboutContent.body)
-                }
-            }
-        }
-    }
+	Column {
+		if err not None {
+			Row(class = "error-row") {
+				Text(error.atString())
+			}
+		} else {
+			Row {
+				Text(aboutContent.title, class = "title")
+				Paragraph(aboutContent.body)
+			}
+		}
+	}
 }
 
-// vim: ft=swift
+// vim: ft=kotlin
