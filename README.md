@@ -5,6 +5,54 @@
 
 GNU Licensed compiler for the Ellipsis ('elp) language, very much a work in progress programming language inspired by the likes of modern UI languages and tools such as Swift UI and Jetpack compose. Compiles to native binaries for Android, iOS, Mac, Windows and Linux.
 
-example apps can be found in the examples folder.
+## Why am I doing this?
 
-This is my first Rust project and I tried to use existing tools to do a lot of this from ANTLR to Pest which all had their own problems so I decided to write my own.
+> “For a successful technology, reality must take precedence over public relations, for nature cannot be fooled.”
+> ― Richard P. Feynman
+
+Firstly, apparently I'm a glutton for punishment but mostly because I've been a software developer for a long time and not once have I seen a language designed for the one thing I spend most of my time doing. Creating software for people to use that is safe. Why do we settle for shoe horned languages and frameworks or the argument of _"just do it natively for each platform?"_
+
+I want a single language that compiles to native binaries that target each platform, not a web view, not JavaScript, not owned or deeply funded/owned by sponsorship by a large corporation but a single, source of truth language that allows anyone to build **great** software with no matter what needs to get done.
+
+I will never "sell" this language or it's rights and I don't ever plan to "profit" on this language, nor do I plan to create any kind of bureaucratic body to "manage" it or "progress" it. This is FOSS through and through. We; as the community have a right and an obligation to ensure our software chains and so, I encourage you to fork it, learn it, improve it and submit PRs and together we create a language that we own, control and distribute across platforms. There is nothing to protect, nothing to copyright, trademark or otherwise. 
+
+_There is no mechanism to screw anyone else over and I will do my best to keep it that way forever_
+
+## Elp?
+
+Originally I was calling it ellipsis, for no other reason than I thought it sounded cool but it evolved into 'elp which is a slang colloquialism for "help" here in England.
+
+## Obligatory "hello world"
+
+Targeting a device with a CLI, we can simply `println("hello world")` in our main function.
+
+```
+import { println } from "elp/stdio"
+
+fn main {
+    println("hello world")
+}
+```
+
+### An "app" hello world.
+
+```kotlin
+import { App, Window } from "elp"
+
+@App
+export fn HelloWorld -> App {
+	App(globalStyles = Styles()) {
+		Window {
+			Column {
+			    Row {
+			        Text("Hello World")
+			    }
+			}
+		}
+	}
+}
+
+```
+
+More complete example apps can be found in the [examples](https://github.com/elp-lang/elpc/tree/main/examples) folder.
+
