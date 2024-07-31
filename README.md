@@ -3,7 +3,7 @@
 [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 [![codecov](https://codecov.io/gh/elp-lang/elpc/graph/badge.svg?token=9HRZ43JYME)](https://codecov.io/gh/elp-lang/elpc)
 
-GNU Licensed compiler for the Ellipsis ('elp) language, very much a work in progress programming language inspired by the likes of modern UI languages and tools such as Swift UI and Jetpack compose. Compiles to native binaries for Android, iOS, Mac, Windows and Linux.
+GNU Licensed compiler for the Ellipsis ('elp) language, very much a work in progress programming language inspired by the likes of modern; platform-specific, UI languages and tools such as Swift UI and Jetpack Compose. Compiles to native binaries for Android, iOS, Mac, Windows and Linux and html/css/javascript for the web.
 
 ## Why am I doing this?
 
@@ -16,11 +16,11 @@ I want a single language that compiles to native binaries that target each platf
 
 I will never "sell" this language or it's rights and I don't ever plan to "profit" on this language, nor do I plan to create any kind of bureaucratic body to "manage" it or "progress" it. This is FOSS through and through. We; as the community have a right and an obligation to ensure our software chains and so, I encourage you to fork it, learn it, improve it and submit PRs and together we create a language that we own, control and distribute across platforms. There is nothing to protect, nothing to copyright, trademark or otherwise. 
 
-_There is no mechanism to screw anyone else over and I will do my best to keep it that way forever_
+>_Actively; and consciously, design away mechanisms designed to screw anyone else over._
 
 ## Elp?
 
-Originally I was calling it ellipsis, for no other reason than I thought it sounded cool but it evolved into 'elp which is a slang colloquialism for "help" here in England.
+Originally I was calling it ellipsis, for no other reason than I thought it sounded cool but it evolved into 'elp which is a slang/colloquialism for "help" here in England.
 
 ## Obligatory "hello world"
 
@@ -37,22 +37,40 @@ fn main {
 ### An "app" hello world.
 
 ```kotlin
-import { App, Window } from "elp"
+import { App, Window } from "elp/app"
+import { Column, Row, Text } from "elp/app/components"
 
 @App
 export fn HelloWorld -> App {
-	App(globalStyles = Styles()) {
+	App {
 		Window {
 			Column {
-			    Row {
-			        Text("Hello World")
-			    }
+				Row {
+					Text("Hello World")
+				}
 			}
 		}
 	}
 }
-
 ```
 
 More complete example apps can be found in the [examples](https://github.com/elp-lang/elpc/tree/main/examples) folder.
 
+## What am I actually trying to do here? (my feature wishlist)
+
+Design a language:
+
+* that's easy to understand, test and deploy cross-platform
+* that's safe to use
+  * Memory safe
+  * Type safe 
+  * Intellectual Property safe.
+* that enforces testing
+* that enforces the best accessibility standards possible
+* has built in tooling for 
+  * Package management
+  * Profiling and debugging with llvm
+  * Testing with coverage
+  * Supply chain management
+  * Opsec management
+  * Ci/cd integration
