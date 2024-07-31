@@ -1,7 +1,7 @@
 use crate::span::Span;
 use std::fmt::Display;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub enum TokenType {
     SOI,
     AccessModifier(AccessModifier),
@@ -14,6 +14,7 @@ pub enum TokenType {
     IntegerLiteral(i64),
     Keyword(Keyword),
     MacroCall(String),
+    #[default]
     Nil,
     StringLiteral(String),
     Symbol(Symbol),
@@ -125,7 +126,7 @@ pub enum Symbol {
     Underscore,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct Token {
     pub token_type: TokenType,
     pub source: Source,

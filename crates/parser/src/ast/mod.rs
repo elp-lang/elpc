@@ -21,7 +21,7 @@ pub enum ASTNode<'a> {
 }
 
 pub trait ASTNodeMember<'a> {
-    fn new(token_stream: &'a TokenStream) -> Self
+    fn new(token_stream: &'a mut TokenStream) -> Self
     where
         Self: Sized;
 

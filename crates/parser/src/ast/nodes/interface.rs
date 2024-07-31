@@ -1,11 +1,11 @@
-use serde_json::Map;
-
 use crate::{
     ast::ASTNodeMember,
     lexer::token_stream::TokenStream,
     parsing_error::ParsingError,
-    tokens::{Keyword, Symbol, TokenType},
+    tokens::{Keyword, Symbol, Token, TokenType},
 };
+
+use super::nil::NilASTNode;
 
 pub struct InterfaceMemberASTNode<'a> {
     name: String,
@@ -14,7 +14,7 @@ pub struct InterfaceMemberASTNode<'a> {
 
 pub struct InterfaceASTNode<'a> {
     name: Option<String>,
-    token_stream: &'a TokenStream,
+    token_stream: &'a mut TokenStream,
 
     pub members: Vec<&'a InterfaceMemberASTNode<'a>>,
 }
@@ -23,18 +23,34 @@ impl<'a> InterfaceASTNode<'a> {
     fn parse_member(&mut self) -> Result<Option<InterfaceMemberASTNode>, Box<ParsingError>> {
         let mut member = InterfaceMemberASTNode {
             name: "".to_string(),
-            r#type: TokenType::Keyword(Keyword::Nil),
+            r#type: &NilASTNode::new(self.token_stream),
         };
 
         loop {
-            let token_option = self.token_stream.next();
+            let token_option = &self.token_stream.next();
 
             match token_option {
                 Some(token) => match &token.token_type {
-                    TokenType::EOF => {
-                        return Err(Box::new(ParsingError::UnexpectedToken(token.clone())))
+                    TokenType::Ident(name) => {
+                        if name.is_empty() {
+                            return Err(Box::new(ParsingError::ExpectedToken(Token {
+                                token_type: TokenType::Ident("named member".into()),
+                                ..Default::default()
+                            })));
+                        }
+
+                        member.name = name.into();
                     }
-                    _ => return Err(Box::new(ParsingError::UnexpectedToken(token.clone()))),
+                    TokenType::EOF => {
+                        return Err(Box::new(ParsingError::UnexpectedToken(
+                            token.clone().to_owned(),
+                        )))
+                    }
+                    _ => {
+                        return Err(Box::new(ParsingError::UnexpectedToken(
+                            token.clone().to_owned(),
+                        )))
+                    }
                 },
                 None => return Ok(None),
             }
@@ -43,7 +59,7 @@ impl<'a> InterfaceASTNode<'a> {
 }
 
 impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
-    fn new(token_stream: &'a TokenStream) -> Self
+    fn new(token_stream: &'a mut TokenStream) -> Self
     where
         Self: Sized,
     {

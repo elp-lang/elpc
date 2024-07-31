@@ -13,6 +13,7 @@ pub enum ParsingError {
     InvalidEscapeSequence(char, Source),
     UnterminatedStringLiteral(Source),
     UnexpectedToken(Token),
+    ExpectedToken(Token),
 }
 
 impl fmt::Display for ParsingError {
@@ -68,6 +69,15 @@ impl fmt::Display for ParsingError {
                 )
             }
             ParsingError::UnexpectedToken(token) => write!(
+                f,
+                "unexpected token found: {:?}\n {}\n {:?}:{}-{}",
+                token,
+                token.source.path,
+                token.source.span.lines,
+                token.source.span.start,
+                token.source.span.end
+            ),
+            ParsingError::ExpectedToken(token) => write!(
                 f,
                 "unexpected token found: {:?}\n {}\n {:?}:{}-{}",
                 token,
