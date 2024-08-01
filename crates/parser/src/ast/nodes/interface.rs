@@ -118,3 +118,31 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
         Ok(self)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ast::ASTNodeMember,
+        lexer::{token_stream::TokenStream, Lexer},
+    };
+
+    use super::InterfaceASTNode;
+
+    #[test]
+    fn test_interface_member_parsing() {
+        let mut lexer = Lexer::new_str("name: String");
+        let tokens = lexer.consume_all_tokens().unwrap();
+        let mut token_stream = TokenStream::new(tokens);
+
+        let mut interface_parser = InterfaceASTNode::new(&mut token_stream);
+
+        let member = interface_parser.parse_member();
+
+        assert_eq!(
+            member,
+            Ok(Some(InterfaceMemberASTNode {
+            name: "name".into(),
+            r#type: 
+        }))
+    }
+}
