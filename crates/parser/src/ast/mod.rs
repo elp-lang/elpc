@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use crate::{lexer::token_stream::TokenStream, parsing_error::ParsingError, tokens::Token};
 
 use self::nodes::interface::InterfaceASTNode;
@@ -20,12 +21,12 @@ pub enum ASTNode<'a> {
     ComponentDeclaration,
 }
 
-pub trait ASTNodeMember<'a> {
-    fn new(token_stream: &'a mut TokenStream) -> Self
+pub trait ASTNodeMember<'a>: PartialEq + Debug {
+    fn new() -> Self
     where
         Self: Sized;
 
-    // accepts will receive a token and it should decide whether or not
+    // accepts will receive a token, and it should decide whether
     // it will continue to consume the token stream and parse or skip.
     // returning true will invoke the produce function to produce a new ASTNodeMember.
     fn accepts(&'a self, token: &Token) -> bool;
@@ -34,7 +35,7 @@ pub trait ASTNodeMember<'a> {
     // user's intention and advance the token_stream to the next token for
     // the next ASTNodeMember to consume.
     // TODO work out a better parsing error structure as having to store on the heap might lead to OOM error if the token is huge (a large interface, recursive type, etc.)
-    fn produce(&'a mut self) -> Result<&Self, Box<ParsingError>>
+    fn produce(&'a mut self, with_token_stream: &'a mut TokenStream) -> Result<&Self, Box<ParsingError>>
     where
         Self: Sized;
 }
