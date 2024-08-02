@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="FOSS" pattern="file[elpc]:*" />
+</component>

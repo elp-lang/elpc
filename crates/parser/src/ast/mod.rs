@@ -35,7 +35,7 @@ pub trait ASTNodeMember<'a>: PartialEq + Debug {
     // user's intention and advance the token_stream to the next token for
     // the next ASTNodeMember to consume.
     // TODO work out a better parsing error structure as having to store on the heap might lead to OOM error if the token is huge (a large interface, recursive type, etc.)
-    fn produce(&'a mut self, with_token_stream: &'a mut TokenStream) -> Result<&Self, Box<ParsingError>>
+    fn produce(with_token_stream: &'a mut TokenStream) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized;
 }

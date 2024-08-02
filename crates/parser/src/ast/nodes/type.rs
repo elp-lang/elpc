@@ -11,6 +11,7 @@ pub enum IntrinsicTypes {
     Function,
     Interface,
     Nil,
+    InvalidUnknown,
 }
 
 #[derive(PartialEq, Debug)]
