@@ -1,11 +1,16 @@
+use std::marker;
+
 use crate::ast::ASTNodeMember;
 use crate::parsing_error::ParsingError;
 use crate::tokens::{Token, TokenType, WhiteSpace};
 
 #[derive(PartialEq, Debug)]
 pub struct WhiteSpaceASTNode<'a> {
-    r#type: &'a WhiteSpace,
+    r#type: WhiteSpace,
+    _marker: marker::PhantomData<&'a ()>,
 }
+
+impl<'a> WhiteSpaceASTNode<'a> {}
 
 impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
     fn new() -> Self
@@ -13,7 +18,8 @@ impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
         Self: Sized,
     {
         Self {
-            r#type: &WhiteSpace::Space,
+            r#type: WhiteSpace::Space,
+            _marker: marker::PhantomData::default(),
         }
     }
 
@@ -30,7 +36,7 @@ impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
         for token in token_stream {
             match &token.token_type {
                 TokenType::WhiteSpace(ws) => {
-                    out.r#type = &ws.clone();
+                    out.r#type = ws.clone();
                 }
                 _ => break,
             }

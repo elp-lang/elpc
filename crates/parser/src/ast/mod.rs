@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{lexer::token_stream::TokenStream, parsing_error::ParsingError, tokens::Token};
+use crate::{parsing_error::ParsingError, tokens::Token};
 
 use self::nodes::interface::InterfaceASTNode;
 
