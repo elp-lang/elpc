@@ -14,6 +14,7 @@ pub enum ParsingError {
     UnterminatedStringLiteral(Source),
     UnexpectedToken(Token),
     ExpectedToken(Token),
+    UnexpectedTokenExpected(Token, Token),
 }
 
 impl fmt::Display for ParsingError {
@@ -85,6 +86,16 @@ impl fmt::Display for ParsingError {
                 token.source.span.lines,
                 token.source.span.start,
                 token.source.span.end
+            ),
+            ParsingError::UnexpectedTokenExpected(unex, expec) => write!(
+                f,
+                "unexpected token found: {:?}\n {}\n {:?}:{}-{}. Expected {:?}",
+                unex,
+                unex.source.path,
+                unex.source.span.lines,
+                unex.source.span.start,
+                unex.source.span.end,
+                expec
             ),
         }
     }

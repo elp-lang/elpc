@@ -27,7 +27,7 @@ impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
         matches!(token.token_type, TokenType::WhiteSpace(..))
     }
 
-    fn produce(token_stream: Vec<Token>) -> Result<Self, Box<ParsingError>>
+    fn produce(token_stream: &Vec<Token>) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {

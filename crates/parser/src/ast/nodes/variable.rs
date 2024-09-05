@@ -27,7 +27,7 @@ impl<'a> ASTNodeMember<'a> for VariableASTNode<'a> {
         )
     }
 
-    fn produce(_token_stream: Vec<Token>) -> Result<Self, Box<ParsingError>>
+    fn produce(_token_stream: &Vec<Token>) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
