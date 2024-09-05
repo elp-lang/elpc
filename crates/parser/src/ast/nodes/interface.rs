@@ -17,7 +17,7 @@ pub struct InterfaceASTNode<'a> {
     pub members: Vec<InterfaceMemberASTNode<'a>>,
 }
 
-fn parse_member(token_stream: &Vec<Token>) -> Result<InterfaceMemberASTNode, Box<ParsingError>> {
+fn parse_member(token_stream: &[Token]) -> Result<InterfaceMemberASTNode, Box<ParsingError>> {
     let mut member = InterfaceMemberASTNode {
         name: None,
         r#type: &Types::Intrinsic(IntrinsicTypes::InvalidUnknown),
@@ -82,14 +82,14 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
         let mut out = Self::new();
         let mut is_open = false;
 
-        for token in token_stream.into_iter() {
+        for token in token_stream.iter() {
             match &token.token_type {
                 TokenType::Ident(ident) => {
                     if !is_open && out.name.is_none() {
                         out.name = Some(ident.to_string());
                         continue;
                     } else if is_open {
-                        match parse_member(&token_stream) {
+                        match parse_member(token_stream) {
                             Ok(member) => out.members.push(member),
                             Err(err) => return Err(err),
                         }
@@ -132,26 +132,9 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::{parse_member, InterfaceASTNode, InterfaceMemberASTNode, Types};
     use crate::ast::nodes::r#type::IntrinsicTypes;
     use crate::{ast::ASTNodeMember, lexer::Lexer};
-
-    use super::{parse_member, InterfaceASTNode, InterfaceMemberASTNode, Types};
-
-    #[test]
-    fn test_interface_member_parsing() {
-        let mut lexer = Lexer::new_str("name: String");
-        let tokens = lexer.consume_all_tokens().unwrap();
-
-        let member = parse_member(&tokens);
-
-        assert_eq!(
-            member.unwrap(),
-            InterfaceMemberASTNode {
-                name: Some("name".into()),
-                r#type: &Types::Intrinsic(IntrinsicTypes::String)
-            }
-        )
-    }
 
     #[test]
     fn test_interface_parsing() {
@@ -171,6 +154,22 @@ mod tests {
                     name: Some("name".into()),
                     r#type: &Types::Intrinsic(IntrinsicTypes::String)
                 }],
+            }
+        )
+    }
+
+    #[test]
+    fn test_interface_member_parsing() {
+        let mut lexer = Lexer::new_str("name: String");
+        let tokens = lexer.consume_all_tokens().unwrap();
+
+        let member = parse_member(&tokens);
+
+        assert_eq!(
+            member.unwrap(),
+            InterfaceMemberASTNode {
+                name: Some("name".into()),
+                r#type: &Types::Intrinsic(IntrinsicTypes::String)
             }
         )
     }
