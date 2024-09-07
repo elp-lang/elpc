@@ -1,4 +1,5 @@
 use crate::ast::nodes::r#type::{IntrinsicTypes, Types};
+use crate::token_stream::TokenStream;
 use crate::{
     ast::ASTNodeMember,
     parsing_error::ParsingError,
@@ -6,49 +7,62 @@ use crate::{
 };
 
 #[derive(PartialEq, Debug)]
-pub struct InterfaceMemberASTNode<'a> {
+pub struct InterfaceMemberASTNode {
     name: Option<String>,
-    r#type: &'a Types,
+    r#type: Types,
 }
 
 #[derive(PartialEq, Debug)]
-pub struct InterfaceASTNode<'a> {
+pub struct InterfaceASTNode {
     name: Option<String>,
-    pub members: Vec<InterfaceMemberASTNode<'a>>,
+    pub members: Vec<InterfaceMemberASTNode>,
 }
 
-fn parse_member(token_stream: &[Token]) -> Result<InterfaceMemberASTNode, Box<ParsingError>> {
+fn parse_member(
+    token_stream: &mut TokenStream,
+) -> Result<InterfaceMemberASTNode, Box<ParsingError>> {
     let mut member = InterfaceMemberASTNode {
         name: None,
-        r#type: &Types::Intrinsic(IntrinsicTypes::InvalidUnknown),
+        r#type: Types::Intrinsic(IntrinsicTypes::InvalidUnknown),
     };
 
-    for token in token_stream.iter() {
+    while let Some(token) = token_stream.token() {
         match &token.token_type {
-            TokenType::Ident(name) => {
-                if name.is_empty() {
+            TokenType::Ident(ident) => {
+                if ident.is_empty() {
                     return Err(Box::new(ParsingError::ExpectedToken(Token {
-                        token_type: TokenType::Ident("named member".into()),
+                        token_type: TokenType::Ident("any".into()),
                         ..Default::default()
                     })));
                 }
 
-                member.name = Some(name.into());
+                if member.name.is_none() {
+                    member.name = Some(ident.into());
+                } else {
+                    member.r#type = Types::User(ident.into());
+                }
+                token_stream.consume();
             }
             TokenType::Symbol(Symbol::Colon) => {
                 if member.name.is_none() {
                     return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                 }
+                token_stream.consume();
 
                 continue;
             }
             TokenType::SOI => {
+                token_stream.consume();
                 continue;
             }
-            TokenType::EOF => {
+            TokenType::EOF | TokenType::Symbol(Symbol::CloseBlock) => {
+                token_stream.consume();
                 break;
             }
-            TokenType::WhiteSpace(..) => continue,
+            TokenType::WhiteSpace(..) => {
+                token_stream.consume();
+                continue;
+            }
             _ => {
                 return Err(Box::new(ParsingError::UnexpectedToken(
                     token.clone().to_owned(),
@@ -60,7 +74,7 @@ fn parse_member(token_stream: &[Token]) -> Result<InterfaceMemberASTNode, Box<Pa
     Ok(member)
 }
 
-impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
+impl<'a> ASTNodeMember<'a> for InterfaceASTNode {
     fn new() -> Self
     where
         Self: Sized,
@@ -75,24 +89,26 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
         matches!(token.token_type, TokenType::Keyword(Keyword::Interface))
     }
 
-    fn produce(token_stream: &'a Vec<Token>) -> Result<Self, Box<ParsingError>>
+    fn produce(token_stream: &'a mut TokenStream) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
         let mut out = Self::new();
         let mut is_open = false;
 
-        for token in token_stream.iter() {
+        while let Some(token) = token_stream.token() {
             match &token.token_type {
                 TokenType::Ident(ident) => {
                     if !is_open && out.name.is_none() {
                         out.name = Some(ident.to_string());
+                        token_stream.consume();
                         continue;
                     } else if is_open {
                         match parse_member(token_stream) {
                             Ok(member) => out.members.push(member),
                             Err(err) => return Err(err),
-                        }
+                        };
+                        token_stream.consume();
                     } else {
                         return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                     }
@@ -100,6 +116,7 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
                 TokenType::Symbol(Symbol::OpenBlock) => {
                     is_open = true;
 
+                    token_stream.consume();
                     continue;
                 }
                 TokenType::Symbol(Symbol::CloseBlock) => {
@@ -109,17 +126,20 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
 
                     is_open = false;
 
+                    token_stream.consume();
                     continue;
                 }
                 TokenType::WhiteSpace(..)
                 | TokenType::Keyword(Keyword::Interface)
                 | TokenType::SOI => {
+                    token_stream.consume();
                     continue;
                 }
                 TokenType::EOF => {
                     if is_open {
                         return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                     }
+                    token_stream.consume();
                     continue;
                 }
                 _ => return Err(Box::new(ParsingError::UnexpectedToken(token.clone()))),
@@ -133,7 +153,7 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode<'a> {
 #[cfg(test)]
 mod tests {
     use super::{parse_member, InterfaceASTNode, InterfaceMemberASTNode, Types};
-    use crate::ast::nodes::r#type::IntrinsicTypes;
+    use crate::token_stream::TokenStream;
     use crate::{ast::ASTNodeMember, lexer::Lexer};
 
     #[test]
@@ -144,7 +164,8 @@ mod tests {
 }",
         );
         let tokens = lexer.consume_all_tokens().unwrap();
-        let interface = InterfaceASTNode::produce(&tokens);
+        let mut token_stream = TokenStream::new(&tokens);
+        let interface = InterfaceASTNode::produce(&mut token_stream);
 
         assert_eq!(
             interface.unwrap(),
@@ -152,7 +173,7 @@ mod tests {
                 name: Some("NameInterface".into()),
                 members: vec![InterfaceMemberASTNode {
                     name: Some("name".into()),
-                    r#type: &Types::Intrinsic(IntrinsicTypes::String)
+                    r#type: Types::User("String".into())
                 }],
             }
         )
@@ -162,14 +183,14 @@ mod tests {
     fn test_interface_member_parsing() {
         let mut lexer = Lexer::new_str("name: String");
         let tokens = lexer.consume_all_tokens().unwrap();
-
-        let member = parse_member(&tokens);
+        let mut token_stream = TokenStream::new(&tokens);
+        let member = parse_member(&mut token_stream);
 
         assert_eq!(
             member.unwrap(),
             InterfaceMemberASTNode {
                 name: Some("name".into()),
-                r#type: &Types::Intrinsic(IntrinsicTypes::String)
+                r#type: Types::User("String".into())
             }
         )
     }

@@ -2,6 +2,7 @@ use std::marker;
 
 use crate::ast::ASTNodeMember;
 use crate::parsing_error::ParsingError;
+use crate::token_stream::TokenStream;
 use crate::tokens::{Token, TokenType, WhiteSpace};
 
 #[derive(PartialEq, Debug)]
@@ -27,13 +28,13 @@ impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
         matches!(token.token_type, TokenType::WhiteSpace(..))
     }
 
-    fn produce(token_stream: &Vec<Token>) -> Result<Self, Box<ParsingError>>
+    fn produce(token_stream: &mut TokenStream) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
         let mut out = Self::new();
 
-        for token in token_stream {
+        for token in token_stream.iter() {
             match &token.token_type {
                 TokenType::WhiteSpace(ws) => {
                     out.r#type = ws.clone();

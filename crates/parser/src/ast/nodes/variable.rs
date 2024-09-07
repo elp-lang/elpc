@@ -1,6 +1,7 @@
 use crate::ast::nodes::r#type::IntrinsicTypes::Nil;
 use crate::ast::ASTNodeMember;
 use crate::parsing_error::ParsingError;
+use crate::token_stream::TokenStream;
 use crate::tokens::{Keyword, Token, TokenType};
 
 use super::r#type::Types;
@@ -27,7 +28,7 @@ impl<'a> ASTNodeMember<'a> for VariableASTNode<'a> {
         )
     }
 
-    fn produce(_token_stream: &Vec<Token>) -> Result<Self, Box<ParsingError>>
+    fn produce(_token_stream: &mut TokenStream) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
