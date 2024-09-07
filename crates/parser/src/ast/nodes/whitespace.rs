@@ -20,7 +20,7 @@ impl<'a> ASTNodeMember<'a> for WhiteSpaceASTNode<'a> {
     {
         Self {
             r#type: WhiteSpace::Space,
-            _marker: marker::PhantomData::default(),
+            _marker: marker::PhantomData,
         }
     }
 

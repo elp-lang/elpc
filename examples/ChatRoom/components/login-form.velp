@@ -1,5 +1,5 @@
 import { Column } from "elp/layout"
-import { 
+import {
 	Form,
 	EmailInput,
 	SecureTextInput,
@@ -28,7 +28,7 @@ export enum LoginError {
 // Component and Either interfaces.
 export component LoginForm<LoginProps, LoginError> {
 	// Exports in a component are considered the props of the component.
-	// Similarly to the way that React and Svelte have props and SwiftUI has 
+	// Similarly to the way that React and Svelte have props and SwiftUI has
 	// struct properties.
 	export var email Stateful<Optional<string>>
 	export var onSubmit fn(string, Protected<string>) -> nil

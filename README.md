@@ -14,7 +14,7 @@ Firstly, apparently I'm a glutton for punishment but mostly because I've been a 
 
 I want a single language that compiles to native binaries that target each platform, not a web view, not JavaScript, not owned or deeply funded/owned by sponsorship by a large corporation but a single, source of truth language that allows anyone to build **great** software with no matter what needs to get done.
 
-I will never "sell" this language or it's rights and I don't ever plan to "profit" on this language, nor do I plan to create any kind of bureaucratic body to "manage" it or "progress" it. This is FOSS through and through. We; as the community have a right and an obligation to ensure our software chains and so, I encourage you to fork it, learn it, improve it and submit PRs and together we create a language that we own, control and distribute across platforms. There is nothing to protect, nothing to copyright, trademark or otherwise. 
+I will never "sell" this language or it's rights and I don't ever plan to "profit" on this language, nor do I plan to create any kind of bureaucratic body to "manage" it or "progress" it. This is FOSS through and through. We; as the community have a right and an obligation to ensure our software chains and so, I encourage you to fork it, learn it, improve it and submit PRs and together we create a language that we own, control and distribute across platforms. There is nothing to protect, nothing to copyright, trademark or otherwise.
 
 >_Actively; and consciously, design away mechanisms designed to screw anyone else over._
 
@@ -63,11 +63,11 @@ Design a language:
 * that's easy to understand, test and deploy cross-platform
 * that's safe to use
   * Memory safe
-  * Type safe 
+  * Type safe
   * Intellectual Property safe.
 * that enforces testing
 * that enforces the best accessibility standards possible
-* has built in tooling for 
+* has built in tooling for
   * Package management
   * Profiling and debugging with llvm
   * Testing with coverage

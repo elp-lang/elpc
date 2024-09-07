@@ -17,7 +17,7 @@ pub enum IntrinsicTypes {
 #[derive(PartialEq, Debug)]
 pub enum Types {
     Intrinsic(IntrinsicTypes),
-    User(String)
+    User(String),
 }
 pub trait TypeReferenceASTNode<'a>: ASTNodeMember<'a> {
     fn get_type_reference(&self) -> &'a Types;

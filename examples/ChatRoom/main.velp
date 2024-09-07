@@ -15,7 +15,7 @@ export fn Chat(name *string) -> App {
         Window {
             if .name not Empty or not .loggedIn {
                 ForEach(.messages) { message in
-                    // We borrow the message to pass down which extends it's lifetime 
+                    // We borrow the message to pass down which extends it's lifetime
                     // and allows for mutation and avoids copying.
                     MessageView(message = &message)
                 }

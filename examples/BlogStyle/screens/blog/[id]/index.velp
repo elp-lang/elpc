@@ -28,4 +28,3 @@ export fn BlogPost -> Component {
 }
 
 // vim: ft=kotlin
-
