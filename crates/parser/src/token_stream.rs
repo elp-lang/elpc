@@ -2,13 +2,13 @@ use std::slice::Iter;
 
 use crate::tokens::Token;
 
-pub struct TokenStream<'a> {
-    tokens: &'a Vec<Token>,
+pub struct TokenStream {
+    tokens: Vec<Token>,
     position: usize,
 }
 
-impl<'a> TokenStream<'a> {
-    pub fn new(tokens: &'a Vec<Token>) -> Self {
+impl TokenStream {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Self {
             tokens,
             position: 0,
@@ -69,7 +69,7 @@ mod tests {
             },
         ];
 
-        let mut token_stream = TokenStream::new(&tokens);
+        let mut token_stream = TokenStream::new(tokens);
 
         assert_eq!(
             token_stream.token(),

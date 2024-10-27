@@ -1,5 +1,11 @@
 use std::fmt::Display;
 
+/// This really isn't an implementation of span and
+/// call site/stack tracing, but it should be okay
+/// as a stub that's pre-implemented in the lexer
+/// and parser and I can come back to proper call site
+/// reporting to help developers with debugging.
+
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct Span {
     pub start: usize,

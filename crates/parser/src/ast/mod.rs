@@ -1,7 +1,6 @@
 use std::fmt::Debug;
-
-use crate::{parsing_error::ParsingError, token_stream::TokenStream, tokens::Token};
-
+use petgraph::graph::{DiGraph, NodeIndex};
+use crate::token_stream::TokenStream;
 use self::nodes::interface::InterfaceASTNode;
 
 pub mod nodes;
@@ -20,23 +19,51 @@ pub enum ASTNode {
     FunctionDeclaration,
     ObjectDeclaration,
     ComponentDeclaration,
+
+    // Expressions.
+    BlockStatement
+}
+#[derive(Debug, Default)]
+pub enum ASTNodeEdge {
+    #[default]
+    Direct,
+    Conditional,
+    Loop,
+    Returns,
+    Call,
 }
 
-pub trait ASTNodeMember<'a>: PartialEq + Debug {
-    fn new() -> Self
-    where
-        Self: Sized;
+/// The general representation of your scripts is a
+/// directed graph of nodes and edges that represent
+/// your script in a natural way while maintaining
+/// the intended purpose of the script.
+pub type ElpASTGraph = DiGraph<ASTNode, ASTNodeEdge>;
 
-    // accepts will receive a token, and it should decide whether
-    // it will continue to consume the token stream and parse or skip.
-    // returning true will invoke the produce function to produce a new ASTNodeMember.
-    fn accepts(&'a self, token: &Token) -> bool;
+pub struct ElpAST {
+    pub graph: ElpASTGraph,
+    pub root_index: NodeIndex,
+    token_stream: TokenStream
+}
 
-    // produce should return a new ASTNodeMember that represents the current
-    // user's intention and advance the token_stream to the next token for
-    // the next ASTNodeMember to consume.
-    // TODO work out a better parsing error structure as having to store on the heap might lead to OOM error if the token is huge (a large interface, recursive type, etc.)
-    fn produce(with_token_stream: &'a mut TokenStream) -> Result<Self, Box<ParsingError>>
-    where
-        Self: Sized;
+impl ElpAST {
+    pub fn new(token_stream: TokenStream) -> Self {
+        let mut graph = ElpASTGraph::new();
+        let root_index = graph.add_node(ASTNode::Root);
+
+        Self {
+            graph,
+            root_index,
+            token_stream
+        }
+    }
+
+    fn parse_tokens(&mut self) {
+        while let Some(token) = self.token_stream.token() {
+            match token.token_type {
+                _ => {
+                    println!("Unexpected token {:#?}", token);
+                }
+            }
+        }
+    }
 }

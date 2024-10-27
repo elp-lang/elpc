@@ -1,4 +1,4 @@
-use crate::ast::ASTNodeMember;
+use std::marker;
 
 #[derive(PartialEq, Debug)]
 pub enum IntrinsicTypes {
@@ -19,6 +19,14 @@ pub enum Types {
     Intrinsic(IntrinsicTypes),
     User(String),
 }
-pub trait TypeReferenceASTNode<'a>: ASTNodeMember<'a> {
-    fn get_type_reference(&self) -> &'a Types;
+/// A type alias is a type hint to the compiler that supports
+/// generic parameters.
+///
+/// @example Optional<String>
+/// @example Tuple<Int, String>
+/// @example Array<MyUnspecializedThing<MySpecialisedObject>>
+#[derive(PartialEq, Debug)]
+pub struct TypeAliasASTNode<'a> {
+    r#type: Box<Types>,
+    _marker: marker::PhantomData<&'a ()>,
 }

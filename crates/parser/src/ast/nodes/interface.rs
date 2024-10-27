@@ -1,7 +1,6 @@
 use crate::ast::nodes::r#type::{IntrinsicTypes, Types};
 use crate::token_stream::TokenStream;
 use crate::{
-    ast::ASTNodeMember,
     parsing_error::ParsingError,
     tokens::{Keyword, Symbol, Token, TokenType},
 };
@@ -74,7 +73,7 @@ fn parse_member(
     Ok(member)
 }
 
-impl<'a> ASTNodeMember<'a> for InterfaceASTNode {
+impl InterfaceASTNode {
     fn new() -> Self
     where
         Self: Sized,
@@ -85,11 +84,7 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode {
         }
     }
 
-    fn accepts(&'a self, token: &Token) -> bool {
-        matches!(token.token_type, TokenType::Keyword(Keyword::Interface))
-    }
-
-    fn produce(token_stream: &'a mut TokenStream) -> Result<Self, Box<ParsingError>>
+    fn produce(token_stream: &mut TokenStream) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
@@ -154,7 +149,7 @@ impl<'a> ASTNodeMember<'a> for InterfaceASTNode {
 mod tests {
     use super::{parse_member, InterfaceASTNode, InterfaceMemberASTNode, Types};
     use crate::token_stream::TokenStream;
-    use crate::{ast::ASTNodeMember, lexer::Lexer};
+    use crate::{ lexer::Lexer};
 
     #[test]
     fn test_interface_parsing() {
@@ -164,7 +159,7 @@ mod tests {
 }",
         );
         let tokens = lexer.consume_all_tokens().unwrap();
-        let mut token_stream = TokenStream::new(&tokens);
+        let mut token_stream = TokenStream::new(tokens);
         let interface = InterfaceASTNode::produce(&mut token_stream);
 
         assert_eq!(
@@ -183,7 +178,7 @@ mod tests {
     fn test_interface_member_parsing() {
         let mut lexer = Lexer::new_str("name: String");
         let tokens = lexer.consume_all_tokens().unwrap();
-        let mut token_stream = TokenStream::new(&tokens);
+        let mut token_stream = TokenStream::new(tokens);
         let member = parse_member(&mut token_stream);
 
         assert_eq!(
