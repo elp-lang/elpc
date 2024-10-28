@@ -4,6 +4,7 @@ use crate::{
     parsing_error::ParsingError,
     tokens::{Keyword, Symbol, Token, TokenType},
 };
+use crate::ast::{ASTNodeProducer, ElpASTContext};
 
 #[derive(PartialEq, Debug)]
 pub struct InterfaceMemberASTNode {
@@ -73,7 +74,7 @@ fn parse_member(
     Ok(member)
 }
 
-impl InterfaceASTNode {
+impl ASTNodeProducer for InterfaceASTNode {
     fn new() -> Self
     where
         Self: Sized,
@@ -84,26 +85,26 @@ impl InterfaceASTNode {
         }
     }
 
-    fn produce(token_stream: &mut TokenStream) -> Result<Self, Box<ParsingError>>
+    fn produce(&self, elp_astcontext: &ElpASTContext) -> Result<Self, Box<ParsingError>>
     where
         Self: Sized,
     {
         let mut out = Self::new();
         let mut is_open = false;
 
-        while let Some(token) = token_stream.token() {
+        while let Some(token) = elp_astcontext.token_stream.token() {
             match &token.token_type {
                 TokenType::Ident(ident) => {
                     if !is_open && out.name.is_none() {
                         out.name = Some(ident.to_string());
-                        token_stream.consume();
+                        elp_astcontext.token_stream.consume();
                         continue;
                     } else if is_open {
-                        match parse_member(token_stream) {
+                        match parse_member(elp_astcontext.token_stream) {
                             Ok(member) => out.members.push(member),
                             Err(err) => return Err(err),
                         };
-                        token_stream.consume();
+                        elp_astcontext.token_stream.consume();
                     } else {
                         return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                     }
@@ -111,7 +112,7 @@ impl InterfaceASTNode {
                 TokenType::Symbol(Symbol::OpenBlock) => {
                     is_open = true;
 
-                    token_stream.consume();
+                    elp_astcontext.token_stream.consume();
                     continue;
                 }
                 TokenType::Symbol(Symbol::CloseBlock) => {
@@ -121,20 +122,20 @@ impl InterfaceASTNode {
 
                     is_open = false;
 
-                    token_stream.consume();
+                    elp_astcontext.token_stream.consume();
                     continue;
                 }
                 TokenType::WhiteSpace(..)
                 | TokenType::Keyword(Keyword::Interface)
                 | TokenType::SOI => {
-                    token_stream.consume();
+                    elp_astcontext.token_stream.consume();
                     continue;
                 }
                 TokenType::EOF => {
                     if is_open {
                         return Err(Box::new(ParsingError::UnexpectedToken(token.clone())));
                     }
-                    token_stream.consume();
+                    elp_astcontext.token_stream.consume();
                     continue;
                 }
                 _ => return Err(Box::new(ParsingError::UnexpectedToken(token.clone()))),

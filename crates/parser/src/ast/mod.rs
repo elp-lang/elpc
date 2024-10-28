@@ -1,9 +1,24 @@
 use std::fmt::Debug;
 use petgraph::graph::{DiGraph, NodeIndex};
+use crate::parsing_error::ParsingError;
 use crate::token_stream::TokenStream;
+use crate::tokens::{Keyword, TokenType};
 use self::nodes::interface::InterfaceASTNode;
 
 pub mod nodes;
+
+pub struct ElpASTContext<'a> {
+    pub graph: &'a mut ElpASTGraph,
+    pub node_index: &'a NodeIndex,
+    pub parent_node_index: Option<&'a NodeIndex>,
+    pub edge: ASTNodeEdge,
+    pub token_stream: &'a mut TokenStream
+}
+
+pub trait ASTNodeProducer {
+    fn new() -> Self;
+    fn produce(&self, context: &ElpASTContext<'_>) -> Result<Self, ParsingError>;
+}
 
 // ASTNode is an expression parsed from the source file.
 pub enum ASTNode {
@@ -60,6 +75,9 @@ impl ElpAST {
     fn parse_tokens(&mut self) {
         while let Some(token) = self.token_stream.token() {
             match token.token_type {
+                TokenType::Keyword(Keyword::Interface) => {
+
+                }
                 _ => {
                     println!("Unexpected token {:#?}", token);
                 }
