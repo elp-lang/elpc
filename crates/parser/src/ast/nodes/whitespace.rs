@@ -31,7 +31,7 @@ impl<'a> WhiteSpaceASTNode<'a> {
     {
         let mut out = Self::new();
 
-        for token in token_stream {
+        for token in token_stream.iter() {
             match &token.token_type {
                 TokenType::WhiteSpace(ws) => {
                     out.r#type = ws.clone();

@@ -4,15 +4,15 @@ use crate::{
     parsing_error::ParsingError,
     tokens::{Keyword, Symbol, Token, TokenType},
 };
-use crate::ast::{ASTNodeProducer, ElpASTContext};
+use crate::ast::{ASTNode, ASTNodeProducer, ElpASTContext, ElpASTGraph};
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct InterfaceMemberASTNode {
     name: Option<String>,
     r#type: Types,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct InterfaceASTNode {
     name: Option<String>,
     pub members: Vec<InterfaceMemberASTNode>,
@@ -85,10 +85,11 @@ impl ASTNodeProducer for InterfaceASTNode {
         }
     }
 
-    fn produce(&self, elp_astcontext: &ElpASTContext) -> Result<Self, Box<ParsingError>>
+    fn produce(&self, elp_astcontext: &mut ElpASTContext) -> Result<ElpASTGraph, Box<ParsingError>>
     where
         Self: Sized,
     {
+        let mut graph = ElpASTGraph::new();
         let mut out = Self::new();
         let mut is_open = false;
 
@@ -142,7 +143,7 @@ impl ASTNodeProducer for InterfaceASTNode {
             }
         }
 
-        Ok(out)
+        Ok(ASTNode::InterfaceDeclaration(out))
     }
 }
 
@@ -151,6 +152,7 @@ mod tests {
     use super::{parse_member, InterfaceASTNode, InterfaceMemberASTNode, Types};
     use crate::token_stream::TokenStream;
     use crate::{ lexer::Lexer};
+    use crate::ast::{ASTNode, ASTNodeProducer, ElpASTContext, ElpASTGraph};
 
     #[test]
     fn test_interface_parsing() {
@@ -161,17 +163,26 @@ mod tests {
         );
         let tokens = lexer.consume_all_tokens().unwrap();
         let mut token_stream = TokenStream::new(tokens);
-        let interface = InterfaceASTNode::produce(&mut token_stream);
+        let node = InterfaceASTNode::new();
+        let mut graph = ElpASTGraph::new();
+        let parent_node_index = graph.add_node(ASTNode::Root);
+        
+        let mut context = ElpASTContext {
+            token_stream: &mut token_stream,
+            graph: &mut graph,
+            parent_node_index: Some(&parent_node_index),
+        };
+        let interface = node.produce(&mut context);
 
         assert_eq!(
             interface.unwrap(),
-            InterfaceASTNode {
+            ASTNode::InterfaceDeclaration(InterfaceASTNode {
                 name: Some("NameInterface".into()),
                 members: vec![InterfaceMemberASTNode {
                     name: Some("name".into()),
                     r#type: Types::User("String".into())
                 }],
-            }
+            })
         )
     }
 

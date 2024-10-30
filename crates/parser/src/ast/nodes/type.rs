@@ -1,6 +1,6 @@
 use std::marker;
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum IntrinsicTypes {
     Bool,
     String,
@@ -14,7 +14,7 @@ pub enum IntrinsicTypes {
     InvalidUnknown,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Types {
     Intrinsic(IntrinsicTypes),
     User(String),
