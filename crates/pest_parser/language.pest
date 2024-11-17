@@ -1,7 +1,18 @@
-program = _{ SOI ~ statement* ~ EOI }
+program = _{ SOI ~ expression* ~ EOI }
 
-statement  = _{ expression }
-expression = _{ import | macro | export | enum }
+expression = _{
+    import
+  | macro
+  | export
+  | enum
+  | function_def
+  | function_component_call
+  | function_call
+  | variable_assignment
+}
+
+// Variables
+variable_assignment = { ("var" | "const")? ~ IDENT ~ "=" ~ expression }
 
 // Programming type info.
 elp_type    = { !KEYWORD ~ IDENT ~ elp_generic? }
@@ -12,7 +23,16 @@ enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
 // Imports and exports in modules.
 import         =  { "import" ~ "{" ~ import_pattern ~ ("," ~ import_pattern)* ~ "}" ~ "from" ~ string }
 import_pattern = _{ IDENT ~ ("as" ~ IDENT)? }
-export         = _{ "export" ~ statement }
+export         = _{ "export" ~ expression }
+
+// Functions
+function_def            = { "fn" ~ IDENT ~ function_arguments? ~ (ARROW ~ elp_type)? ~ block }
+function_arguments      = { "(" ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
+function_argument       = { IDENT ~ ":" ~ elp_type }
+function_component_call = { function_call ~ block }
+function_call           = { IDENT ~ ("(" ~ expression ~ ("," ~ expression)* ~ ")")? }
+
+block = { "{" ~ expression* ~ "}" }
 
 // Meta programming tooling.
 macro = { "@" ~ IDENT ~ ("(" ~ elp_type ~ ")")? }
@@ -30,7 +50,8 @@ number = @{
 }
 
 // Lexer tokens
-IDENT      = @{ !number ~ !KEYWORD ~ (ASCII_ALPHANUMERIC+ | "_")* ~ ASCII_ALPHANUMERIC* }
+IDENT      = @{ !number ~ !KEYWORD ~ (ASCII_ALPHANUMERIC+ | "_")+ ~ ASCII_ALPHANUMERIC* }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{ "import" | "export" | "enum" | "object" }
+KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" }
+ARROW      = _{ "->" }

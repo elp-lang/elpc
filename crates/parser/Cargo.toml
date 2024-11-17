@@ -1,5 +1,5 @@
 [package]
-name = "elp_parser"
+name = "elp_parser_old"
 version = "0.1.0"
 edition = "2021"
 
