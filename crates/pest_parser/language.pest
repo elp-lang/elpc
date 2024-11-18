@@ -11,19 +11,17 @@ expression = _{
   | variable_assignment
 }
 
+// Imports and exports in modules.
+import = { "import" ~ "{" ~ (","? ~ IDENT ~ ("as" ~ IDENT)?)+ ~ "}" ~ "from" ~ string }
+export = { "export" ~ expression }
+
 // Variables
-variable_assignment = { ("var" | "const")? ~ IDENT ~ "=" ~ expression }
+variable_assignment = { ("var" | "const") ~ IDENT ~ (":" ~ elp_type)? ~ "=" ~ expression }
 
 // Programming type info.
-elp_type    = { !KEYWORD ~ IDENT ~ elp_generic? }
-elp_generic = { "<" ~ elp_type ~ ("," ~ elp_type)* ~ ">" }
+elp_type    = { IDENT ~ ("<" ~ elp_type ~ ("," ~ elp_type)* ~ ">")? }
 enum        = { "enum" ~ IDENT ~ "{" ~ enum_member ~ ("," ~ enum_member)* ~ "}" }
-enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
-
-// Imports and exports in modules.
-import         =  { "import" ~ "{" ~ import_pattern ~ ("," ~ import_pattern)* ~ "}" ~ "from" ~ string }
-import_pattern = _{ IDENT ~ ("as" ~ IDENT)? }
-export         = _{ "export" ~ expression }
+enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? ~ ","? }
 
 // Functions
 function_def            = { "fn" ~ IDENT ~ function_arguments? ~ (ARROW ~ elp_type)? ~ block }
@@ -50,8 +48,17 @@ number = @{
 }
 
 // Lexer tokens
-IDENT      = @{ !number ~ !KEYWORD ~ (ASCII_ALPHANUMERIC+ | "_")+ ~ ASCII_ALPHANUMERIC* }
+IDENT      = @{ !(number | KEYWORD) ~ (ASCII_ALPHANUMERIC+ | "_" | "\"" ~ inner ~ "\"")+ }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" }
+KEYWORD    = _{
+    "import"
+  | "export"
+  | "enum"
+  | "object"
+  | "fn"
+  | "var"
+  | "const"
+  | "object"
+}
 ARROW      = _{ "->" }
