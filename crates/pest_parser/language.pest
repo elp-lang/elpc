@@ -2,34 +2,64 @@ program = _{ SOI ~ expression* ~ EOI }
 
 expression = _{
     import
+  | number
   | macro
   | export
   | enum
+  | object_def
   | function_def
   | function_component_call
   | function_call
+  | match_tree
+  | variable_declaration
   | variable_assignment
+  | variable_access
+  | object_method_assignment
+  | contextual_variable_access
+  | function_return_value
 }
 
 // Imports and exports in modules.
 import = { "import" ~ "{" ~ (","? ~ IDENT ~ ("as" ~ IDENT)?)+ ~ "}" ~ "from" ~ string }
 export = { "export" ~ expression }
 
-// Variables
-variable_assignment = { ("var" | "const") ~ IDENT ~ (":" ~ elp_type)? ~ "=" ~ expression }
+// Variables.
+variable_declaration       = { ("var" | "const") ~ IDENT ~ (":" ~ elp_type)? }
+variable_assignment        = { variable_declaration ~ value_assignment }
+value_assignment           = { "=" ~ expression }
+variable_access            = { (POINTER | REFERENCE) ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
+contextual_variable_access = { "." ~ IDENT }
 
 // Programming type info.
-elp_type    = { IDENT ~ ("<" ~ elp_type ~ ("," ~ elp_type)* ~ ">")? }
-enum        = { "enum" ~ IDENT ~ "{" ~ enum_member ~ ("," ~ enum_member)* ~ "}" }
-enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? ~ ","? }
+elp_type    = { IDENT ~ elp_generic? }
+elp_generic = { "<" ~ elp_type ~ ("," ~ elp_type)* ~ ">" }
+enum        = { "enum" ~ IDENT ~ "{" ~ (enum_member ~ ("," ~ enum_member)* ~ ","?)? ~ "}" }
+enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
 
-// Functions
-function_def            = { "fn" ~ IDENT ~ function_arguments? ~ (ARROW ~ elp_type)? ~ block }
-function_arguments      = { "(" ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
-function_argument       = { IDENT ~ ":" ~ elp_type }
+// Functions.
+function_def            = { "fn" ~ (IDENT ~ ("." ~ IDENT)*) ~ function_arguments? ~ function_return_type? ~ block }
+function_return_type    = { "->" ~ elp_type }
+function_arguments      = { "(" ~ (SELF ~ ","?)? ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
+function_argument       = { IDENT ~ elp_type }
 function_component_call = { function_call ~ block }
-function_call           = { IDENT ~ ("(" ~ expression ~ ("," ~ expression)* ~ ")")? }
+function_call           = { IDENT ~ ("(" ~ (expression ~ ("," ~ expression)*)? ~ ")")? }
+function_return_value   = { RETURN ~ expression }
 
+// Objects.
+object_def               = { "object" ~ IDENT ~ object_implements? ~ "{" ~ (object_member ~ ("," ~ object_member)* ~ ","?)? ~ "}" }
+object_implements        = { IMPLEMENTS ~ elp_type ~ ("," ~ elp_type)* }
+object_member            = { "." ~ IDENT ~ object_key_type? ~ object_key_default_value? ~ object_key_tags? }
+object_key_type          = { elp_type }
+object_key_default_value = { "=" ~ expression }
+object_key_tags          = { "`" ~ IDENT ~ ":" ~ string ~ "`" }
+object_method_assignment = { "." ~ IDENT ~ value_assignment }
+
+// Matches.
+match_tree  = { "match" ~ (variable_access | contextual_variable_access) ~ "{" ~ match_arm+ ~ "}" }
+match_arm   = { match_range ~ "->" ~ block }
+match_range = { string | (number ~ ".." ~ number) }
+
+// Groups of expressions.
 block = { "{" ~ expression* ~ "}" }
 
 // Meta programming tooling.
@@ -48,17 +78,12 @@ number = @{
 }
 
 // Lexer tokens
-IDENT      = @{ !(number | KEYWORD) ~ (ASCII_ALPHANUMERIC+ | "_" | "\"" ~ inner ~ "\"")+ }
+IDENT      = @{ !number ~ !KEYWORD ~ (ASCII_ALPHANUMERIC+ | "_" | "\"" ~ inner ~ "\"")+ }
+SELF       =  { "self" }
+RETURN     =  { "return" }
+REFERENCE  =  { "&" }
+POINTER    =  { "*" }
+IMPLEMENTS =  { "implements" }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{
-    "import"
-  | "export"
-  | "enum"
-  | "object"
-  | "fn"
-  | "var"
-  | "const"
-  | "object"
-}
-ARROW      = _{ "->" }
+KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" | "object" }

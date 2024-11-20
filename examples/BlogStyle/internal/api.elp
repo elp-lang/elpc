@@ -10,8 +10,8 @@ import { parse as fromJSON, JSONError } from "elp/data/json"
 // Enums take types which are used in pattern matching.
 @toString
 export enum ApiErrorType {
-	.SERVER(Optional<string>)
-	.USER(Optional<string>)
+	.SERVER(Optional<string>),
+	.USER(Optional<string>),
 	.UNKNOWN,
 }
 
@@ -94,3 +94,4 @@ export fn createBlogPost(content string) -> Either<Content, ApiError> {
 }
 
 // vim: ft=kotlin
+
