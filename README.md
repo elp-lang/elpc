@@ -58,7 +58,7 @@ More complete example apps can be found in the [examples](https://github.com/elp
 
 ## What am I actually trying to do here? 
 
-having spent a large amount of my career across the entire spectrum of software development I've been privvy to a whole range of problems with coding. Specifically the cross platform-ness of any given technology and it's always been a gripe of mine that there wasn't actually a native way to do anything across platforms that didn't involve knowing how to write safe C++ or using enormous DSLs like Qt with it's own compilation problems.
+having spent a large amount of my career across the entire spectrum of software development I've been privvy to a whole range of problems with coding. Specifically the cross platform-ness of any given technology and it's always been a gripe of mine that there wasn't actually a native way to do anything across platforms that didn't involve knowing how to write safe C++ or using enormous DSLs like Qt with it's own compilation and licensing problems.
 
 Thus I have started to try and remedy that by creating a new language, that is under the hood actually a compiler on top of a very large [Directed Graph](https://en.wikipedia.org/wiki/Directed_graph) (I have to document this further but it's very cool.)
 
