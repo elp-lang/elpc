@@ -21,11 +21,11 @@ export enum ApiErrorType {
 // Also note the discrete, Go like tagged fields, these optional tokens enable safe metaprogramming and can be of any value.They are a build time feature similar to a @macro
 @mergeable(Content)
 export object Content implements FromTo<JSON> {
-    .id     = UUID.v4() `json: "id"`
+    .id     = UUID.v4() `json: "id"`,
 
-    .title  string      `json: "title"`
-    .body   string      `json: "body"`
-	.calls  = 0
+    .title  string      `json: "title"`,
+    .body   string      `json: "body"`,
+	.calls  = 0,
 }
 
 // Note the use of pointer semantics here which also denotes the lifetime of the variable.Returning a pointer to a value will transfer the ownership of the data to the call site.
