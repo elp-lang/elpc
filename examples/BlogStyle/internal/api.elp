@@ -58,9 +58,9 @@ fn ApiError.toString(self) -> String {
 // This method is a static method as it doesn't take a self parameter.
 fn ApiError.from(err HttpError) -> ApiError {
 	return match err.responseCode {
-		400..499 -> ApiError.new(.USER(err.toString()))
-		500..599 -> ApiError.new(.SERVER(err.toString()))
-		.. -> ApiError.new(.UNKNOWN)
+		400..499 -> ApiError.new(.USER(err.toString())),
+		500..599 -> ApiError.new(.SERVER(err.toString())),
+		.. -> ApiError.new(.UNKNOWN),
 	}
 }
 

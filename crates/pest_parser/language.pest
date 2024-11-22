@@ -26,11 +26,11 @@ import = { "import" ~ "{" ~ (","? ~ IDENT ~ ("as" ~ IDENT)?)+ ~ "}" ~ "from" ~ s
 export = { "export" ~ expression }
 
 // Variables.
-variable_declaration       =  { ("var" | "const") ~ IDENT ~ (":" ~ elp_type)? }
-variable_assignment        =  { variable_declaration ~ value_assignment }
-value_assignment           =  { "=" ~ expression }
-variable_access            = _{ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
-contextual_variable_access =  { "." ~ IDENT }
+variable_declaration       = { ("var" | "const") ~ IDENT ~ (":" ~ elp_type)? }
+variable_assignment        = { variable_declaration ~ value_assignment }
+value_assignment           = { "=" ~ expression }
+variable_access            = { (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
+contextual_variable_access = { "." ~ IDENT }
 
 // Programming type info.
 elp_type    = { IDENT ~ elp_generic? }
@@ -40,11 +40,12 @@ enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
 
 // Functions.
 function_def            = { "fn" ~ (IDENT ~ ("." ~ IDENT)*) ~ function_arguments? ~ function_return_type? ~ block }
-function_return_type    = { "->" ~ elp_type }
+function_return_type    = { ARROW ~ elp_type }
 function_arguments      = { "(" ~ (SELF ~ ","?)? ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
 function_argument       = { IDENT ~ elp_type }
 function_component_call = { function_call ~ block }
-function_call           = { (variable_access | contextual_variable_access) ~ elp_generic? ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
+function_call           = { (variable_access | contextual_variable_access) ~ elp_generic? ~ "(" ~ function_call_arguments ~ ")" }
+function_call_arguments = { (expression ~ ("," ~ expression)*)? }
 function_return_value   = { RETURN ~ expression }
 
 // Objects.
@@ -58,7 +59,7 @@ object_method_assignment = { "." ~ IDENT ~ value_assignment }
 
 // Matches.
 match_tree       = { "match" ~ (variable_access | contextual_variable_access | function_call) ~ "{" ~ match_arm+ ~ "}" }
-match_arm        = { (variable_access | contextual_variable_access | match_range | function_call) ~ "->" ~ (block | expression) ~ "," }
+match_arm        = { (function_call | variable_access | contextual_variable_access | match_range) ~ ARROW ~ (block | expression) ~ ","? }
 match_rangeables = { (string | number | variable_access) }
 match_range      = { (match_rangeables | (".." ~ match_rangeables?) | (match_rangeables ~ ".." ~ match_rangeables?))+ }
 
@@ -81,6 +82,7 @@ number = @{
 }
 
 // Lexer tokens
+ARROW      = _{ "->" }
 IDENT      = @{ !number ~ !KEYWORD ~ (ASCII_ALPHANUMERIC+ | "_" | "\"" ~ inner ~ "\"")+ }
 SELF       =  { "self" }
 RETURN     =  { "return" }
@@ -89,4 +91,4 @@ POINTER    =  { "*" }
 IMPLEMENTS =  { "implements" }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" | "object" }
+KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" | "object" | "match" }
