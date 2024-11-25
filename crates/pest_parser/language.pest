@@ -11,9 +11,10 @@ expression = _{
   | object_def
   | function_def
   | function_call
+  | object_instantiation
   | match_tree
-  | variable_access
   | variable_assignment
+  | variable_access
   | variable_declaration
   | object_method_assignment
   | contextual_variable_access
@@ -53,13 +54,16 @@ function_call_arguments = { (expression ~ ("," ~ expression)*)? }
 function_return_value   = { RETURN ~ expression }
 
 // Objects.
-object_def               = { "object" ~ IDENT ~ object_implements? ~ "{" ~ (object_member ~ ("," ~ object_member)* ~ ","?)? ~ "}" }
-object_implements        = { IMPLEMENTS ~ elp_type ~ ("," ~ elp_type)* }
-object_member            = { "." ~ IDENT ~ object_key_type? ~ object_key_default_value? ~ object_key_tags? }
-object_key_type          = { elp_type }
-object_key_default_value = { "=" ~ expression }
-object_key_tags          = { "`" ~ IDENT ~ ":" ~ string ~ "`" }
-object_method_assignment = { "." ~ IDENT ~ value_assignment }
+object_def                  = { "object" ~ IDENT ~ object_implements? ~ "{" ~ (object_member ~ ("," ~ object_member)* ~ ","?)? ~ "}" }
+object_implements           = { IMPLEMENTS ~ elp_type ~ ("," ~ elp_type)* }
+object_member               = { "." ~ IDENT ~ object_key_type? ~ object_key_default_value? ~ object_key_tags? }
+object_key_type             = { elp_type }
+object_key_default_value    = { "=" ~ expression }
+object_key_tags             = { "`" ~ IDENT ~ ":" ~ string ~ "`" }
+object_method_assignment    = { "." ~ IDENT ~ value_assignment }
+object_value_spread         = { "..." ~ expression }
+object_instantiation        = { IDENT ~ "{" ~ object_instantiation_member ~ ("," ~ object_instantiation_member)* ~ "}" }
+object_instantiation_member = { object_value_spread | ("." ~ IDENT ~ "=" ~ expression) }
 
 // Matches.
 match_tree       = { "match" ~ (function_call | variable_access | contextual_variable_access) ~ "{" ~ match_arm+ ~ "}" }
