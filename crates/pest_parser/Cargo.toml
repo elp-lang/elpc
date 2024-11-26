@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+pest = { version = "2" }
+pest_derive = { version = "2" }
+from-pest = { version = "0.3.2" }
+pest-ast = { version = "0.3.4" }

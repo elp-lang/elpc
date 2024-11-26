@@ -25,8 +25,10 @@ expression = _{
 }
 
 // Imports and exports in modules.
-import = { "import" ~ "{" ~ (","? ~ IDENT ~ ("as" ~ IDENT)?)+ ~ "}" ~ "from" ~ string }
-export = { "export" ~ expression }
+import            = { "import" ~ "{" ~ import_name ~ (","? ~ import_name)* ~ "}" ~ "from" ~ string }
+import_name       = { IDENT ~ import_name_alias? }
+import_name_alias = { "as" ~ IDENT }
+export            = { "export" ~ expression }
 
 // Variables.
 variable_declaration       = { ("var" | "const") ~ variable_access ~ (":" ~ elp_type)? }
