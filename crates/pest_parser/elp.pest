@@ -8,7 +8,9 @@ expression = _{
   | macro
   | export
   | enum
+  | if_tree
   | object_def
+  | component_def
   | function_def
   | function_call
   | object_instantiation
@@ -29,13 +31,14 @@ export = { "export" ~ expression }
 // Variables.
 variable_declaration       = { ("var" | "const") ~ variable_access ~ (":" ~ elp_type)? }
 variable_assignment        = { (variable_declaration | variable_access) ~ value_assignment }
-value_assignment           = { operand_assignment ~ expression }
+value_assignment           = { (operand_assignment | equality) ~ expression }
 operand_assignment         = { operand? ~ "=" }
-variable_access            = { (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
+variable_access            = { equality? ~ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
 contextual_variable_access = { "." ~ IDENT }
 
-// Mathematical operations.
-operand = { "+" | "-" | "*" | "/" }
+// operations.
+operand  = { "+" | "-" | "*" | "/" }
+equality = { "!" | "=" }
 
 // Programming type info.
 elp_type    = { IDENT ~ elp_generic? }
@@ -44,7 +47,7 @@ enum        = { "enum" ~ IDENT ~ "{" ~ (enum_member ~ ("," ~ enum_member)* ~ ","
 enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
 
 // Functions.
-function_def            = { "fn" ~ (IDENT ~ ("." ~ IDENT)*) ~ function_arguments? ~ function_return_type? ~ block }
+function_def            = { "fn" ~ (IDENT ~ ("." ~ IDENT)*)? ~ function_arguments? ~ function_return_type? ~ block }
 function_return_type    = { ARROW ~ elp_type }
 function_arguments      = { "(" ~ (SELF ~ ","?)? ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
 function_argument       = { IDENT ~ elp_type }
@@ -55,7 +58,7 @@ function_return_value   = { RETURN ~ expression }
 
 // Objects.
 object_def                  = { "object" ~ IDENT ~ object_implements? ~ "{" ~ (object_member ~ ("," ~ object_member)* ~ ","?)? ~ "}" }
-object_implements           = { IMPLEMENTS ~ elp_type ~ ("," ~ elp_type)* }
+object_implements           = { "implements" ~ elp_type ~ ("," ~ elp_type)* }
 object_member               = { "." ~ IDENT ~ object_key_type? ~ object_key_default_value? ~ object_key_tags? }
 object_key_type             = { elp_type }
 object_key_default_value    = { "=" ~ expression }
@@ -64,6 +67,14 @@ object_method_assignment    = { "." ~ IDENT ~ value_assignment }
 object_value_spread         = { "..." ~ expression }
 object_instantiation        = { IDENT ~ "{" ~ object_instantiation_member ~ ("," ~ object_instantiation_member)* ~ "}" }
 object_instantiation_member = { object_value_spread | ("." ~ IDENT ~ "=" ~ expression) }
+
+// Components
+component_def = { "component" ~ (IDENT ~ ("." ~ IDENT)*) ~ function_arguments? ~ function_return_type? ~ block }
+
+// If, elseif, else
+if_tree     = { "if" ~ expression ~ block ~ elseif_tree? ~ else_tree? }
+elseif_tree = { "elseif" ~ expression ~ block }
+else_tree   = { "else" ~ block }
 
 // Matches.
 match_tree       = { "match" ~ (function_call | variable_access | contextual_variable_access) ~ "{" ~ match_arm+ ~ "}" }
@@ -96,7 +107,6 @@ SELF       =  { "self" }
 RETURN     =  { "return" }
 REFERENCE  =  { "&" }
 POINTER    =  { "*" }
-IMPLEMENTS =  { "implements" }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{ "import" | "export" | "enum" | "object" | "fn" | "var" | "const" | "object" | "match" }
+KEYWORD    = _{ "import" | "export" | "component" | "implements" | "enum" | "object" | "fn" | "var" | "const" | "object" | "match" }
