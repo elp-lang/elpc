@@ -3,13 +3,13 @@ use pest_ast::FromPest;
 use crate::parser::Rule;
 
 #[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::import))]
+#[pest_ast(rule(Rule::import_name))]
 pub struct ImportName {
     pub name: String,
 }
 
 #[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::import))]
+#[pest_ast(rule(Rule::import_name_alias))]
 pub struct ImportNameAlias {
     pub name: String,
 }
@@ -17,6 +17,10 @@ pub struct ImportNameAlias {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::import))]
 pub struct Import {
-    #[pest_ast(outer(with(span_into_str), with(str::parse), with(Result::unwrap)))]
     pub names: f64,
+    pub module: String,
 }
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::EOI))]
+struct Eoi;
