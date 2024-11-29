@@ -4,14 +4,17 @@ use crate::parser::Rule;
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::import_name))]
-pub struct ImportName {
-    pub name: String,
+pub struct ImportName<'pest> {
+    #[pest_ast(outer())]
+    pub name: &'pest str,
+    #[pest_ast(outer())]
+    pub alias: Option<&'pest str>,
 }
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::import_name_alias))]
-pub struct ImportNameAlias {
-    pub name: String,
+pub struct ImportNameAlias<'pest> {
+    pub name: &'pest str,
 }
 
 #[derive(Debug, FromPest)]
