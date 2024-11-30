@@ -1,5 +1,3 @@
 [workspace]
 resolver = "2"
-members = [
-	"crates/parser"
-, "crates/pest_parser"]
+members = ["crates/pest_parser"]

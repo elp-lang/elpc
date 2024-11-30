@@ -56,7 +56,7 @@ export fn HelloWorld -> App {
 
 More complete example apps can be found in the [examples](https://github.com/elp-lang/elpc/tree/main/examples) folder.
 
-## What am I actually trying to do here? 
+## What am I actually trying to do here?
 
 having spent a large amount of my career across the entire spectrum of software development I've been privvy to a whole range of problems with coding. Specifically the cross platform-ness of any given technology and it's always been a gripe of mine that there wasn't actually a native way to do anything across platforms that didn't involve knowing how to write safe C++ or using enormous DSLs like Qt with it's own compilation and licensing problems.
 

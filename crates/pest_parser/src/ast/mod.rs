@@ -46,24 +46,24 @@ pub struct Import<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::import_name))]
 pub struct ImportName<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
 
-    #[pest_ast(outer(with(span_into_str_option)))]
+    #[pest_ast(inner(with(span_into_str_option)))]
     pub alias: Option<&'a str>,
 }
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::string))]
 pub struct StringValue<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub value: &'a str,
 }
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::number))]
 pub struct Number<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub value: &'a str, // or any desired numeric type like f64 with conversion
 }
 
@@ -76,7 +76,7 @@ pub struct Block<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::r#macro))]
 pub struct Macro<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub arguments: Vec<Expression<'a>>,
 }
@@ -84,7 +84,7 @@ pub struct Macro<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::r#enum))]
 pub struct Enum<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub members: Vec<EnumMember<'a>>,
 }
@@ -92,7 +92,7 @@ pub struct Enum<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::enum_member))]
 pub struct EnumMember<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub types: Vec<ElpType<'a>>,
 }
@@ -100,7 +100,7 @@ pub struct EnumMember<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::elp_type))]
 pub struct ElpType<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub generics: Option<Vec<ElpType<'a>>>,
 }
@@ -130,7 +130,7 @@ pub struct ElseTree<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::object_def))]
 pub struct ObjectDef<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub implements: Option<Vec<ElpType<'a>>>,
     pub members: Vec<ObjectMember<'a>>,
@@ -139,7 +139,7 @@ pub struct ObjectDef<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::object_member))]
 pub struct ObjectMember<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub key_type: Option<ElpType<'a>>,
     pub default_value: Option<Box<Expression<'a>>>,
@@ -149,16 +149,16 @@ pub struct ObjectMember<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::object_member_visibility))]
 pub struct ObjectMemberVisibility<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub visibility: &'a str,
 }
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::object_key_tags))]
 pub struct Tag<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub value: &'a str, // The string portion.
 }
 
@@ -166,7 +166,7 @@ pub struct Tag<'a> {
 #[pest_ast(rule(Rule::object_method_assignment))]
 pub struct ObjectMethodAssignment<'a> {
     pub target: VariableAccess<'a>,
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub method_name: &'a str,
     pub value: Box<Expression<'a>>,
 }
@@ -174,7 +174,7 @@ pub struct ObjectMethodAssignment<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::component_def))]
 pub struct ComponentDef<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub arguments: Option<Vec<FunctionArgument<'a>>>,
     pub return_type: Option<ElpType<'a>>,
@@ -184,7 +184,7 @@ pub struct ComponentDef<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::function_def))]
 pub struct FunctionDef<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub arguments: Option<Vec<FunctionArgument<'a>>>,
     pub return_type: Option<ElpType<'a>>,
@@ -194,7 +194,7 @@ pub struct FunctionDef<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::function_component_call))]
 pub struct FunctionComponentCall<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub arguments: Vec<Expression<'a>>,
     pub children: Option<Block<'a>>,
@@ -203,7 +203,7 @@ pub struct FunctionComponentCall<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::function_argument))]
 pub struct FunctionArgument<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub argument_type: ElpType<'a>,
 }
@@ -226,7 +226,7 @@ pub struct VariableAssignment<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::variable_access))]
 pub struct VariableAccess<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
 
     #[pest_ast(inner(with(span_into_vec_str)))]
@@ -236,7 +236,7 @@ pub struct VariableAccess<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::object_instantiation))]
 pub struct ObjectInstantiation<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub generics: Option<Vec<ElpType<'a>>>,
     pub arguments: Vec<Expression<'a>>,
@@ -265,8 +265,8 @@ pub struct MatchRange<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::match_rangeables))]
 pub enum MatchRangeItem<'a> {
-    StringLiteral(#[pest_ast(outer(with(span_into_str)))] &'a str),
-    NumberLiteral(#[pest_ast(outer(with(span_into_str)))] &'a str),
+    StringLiteral(#[pest_ast(inner(with(span_into_str)))] &'a str),
+    NumberLiteral(#[pest_ast(inner(with(span_into_str)))] &'a str),
     VariableAccess(VariableAccess<'a>),
 }
 
@@ -289,7 +289,7 @@ pub enum MatchBody<'a> {
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::variable_declaration))]
 pub struct VariableDeclaration<'a> {
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub name: &'a str,
     pub variable_type: Option<ElpType<'a>>,
     pub value: Option<Box<Expression<'a>>>,
@@ -299,7 +299,7 @@ pub struct VariableDeclaration<'a> {
 #[pest_ast(rule(Rule::contextual_variable_access))]
 pub struct ContextualVariableAccess<'a> {
     pub context: Box<Expression<'a>>,
-    #[pest_ast(outer(with(span_into_str)))]
+    #[pest_ast(inner(with(span_into_str)))]
     pub variable_name: &'a str,
 }
 
