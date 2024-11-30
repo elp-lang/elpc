@@ -1,13 +1,16 @@
+pub mod utils;
 use pest_ast::FromPest;
+use utils::{span_into_str, span_into_str_option};
 
 use crate::parser::Rule;
 
 #[derive(Debug, FromPest)]
 #[pest_ast(rule(Rule::import_name))]
 pub struct ImportName<'pest> {
-    #[pest_ast(outer())]
+    #[pest_ast(outer(with(span_into_str)))]
     pub name: &'pest str,
-    #[pest_ast(outer())]
+
+    #[pest_ast(outer(with(span_into_str_option)))]
     pub alias: Option<&'pest str>,
 }
 
