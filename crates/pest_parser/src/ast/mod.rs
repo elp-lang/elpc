@@ -8,6 +8,7 @@ use crate::parser::Rule;
 #[pest_ast(rule(Rule::program))]
 pub struct Program<'a> {
     pub expressions: Vec<Expression<'a>>,
+    _eoi: Eoi,
 }
 
 #[derive(Debug, FromPest)]
@@ -308,3 +309,7 @@ pub struct ContextualVariableAccess<'a> {
 pub struct FunctionReturnValue<'a> {
     pub value: Option<Box<Expression<'a>>>,
 }
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::EOI))]
+struct Eoi;

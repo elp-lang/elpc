@@ -11,8 +11,6 @@ pub fn parse_module_source(module_source: &str) -> Result<Program<'_>, Box<dyn s
 
     let ast = ast::Program::from_pest(&mut parse_tree)?;
 
-    println!("Parsed AST: {:?}", ast);
-
     Ok(ast)
 }
 
@@ -22,10 +20,12 @@ mod tests {
 
     #[test]
     fn test_parse_module_source() {
-        let module_source = "";
+        let module_source = "const PI = 3";
 
-        let ast = parse_module_source(module_source).unwrap();
+        let ast = parse_module_source(module_source);
 
-        assert_eq!(ast.public_variables.len(), 1);
+        println!("{:#?}", ast);
+        assert!(ast.is_ok());
+        assert_eq!(ast.unwrap().expressions.len(), 1);
     }
 }
