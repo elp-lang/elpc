@@ -25,18 +25,21 @@ expression = _{
 }
 
 // Imports and exports in modules.
-import            = { "import" ~ "{" ~ import_name ~ (","? ~ import_name)* ~ "}" ~ "from" ~ string }
-import_name       = { IDENT ~ import_name_alias? }
-import_name_alias = { "as" ~ IDENT }
-export            = { "export" ~ expression }
+import             = { "import" ~ "{" ~ import_name ~ (","? ~ import_name)* ~ "}" ~ "from" ~ import_module_path }
+import_module_path = { string }
+import_name        = { IDENT ~ import_name_alias? }
+import_name_alias  = { "as" ~ IDENT }
+export             = { "export" ~ expression }
 
 // Variables.
-variable_declaration       = { ("var" | "const") ~ variable_access ~ (":" ~ elp_type)? }
-variable_assignment        = { (variable_declaration | variable_access) ~ value_assignment }
-value_assignment           = { (operand_assignment | equality) ~ expression }
-operand_assignment         = { operand? ~ "=" }
-variable_access            = { equality? ~ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
-contextual_variable_access = { "." ~ IDENT }
+variable_mutability         = { "var" | "const" }
+variable_declaration        = { variable_mutability ~ IDENT ~ (":" ~ elp_type)? }
+variable_declaration_target = { variable_declaration | variable_access }
+variable_assignment         = { variable_declaration_target ~ value_assignment }
+value_assignment            = { (operand_assignment | equality) ~ expression }
+operand_assignment          = { operand? ~ "=" }
+variable_access             = { equality? ~ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
+contextual_variable_access  = { "." ~ IDENT }
 
 // operations.
 operand  = { "+" | "-" | "*" | "/" | "^" | "&" }
@@ -80,11 +83,12 @@ elseif_tree = { "elseif" ~ expression ~ block }
 else_tree   = { "else" ~ block }
 
 // Matches.
-match_tree       = { "match" ~ (function_call | variable_access | contextual_variable_access) ~ "{" ~ match_arm+ ~ "}" }
-match_arm        = { (function_call | variable_access | contextual_variable_access | match_range) ~ ARROW ~ match_arm_body ~ ","? }
-match_arm_body = { block | expression }
-match_rangeables = { (string | number | variable_access) }
-match_range      = { (match_rangeables | (".." ~ match_rangeables?) | (match_rangeables ~ ".." ~ match_rangeables?))+ }
+match_tree        = { "match" ~ (function_call | variable_access | contextual_variable_access) ~ "{" ~ match_arm+ ~ "}" }
+match_arm_subject = { function_call | variable_access | contextual_variable_access | match_range }
+match_arm         = { match_arm_subject ~ ARROW ~ match_arm_body ~ ","? }
+match_arm_body    = { block | expression }
+match_rangeables  = { (string | number | variable_access) }
+match_range       = { (match_rangeables | (".." ~ match_rangeables?) | (match_rangeables ~ ".." ~ match_rangeables?))+ }
 
 // Groups of expressions.
 block = { "{" ~ expression* ~ "}" }
