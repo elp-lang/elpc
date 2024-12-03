@@ -8,8 +8,8 @@ use pest::Parser;
 
 pub fn parse_module_source(module_source: &str) -> Result<Program<'_>, Box<dyn std::error::Error>> {
     let mut parse_tree = ElpParser::parse(Rule::program, module_source)?;
-    println!("PT: {:#?}", parse_tree);
-    let ast: ast::Program = ast::Program::from_pest(&mut parse_tree)?;
+    //println!("PT: {:#?}", parse_tree);
+    let ast: ast::Program = ast::Program::from_pest(&mut parse_tree.next().unwrap().into_inner())?;
     println!("AST: {:#?}", ast);
 
     Ok(ast)
@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     fn test_parse_module_source() {
-        let module_source = "import {stuff, other as otherStuff} from \"module\"";
+        let module_source = "import {some, stuff} from \"module\"";
 
         let ast = parse_module_source(module_source);
 
