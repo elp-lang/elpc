@@ -1,6 +1,6 @@
-program = _{ expression* ~ EOI }
+program = _{ SOI ~ expression* ~ EOI }
 
-expression = _{
+expression = {
     import
   | number
   | block
@@ -25,7 +25,7 @@ expression = _{
 }
 
 // Imports and exports in modules.
-import             = { "import" ~ "{" ~ import_name ~ (","? ~ import_name)* ~ "}" ~ "from" ~ import_module_path }
+import             = { "import" ~ "{" ~ (import_name ~ ("," ~ import_name)*)? ~ "}" ~ "from" ~ import_module_path }
 import_module_path = { string }
 import_name        = { IDENT ~ import_name_alias? }
 import_name_alias  = { "as" ~ IDENT }

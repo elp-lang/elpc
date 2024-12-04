@@ -1,31 +1,84 @@
-pub mod import;
-pub mod utils;
-
-use import::ImportStatement;
-use pest_ast::FromPest;
-use utils::span_into_str;
+use from_pest::ConversionError;
 
 use crate::parser::Rule;
 
-#[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::program))]
+pub trait FromPest<'a> {
+    fn from_pest(
+        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
+    ) -> Result<Self, ConversionError<Rule>>
+    where
+        Self: std::marker::Sized;
+}
+
+#[derive(Debug)]
 pub struct Program<'a> {
     pub expressions: Vec<Expression<'a>>,
 }
 
-#[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::IDENT))]
-pub struct IDENT<'a> {
-    #[pest_ast(inner(with(span_into_str)))]
-    pub inner: &'a str,
+impl<'a> FromPest<'a> for Program<'a> {
+    fn from_pest(
+        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
+    ) -> Result<Self, ConversionError<Rule>>
+    where
+        Self: std::marker::Sized,
+    {
+        let mut expressions = Vec::new();
+        for expr in parse_tree.into_inner() {
+            expressions.push(Expression::from_pest(expr)?);
+        }
+        Ok(Program { expressions })
+    }
 }
 
-#[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::expression))]
+#[derive(Debug)]
 pub enum Expression<'a> {
-    Import(ImportStatement<'a>),
+    Import(Import<'a>),
 }
 
-#[derive(Debug, FromPest)]
-#[pest_ast(rule(Rule::EOI))]
-struct Eoi;
+impl<'a> FromPest<'a> for Expression<'a> {
+    fn from_pest(
+        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
+    ) -> Result<Self, ConversionError<Rule>>
+    where
+        Self: std::marker::Sized,
+    {
+        match parse_tree.as_rule() {
+            Rule::import => {
+                let mut names = Vec::new();
+                for name in parse_tree.into_inner() {
+                    let name = name.as_str();
+                    let alias = name
+                        .split_once(" as ")
+                        .map(|(name, alias)| alias.trim())
+                        .map(|s| s.to_string());
+                    names.push(ImportName { name, alias });
+                }
+                let from = StringValue {
+                    value: parse_tree.as_str(),
+                };
+                Ok(Expression::Import(Import { names, from }))
+            }
+            _ => Err(ConversionError::new(
+                parse_tree.as_rule(),
+                "Expected import rule",
+            )),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Import<'a> {
+    pub names: Vec<ImportName<'a>>,
+    pub from: StringValue<'a>,
+}
+
+#[derive(Debug)]
+pub struct ImportName<'a> {
+    pub name: &'a str,
+    pub alias: Option<&'a str>,
+}
+
+#[derive(Debug)]
+pub struct StringValue<'a> {
+    pub value: &'a str,
+}
