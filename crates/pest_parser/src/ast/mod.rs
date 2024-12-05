@@ -4,7 +4,7 @@ use crate::parser::Rule;
 
 pub trait FromPest<'a> {
     fn from_pest(
-        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
+        parse_tree: pest::iterators::Pair<'a, Rule>,
     ) -> Result<Self, ConversionError<Rule>>
     where
         Self: std::marker::Sized;
@@ -16,9 +16,7 @@ pub struct Program<'a> {
 }
 
 impl<'a> FromPest<'a> for Program<'a> {
-    fn from_pest(
-        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
-    ) -> Result<Self, ConversionError<Rule>>
+    fn from_pest(parse_tree: pest::iterators::Pair<'a, Rule>) -> Result<Self, ConversionError<Rule>>
     where
         Self: std::marker::Sized,
     {
@@ -36,9 +34,7 @@ pub enum Expression<'a> {
 }
 
 impl<'a> FromPest<'a> for Expression<'a> {
-    fn from_pest(
-        parse_tree: &'a mut pest::iterators::Pair<'a, Rule>,
-    ) -> Result<Self, ConversionError<Rule>>
+    fn from_pest(parse_tree: pest::iterators::Pair<'a, Rule>) -> Result<Self, ConversionError<Rule>>
     where
         Self: std::marker::Sized,
     {
@@ -47,10 +43,7 @@ impl<'a> FromPest<'a> for Expression<'a> {
                 let mut names = Vec::new();
                 for name in parse_tree.into_inner() {
                     let name = name.as_str();
-                    let alias = name
-                        .split_once(" as ")
-                        .map(|(name, alias)| alias.trim())
-                        .map(|s| s.to_string());
+                    let alias = name.split_once(" as ").map(|(name, alias)| alias.trim());
                     names.push(ImportName { name, alias });
                 }
                 let from = StringValue {
@@ -58,10 +51,7 @@ impl<'a> FromPest<'a> for Expression<'a> {
                 };
                 Ok(Expression::Import(Import { names, from }))
             }
-            _ => Err(ConversionError::new(
-                parse_tree.as_rule(),
-                "Expected import rule",
-            )),
+            _ => Err(ConversionError::NoMatch),
         }
     }
 }
