@@ -1,6 +1,6 @@
 program = _{ SOI ~ expression* ~ EOI }
 
-expression = {
+expression = _{
     import
   | number
   | block

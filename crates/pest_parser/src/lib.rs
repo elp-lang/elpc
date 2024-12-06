@@ -34,6 +34,6 @@ mod tests {
 
         println!("{:#?}", ast);
         assert!(ast.is_ok());
-        assert_eq!(ast.unwrap().expressions.len(), 1);
+        assert_eq!(ast.unwrap().expressions.len(), 2);
     }
 }

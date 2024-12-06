@@ -7,7 +7,7 @@ use pest_derive::Parser;
 pub struct ElpParser;
 
 #[derive(Debug, PartialEq, Eq)]
-pub(crate) enum ElpParseError<'a> {
+pub enum ElpParseError<'a> {
     Unknown,
     UnexpectedToken {
         msg: &'a str,
@@ -20,7 +20,7 @@ pub(crate) enum ElpParseError<'a> {
     },
 }
 
-impl<'a> Display for ElpParseError<'a> {
+impl Display for ElpParseError<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ElpParseError::Unknown => write!(f, "Unknown error"),

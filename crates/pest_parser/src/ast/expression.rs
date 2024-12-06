@@ -3,8 +3,9 @@ use crate::parser::{ElpParseError, Rule};
 use super::{import::Import, FromPest};
 
 #[derive(Debug)]
-pub(crate) enum Expression<'a> {
+pub enum Expression<'a> {
     Import(Import<'a>),
+    Eoi,
 }
 
 impl<'a> FromPest<'a> for Expression<'a> {
@@ -14,7 +15,12 @@ impl<'a> FromPest<'a> for Expression<'a> {
     {
         match pair.as_rule() {
             Rule::import => Ok(Import::from_pest(pair).unwrap()),
-            _ => Err(ElpParseError::Unknown),
+            Rule::EOI => Ok(Expression::Eoi),
+            _ => Err(ElpParseError::ExpectedButGot {
+                msg: "unknown rule",
+                expected: "Expression".into(),
+                found: pair,
+            }),
         }
     }
 }
