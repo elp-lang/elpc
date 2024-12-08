@@ -18,7 +18,7 @@ pub struct Program<'a> {
     pub expressions: Vec<Expression<'a>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct StringValue<'a> {
     pub value: &'a str,
 }

@@ -9,7 +9,6 @@ pub fn parse_module_source<'a>(
     module_source: &'a str,
 ) -> Result<Program<'a>, Box<dyn std::error::Error + 'a>> {
     let parse_tree = ElpParser::parse(Rule::program, module_source)?;
-    println!("PT: {:#?}", parse_tree);
 
     let mut expressions: Vec<ast::expression::Expression> = Vec::new();
 
@@ -18,22 +17,6 @@ pub fn parse_module_source<'a>(
     }
 
     let ast = Program { expressions };
-    println!("AST: {:#?}", ast);
 
     Ok(ast)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::parse_module_source;
-
-    #[test]
-    fn test_parse_module_source() {
-        let module_source = "import {some, stuff as nonsense} from \"module\"";
-        let ast = parse_module_source(module_source);
-
-        println!("{:#?}", ast);
-        assert!(ast.is_ok());
-        assert_eq!(ast.unwrap().expressions.len(), 2);
-    }
 }

@@ -2,7 +2,7 @@ use crate::parser::{ElpParseError, Rule};
 
 use super::{import::Import, FromPest};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Expression<'a> {
     Import(Import<'a>),
     Eoi,
