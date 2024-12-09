@@ -2,23 +2,28 @@ pub(crate) mod expression;
 pub(crate) mod import;
 
 use expression::Expression;
+use pest::Span;
+use pest_ast::FromPest;
 
-use crate::parser::{ElpParseError, Rule};
+use crate::parser::Rule;
 
-pub trait FromPest<'a> {
-    fn from_pest(
-        pair: pest::iterators::Pair<'a, Rule>,
-    ) -> Result<Expression<'a>, ElpParseError<'a>>
-    where
-        Self: std::marker::Sized;
+fn span_into_string(span: Span) -> String {
+    span.as_str().into()
 }
 
-#[derive(Debug)]
-pub struct Program<'a> {
-    pub expressions: Vec<Expression<'a>>,
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::program))]
+pub struct Program {
+    pub expressions: Vec<Expression>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct StringValue<'a> {
-    pub value: &'a str,
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::EOI))]
+struct Eoi;
+
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::string))]
+pub struct StringValue {
+    #[pest_ast(inner(with(span_into_string)))]
+    pub value: String,
 }

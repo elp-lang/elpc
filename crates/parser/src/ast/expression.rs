@@ -1,26 +1,12 @@
-use crate::parser::{ElpParseError, Rule};
+use pest_ast::FromPest;
 
-use super::{import::Import, FromPest};
+use crate::parser::Rule;
 
-#[derive(Debug, PartialEq, Eq)]
-pub enum Expression<'a> {
-    Import(Import<'a>),
-    Eoi,
-}
+use super::import::Import;
 
-impl<'a> FromPest<'a> for Expression<'a> {
-    fn from_pest(pair: pest::iterators::Pair<'a, Rule>) -> Result<Expression<'a>, ElpParseError<'a>>
-    where
-        Self: std::marker::Sized,
-    {
-        match pair.as_rule() {
-            Rule::import => Ok(Import::from_pest(pair).unwrap()),
-            Rule::EOI => Ok(Expression::Eoi),
-            _ => Err(ElpParseError::ExpectedButGot {
-                msg: "unknown rule",
-                expected: "Expression".into(),
-                found: pair,
-            }),
-        }
-    }
+#[derive(Debug, FromPest)]
+#[pest_ast(rule(Rule::expression))]
+pub enum Expression {
+    #[pest_ast(rule(Rule::import))]
+    Import(Import),
 }
