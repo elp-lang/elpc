@@ -17,11 +17,11 @@ pub struct Program {
     pub expressions: Vec<Expression>,
 }
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::EOI))]
 struct Eoi;
 
-#[derive(Debug, FromPest)]
+#[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::string))]
 pub struct StringValue {
     #[pest_ast(inner(with(span_into_string)))]
