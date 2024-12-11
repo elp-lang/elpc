@@ -1,6 +1,6 @@
 program = _{ SOI ~ expression* ~ EOI }
 
-expression = _{
+expression = {
     import
   | number
   | block
@@ -32,8 +32,7 @@ import_name_alias  = { "as" ~ IDENT }
 export             = { "export" ~ expression }
 
 // Variables.
-variable_mutability         = { "var" | "const" }
-variable_declaration        = { variable_mutability ~ IDENT ~ (":" ~ elp_type)? }
+variable_declaration        = { (VAR | CONST) ~ IDENT ~ elp_type? }
 variable_declaration_target = { variable_declaration | variable_access }
 variable_assignment         = { variable_declaration_target ~ value_assignment }
 value_assignment            = { (operand_assignment | equality) ~ expression }
@@ -117,4 +116,6 @@ REFERENCE  =  { "&" }
 POINTER    =  { "*" }
 COMMENT    = _{ "//" ~ (!"\n" ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
-KEYWORD    = _{ "import" | "export" | "component" | "implements" | "enum" | "object" | "fn" | "var" | "const" | "object" | "match" }
+VAR        =  { "var" }
+CONST      =  { "const" }
+KEYWORD    = _{ "import" | "export" | "component" | "implements" | "enum" | "object" | "fn" | VAR | CONST | "object" | "match" }

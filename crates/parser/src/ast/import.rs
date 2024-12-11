@@ -1,8 +1,6 @@
-use pest_ast::FromPest;
-
-use crate::parser::Rule;
-
 use super::{span_into_string, StringValue};
+use crate::parser::Rule;
+use pest_ast::FromPest;
 
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::import))]
