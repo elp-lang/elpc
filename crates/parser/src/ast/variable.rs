@@ -26,7 +26,7 @@ pub struct VariableDeclaration {
     #[pest_ast(inner(with(span_into_string)))]
     pub name: String,
 
-    pub type_annotation: Box<ElpType>,
+    pub type_annotation: Option<Box<ElpType>>,
 }
 
 #[cfg(test)]
@@ -48,10 +48,10 @@ mod tests {
             VariableDeclaration {
                 mutability: VariableMutability::Mutable,
                 name: "hello".to_string(),
-                type_annotation: Box::new(ElpType {
+                type_annotation: Some(Box::new(ElpType {
                     name: "String".to_string(),
                     type_parameters: Some([].into()),
-                }),
+                })),
             }
         );
     }

@@ -1,4 +1,4 @@
-program = _{ SOI ~ expression* ~ EOI }
+program = { expression* ~ EOI }
 
 expression = {
     import
@@ -32,17 +32,17 @@ import_name_alias  = { "as" ~ IDENT }
 export             = { "export" ~ expression }
 
 // Variables.
-variable_declaration        = { (VAR | CONST) ~ IDENT ~ elp_type? }
-variable_declaration_target = { variable_declaration | variable_access }
-variable_assignment         = { variable_declaration_target ~ value_assignment }
-value_assignment            = { (operand_assignment | equality) ~ expression }
-operand_assignment          = { operand? ~ "=" }
-variable_access             = { equality? ~ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
-contextual_variable_access  = { "." ~ IDENT }
+variable_declaration       = { (VAR | CONST) ~ IDENT ~ elp_type? }
+variable_assignment_target = { variable_declaration | variable_access }
+variable_assignment        = { variable_assignment_target ~ value_assignment }
+value_assignment           = { (operand_assignment | equality) ~ expression }
+operand_assignment         = { operand? ~ "=" }
+variable_access            = { equality? ~ (POINTER | REFERENCE)? ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
+contextual_variable_access = { "." ~ IDENT }
 
 // operations.
 operand  = { "+" | "-" | "*" | "/" | "^" | "&" }
-equality = { "!" | "=" }
+equality = { "!" | "=" | "!=" }
 
 // Programming type info.
 elp_type    = { IDENT ~ elp_generic? }

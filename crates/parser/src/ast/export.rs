@@ -5,5 +5,5 @@ use pest_ast::FromPest;
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::export))]
 pub struct Export {
-    expression: Expression,
+    pub expression: Expression,
 }
