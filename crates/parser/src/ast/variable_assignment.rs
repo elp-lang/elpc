@@ -1,4 +1,4 @@
-use super::variable::VariableDeclaration;
+use super::variable_declaration::VariableDeclaration;
 use crate::parser::Rule;
 use pest_ast::FromPest;
 

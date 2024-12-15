@@ -1,29 +1,38 @@
-use super::{export::Export, import::Import, variable::VariableDeclaration};
+use super::{
+    export::Export, import::Import, variable_assignment::VariableAssignment,
+    variable_declaration::VariableDeclaration,
+};
 use crate::parser::Rule;
 use pest_ast::FromPest;
 
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::expression))]
 pub enum Expression {
+    #[pest_ast(rule(Rule::import))]
     Import(Box<Import>),
+    #[pest_ast(rule(Rule::export))]
     Export(Box<Export>),
+    #[pest_ast(rule(Rule::variable_declaration))]
     VariableDeclaration(Box<VariableDeclaration>),
+    #[pest_ast(rule(Rule::variable_assignment))]
+    VariableAssignment(Box<VariableAssignment>),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    use crate::ast::variable_declaration::VariableMutability;
     use crate::{
         ast::{
             import::{ImportModulePath, ImportName, ImportNameAlias},
-            variable::VariableMutability,
             StringValue,
         },
         parser::ElpParser,
     };
     use from_pest::FromPest;
     use pest::Parser;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn parse_import_expression() {
@@ -57,7 +66,7 @@ mod tests {
 
     #[test]
     fn parse_export_expression() {
-        let expression_str = "export const hello = \"world\"";
+        let expression_str = "export const hello";
         let mut pairs = ElpParser::parse(Rule::expression, expression_str).unwrap();
         let ast = Expression::from_pest(&mut pairs).unwrap();
 

@@ -1,4 +1,4 @@
-program = { expression* ~ EOI }
+program = { SOI ~ expression* ~ EOI }
 
 expression = {
     import
