@@ -3,6 +3,7 @@ pub(crate) mod export;
 pub(crate) mod expression;
 pub(crate) mod import;
 pub(crate) mod value_assignment;
+pub(crate) mod variable_access;
 pub(crate) mod variable_assignment;
 pub(crate) mod variable_declaration;
 

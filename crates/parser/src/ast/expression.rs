@@ -10,10 +10,13 @@ use pest_ast::FromPest;
 pub enum Expression {
     #[pest_ast(rule(Rule::import))]
     Import(Box<Import>),
+
     #[pest_ast(rule(Rule::export))]
     Export(Box<Export>),
+
     #[pest_ast(rule(Rule::variable_declaration))]
     VariableDeclaration(Box<VariableDeclaration>),
+
     #[pest_ast(rule(Rule::variable_assignment))]
     VariableAssignment(Box<VariableAssignment>),
 }
