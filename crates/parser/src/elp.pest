@@ -35,15 +35,11 @@ export             = { "export" ~ expression }
 variable_declaration       = { (VAR | CONST) ~ IDENT ~ elp_type? }
 variable_assignment_target = { variable_declaration | variable_access }
 variable_assignment        = { variable_assignment_target ~ value_assignment }
-value_assignment           = { (operand_assignment | equality) ~ expression }
-operand_assignment         = { operand? ~ "=" }
+value_assignment           = { (operand_assignment | EQUALITY) ~ expression }
+operand_assignment         = { OPERAND? ~ "=" }
 variable_access            = { pointer_semantics ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
 pointer_semantics          = { (POINTER | REFERENCE)? }
 contextual_variable_access = { "." ~ IDENT }
-
-// operations.
-operand  = { "+" | "-" | "*" | "/" | "^" | "&" }
-equality = { "!" | "=" | "!=" }
 
 // Programming type info.
 elp_type    = { IDENT ~ elp_generic? }
@@ -120,3 +116,7 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 VAR        =  { "var" }
 CONST      =  { "const" }
 KEYWORD    = _{ "import" | "export" | "component" | "implements" | "enum" | "object" | "fn" | VAR | CONST | "object" | "match" }
+
+// operations.
+OPERAND  = { "+" | "-" | "*" | "/" | "^" | "&" }
+EQUALITY = { "!" | "=" | "!=" }

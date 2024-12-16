@@ -35,6 +35,13 @@ pub struct StringValue {
     pub value: String,
 }
 
+#[derive(Debug, FromPest, PartialEq, Eq)]
+#[pest_ast(rule(Rule::IDENT))]
+pub struct IDENT {
+    #[pest_ast(inner(with(span_into_string)))]
+    pub value: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

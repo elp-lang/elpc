@@ -1,7 +1,7 @@
 use crate::parser::Rule;
 use pest_ast::FromPest;
 
-use super::span_into_string;
+use super::{span_into_string, IDENT};
 
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::pointer_semantics))]
@@ -20,6 +20,7 @@ pub struct VariableAccess {
     #[pest_ast(inner(with(span_into_string)))]
     pub variable_name: String,
 
-    #[pest_ast(inner(with(span_into_string)))]
-    pub member_chain: Vec<String>,
+    // A member chain is something like this:
+    //   `foo.bar.baz` becomes `vec![IDENT { value: "foo".into() }, IDENT { value: "bar".into() }, IDENT { value: "baz".into() }]`
+    pub member_chain: Vec<IDENT>,
 }
