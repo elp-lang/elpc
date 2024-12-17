@@ -1,24 +1,19 @@
-use super::{block::Block, elp_type::ElpType, expression::Expression, span_into_string, IDENT};
+use super::{
+    block::Block, elp_type::ElpType, expression::Expression, variable_access::VariableAccess, IDENT,
+};
 use crate::parser::Rule;
 use pest_ast::FromPest;
 
 #[derive(Debug, FromPest, PartialEq, Eq)]
-#[pest_ast(rule(Rule::SELF))]
-pub struct SelfToken;
-
-#[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::function_argument))]
 pub struct FunctionArgument {
-    #[pest_ast(inner(with(span_into_string)))]
-    pub name: String,
-
+    pub name: IDENT,
     pub type_annotation: Option<ElpType>,
 }
 
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::function_arguments))]
 pub struct FunctionArguments {
-    pub has_self: Option<SelfToken>,
     pub arguments: Vec<FunctionArgument>,
 }
 
@@ -37,11 +32,9 @@ pub struct FunctionReturnValue {
 #[derive(Debug, FromPest, PartialEq, Eq)]
 #[pest_ast(rule(Rule::function_def))]
 pub struct FunctionDef {
-    #[pest_ast(inner(with(span_into_string)))]
-    pub name: String,
-    pub members: Vec<IDENT>,
-    pub arguments: FunctionArguments,
-    pub returns: Option<FunctionReturnType>,
+    pub name: VariableAccess,
+    pub arguments: Option<FunctionArguments>,
+    pub return_type: Option<FunctionReturnType>,
     pub block: Box<Block>,
 }
 
@@ -55,26 +48,34 @@ mod tests {
 
     #[test]
     fn simple_function_def() {
-        let expression_str = "fn hello(name String) -> String { return \"hello {name}\" }";
+        let expression_str = "fn hello.name(name String) -> String { return \"hello {name}\" }";
         let mut pairs = ElpParser::parse(Rule::function_def, expression_str).unwrap();
         let ast = FunctionDef::from_pest(&mut pairs).unwrap();
 
         assert_eq!(
             ast,
             FunctionDef {
-                name: "hello".into(),
-                members: vec![],
-                arguments: FunctionArguments {
-                    has_self: None,
+                name: VariableAccess {
+                    variable_name: IDENT {
+                        value: "hello".into(),
+                    },
+                    pointer_semantics: None,
+                    member_chain: vec![IDENT {
+                        value: "name".into()
+                    }]
+                },
+                arguments: Some(FunctionArguments {
                     arguments: vec![FunctionArgument {
-                        name: "name".into(),
+                        name: IDENT {
+                            value: "name".into()
+                        },
                         type_annotation: Some(ElpType {
                             name: "String".into(),
                             type_parameters: None,
                         }),
                     }],
-                },
-                returns: Some(FunctionReturnType {
+                }),
+                return_type: Some(FunctionReturnType {
                     type_annotation: ElpType {
                         name: "String".into(),
                         type_parameters: None,

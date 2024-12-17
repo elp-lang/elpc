@@ -37,8 +37,8 @@ variable_assignment_target = { variable_declaration | variable_access }
 variable_assignment        = { variable_assignment_target ~ value_assignment }
 value_assignment           = { (operand_assignment | EQUALITY) ~ expression }
 operand_assignment         = { OPERAND? ~ "=" }
-variable_access            = { pointer_semantics ~ IDENT ~ ("." ~ (IDENT | function_call)*)? }
-pointer_semantics          = { (POINTER | REFERENCE)? }
+variable_access            = { pointer_semantics? ~ IDENT ~ (("." ~ IDENT)*)? }
+pointer_semantics          = { POINTER | REFERENCE }
 contextual_variable_access = { "." ~ IDENT }
 
 // Programming type info.
@@ -48,7 +48,7 @@ enum        = { "enum" ~ IDENT ~ "{" ~ (enum_member ~ ("," ~ enum_member)* ~ ","
 enum_member = { "." ~ IDENT ~ ("(" ~ elp_type ~ ("," ~ elp_type)* ~ ")")? }
 
 // Functions.
-function_def            = { "fn" ~ (IDENT ~ ("." ~ IDENT)*)? ~ function_arguments? ~ function_return_type? ~ block }
+function_def            = { "fn" ~ variable_access ~ function_arguments? ~ function_return_type? ~ block }
 function_return_type    = { ARROW ~ elp_type }
 function_arguments      = { "(" ~ (SELF ~ ","?)? ~ (function_argument ~ ("," ~ function_argument)*)? ~ ")" }
 function_argument       = { IDENT ~ elp_type }
