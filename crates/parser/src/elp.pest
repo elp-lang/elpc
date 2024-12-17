@@ -16,11 +16,11 @@ expression = {
   | object_instantiation
   | match_tree
   | variable_assignment
+  | function_return_value
   | variable_access
   | variable_declaration
   | object_method_assignment
   | contextual_variable_access
-  | function_return_value
   | function_component_call
 }
 

@@ -1,6 +1,10 @@
 use super::{
-    export::Export, import::Import, variable_assignment::VariableAssignment,
+    export::Export,
+    function::{FunctionDef, FunctionReturnValue},
+    import::Import,
+    variable_assignment::VariableAssignment,
     variable_declaration::VariableDeclaration,
+    StringValue,
 };
 use crate::parser::Rule;
 use pest_ast::FromPest;
@@ -19,6 +23,15 @@ pub enum Expression {
 
     #[pest_ast(rule(Rule::variable_assignment))]
     VariableAssignment(Box<VariableAssignment>),
+
+    #[pest_ast(rule(Rule::function_def))]
+    FunctionDef(Box<FunctionDef>),
+
+    #[pest_ast(rule(Rule::function_return_value))]
+    FunctionReturnValue(Box<FunctionReturnValue>),
+
+    #[pest_ast(rule(Rule::string))]
+    String(Box<StringValue>),
 }
 
 #[cfg(test)]
